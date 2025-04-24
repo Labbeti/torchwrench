@@ -13,6 +13,25 @@ __version__ = "0.6.0"
 
 # Import global functions and classes from torch
 from torch import *  # type: ignore
+from torch import (
+    complex32,
+    complex64,
+    complex128,
+    double,
+    float,
+    float16,
+    float32,
+    float64,
+    half,
+    int,
+    int8,
+    int16,
+    int32,
+    int64,
+    long,
+    short,
+    uint8,
+)
 
 # Re-import torchoutil modules for language servers
 from . import core as core
@@ -38,7 +57,11 @@ from .hub.download import download_file
 from .hub.paths import get_cache_dir, get_tmp_dir
 from .nn.functional import *
 from .pyoutil.semver import Version
-from .pyoutil.typing.guards import isinstance_guard
+from .pyoutil.typing.guards import (
+    is_dataclass_instance,
+    is_namedtuple_instance,
+    isinstance_guard,
+)
 from .serialization.common import to_builtin
 from .serialization.csv import dump_csv, load_csv, to_csv
 from .serialization.dump_fn import dump, save
