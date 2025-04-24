@@ -15,6 +15,7 @@ from typing import (
     Optional,
     TypeVar,
     Union,
+    get_args,
     overload,
 )
 
@@ -24,7 +25,6 @@ from .typing import isinstance_guard
 
 T = TypeVar("T")
 
-ORIENT_VALUES = ("list", "dict")
 Orient = Literal["list", "dict"]
 
 
@@ -209,7 +209,7 @@ def load_csv(
     elif orient == "list":
         result = data_lst
     else:
-        msg = f"Invalid argument {orient=}. (expected one of {ORIENT_VALUES})"
+        msg = f"Invalid argument {orient=}. (expected one of {get_args(Orient)})"
         raise ValueError(msg)
 
     return result  # type: ignore
