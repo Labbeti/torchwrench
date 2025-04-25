@@ -95,7 +95,7 @@ def list_dict_to_dict_list(
 @overload
 def list_dict_to_dict_list(
     lst: Iterable[Mapping[K, V]],
-    key_mode: KeyMode = "same",
+    key_mode: KeyMode | Iterable[K] = "same",
     default_val: W = None,
     *,
     default_val_fn: Optional[Callable[[K], X]] = None,
@@ -106,7 +106,7 @@ def list_dict_to_dict_list(
 
 def list_dict_to_dict_list(
     lst: Iterable[Mapping[K, V]],
-    key_mode: KeyMode = "same",
+    key_mode: KeyMode | Iterable[K] = "same",
     default_val: W = None,
     *,
     default_val_fn: Optional[Callable[[K], X]] = None,
@@ -129,23 +129,29 @@ def list_dict_to_dict_list(
     except StopIteration:
         return {}
 
-    keys = set(item0.keys())
+    if isinstance(key_mode, str):
+        unique_keys = set(item0.keys())
 
-    if key_mode == "same":
-        invalids = [list(item.keys()) for item in lst if keys != set(item.keys())]
-        if len(invalids) > 0:
-            msg = f"Invalid dict keys for conversion from List[dict] to Dict[list]. (with {key_mode=}, {keys=} and {invalids=})"
+        if key_mode == "same":
+            invalids = [
+                list(item.keys()) for item in lst if unique_keys != set(item.keys())
+            ]
+            if len(invalids) > 0:
+                msg = f"Invalid dict keys for conversion from List[dict] to Dict[list]. (with {key_mode=}, {unique_keys=} and {invalids=})"
+                raise ValueError(msg)
+            keys = list(item0.keys())
+
+        elif key_mode == "intersect":
+            keys = intersect_lists([item.keys() for item in lst])
+
+        elif key_mode == "union":
+            keys = union_lists(item.keys() for item in lst)
+
+        else:
+            msg = f"Invalid argument key_mode={key_mode}. (expected one of {get_args(KeyMode)})"
             raise ValueError(msg)
-
-    elif key_mode == "intersect":
-        keys = intersect_lists([item.keys() for item in lst])
-
-    elif key_mode == "union":
-        keys = union_lists(item.keys() for item in lst)
-
     else:
-        msg = f"Invalid argument key_mode={key_mode}. (expected one of {get_args(KeyMode)})"
-        raise ValueError(msg)
+        keys = list(key_mode)
 
     if list_fn is None:
         list_fn = identity  # type: ignore
