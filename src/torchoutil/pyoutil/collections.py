@@ -22,6 +22,7 @@ from typing import (
     Type,
     TypeVar,
     Union,
+    get_args,
     overload,
 )
 
@@ -52,7 +53,7 @@ T_SupportsMul = TypeVar("T_SupportsMul", bound=SupportsMul)
 T_SupportsOr = TypeVar("T_SupportsOr", bound=SupportsOr)
 
 KeyMode = Literal["intersect", "same", "union"]
-KEY_MODES = ("same", "intersect", "union")
+Order = Literal["left", "right"]
 
 
 @overload
@@ -143,7 +144,7 @@ def list_dict_to_dict_list(
         keys = union_lists(item.keys() for item in lst)
 
     else:
-        msg = f"Invalid argument key_mode={key_mode}. (expected one of {KEY_MODES})"
+        msg = f"Invalid argument key_mode={key_mode}. (expected one of {get_args(KeyMode)})"
         raise ValueError(msg)
 
     if list_fn is None:
@@ -224,7 +225,7 @@ def dict_list_to_list_dict(
         length = max(lengths)
 
     else:
-        msg = f"Invalid argument key_mode={key_mode}. (expected one of {KEY_MODES})"
+        msg = f"Invalid argument key_mode={key_mode}. (expected one of {get_args(KeyMode)})"
         raise ValueError(msg)
 
     result = [
@@ -345,7 +346,7 @@ def find(
     it: Iterable[V],
     *,
     match_fn: Callable[[Any, Any], bool] = operator.eq,
-    order: Literal["left", "right"] = "right",
+    order: Order = "right",
     default: U = -1,
     return_value: bool = False,
 ) -> Union[int, U, Tuple[Union[int, U], Union[V, U]]]:
@@ -372,8 +373,9 @@ def find(
 
         match_fn = revert(match_fn)
     else:
-        ORDER_VALUES = ("left", "right")
-        raise ValueError(f"Invalid argument {order=}. (expected one of {ORDER_VALUES})")
+        raise ValueError(
+            f"Invalid argument {order=}. (expected one of {get_args(Order)})"
+        )
 
     for i, xi in enumerate(it):
         if match_fn(xi, target):

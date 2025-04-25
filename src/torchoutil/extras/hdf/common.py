@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from typing import Any, Dict, List, Literal, TypedDict, Tuple, TypeVar
+from typing import Any, Dict, List, Literal, Tuple, TypedDict, TypeVar
 
 import h5py
 import numpy as np
@@ -10,9 +10,6 @@ T = TypeVar("T", covariant=True)
 
 HDFItemType = Literal["dict", "tuple"]
 ExistsMode = Literal["overwrite", "skip", "error"]
-
-HDF_ITEM_TYPES = ("dict", "tuple")
-EXISTS_MODES = ("overwrite", "skip", "error")
 
 # Force this encoding
 HDF_ENCODING = "utf-8"

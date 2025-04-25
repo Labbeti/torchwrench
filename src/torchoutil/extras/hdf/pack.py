@@ -19,6 +19,7 @@ from typing import (
     Tuple,
     TypeVar,
     Union,
+    get_args,
 )
 
 import h5py
@@ -42,7 +43,6 @@ import torchoutil as to
 from torchoutil import nn
 from torchoutil.extras.hdf.common import (
     _DUMPED_JSON_KEYS,
-    EXISTS_MODES,
     HDF_ENCODING,
     HDF_STRING_DTYPE,
     HDF_VOID_DTYPE,
@@ -144,7 +144,7 @@ def pack_to_hdf(
         msg = f"Cannot overwrite file {hdf_fpath}. Please remove it or use exists='overwrite' or exists='skip' option."
         raise ValueError(msg)
     else:
-        msg = f"Invalid argument {exists=}. (expected one of {EXISTS_MODES})"
+        msg = f"Invalid argument {exists=}. (expected one of {get_args(ExistsMode)})"
         raise ValueError(msg)
 
     if file_kwds is None:
