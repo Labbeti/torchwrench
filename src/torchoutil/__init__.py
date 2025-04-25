@@ -14,7 +14,6 @@ __version__ = "0.6.0"
 # Import global functions and classes from torch
 from torch import *  # type: ignore
 from torch import (
-    complex32,
     complex64,
     complex128,
     double,
