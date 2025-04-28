@@ -95,7 +95,7 @@ def list_dict_to_dict_list(
 @overload
 def list_dict_to_dict_list(
     lst: Iterable[Mapping[K, V]],
-    key_mode: KeyMode | Iterable[K] = "same",
+    key_mode: Union[KeyMode, Iterable[K]] = "same",
     default_val: W = None,
     *,
     default_val_fn: Optional[Callable[[K], X]] = None,
@@ -106,7 +106,7 @@ def list_dict_to_dict_list(
 
 def list_dict_to_dict_list(
     lst: Iterable[Mapping[K, V]],
-    key_mode: KeyMode | Iterable[K] = "same",
+    key_mode: Union[KeyMode, Iterable[K]] = "same",
     default_val: W = None,
     *,
     default_val_fn: Optional[Callable[[K], X]] = None,
