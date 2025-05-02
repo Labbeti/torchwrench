@@ -91,9 +91,9 @@ print(isinstance(x3, to.SignedIntegerTensor))  # False
 ```python
 import torchoutil as to
 
-x1 = to.rand(10, 3, 1)
-x2 = to.pad_dim(x, target_length=5, dim=1, pad_value=-1)
-# x2 has shape (10, 5, 1)
+x = to.rand(10, 3, 1)
+padded = to.pad_dim(x, target_length=5, dim=1, pad_value=-1)
+# x2 has shape (10, 5, 1), padded with -1
 ```
 
 ```python
@@ -101,7 +101,7 @@ import torchoutil as to
 
 tensors = [to.rand(10, 2), to.rand(5, 3), to.rand(0, 5)]
 padded = to.pad_and_stack_rec(tensors, pad_value=0)
-# padded has shape (10, 5)
+# padded has shape (3, 10, 5), padded with 0
 ```
 
 ### Masking
