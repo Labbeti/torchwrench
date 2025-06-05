@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from argparse import Namespace
-from io import TextIOWrapper
+from io import TextIOBase
 from pathlib import Path
 from typing import Any, Iterable, Literal, Mapping, Optional, Type, Union
 
@@ -114,7 +114,7 @@ def dump_yaml(
 
 
 def load_yaml(
-    fpath: Union[str, Path, TextIOWrapper],
+    fpath: Union[str, Path, TextIOBase],
     *,
     Loader: YamlLoaders = SafeLoader,
     on_error: Literal["raise", "ignore"] = "raise",
