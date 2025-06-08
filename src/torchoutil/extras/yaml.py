@@ -158,11 +158,56 @@ class IgnoreTagLoader(SafeLoader):
         elif isinstance(node, SequenceNode):
             return self.construct_sequence(node)
         else:
-            raise NotImplementedError(f"Unsupported node type {type(node)}.")
+            raise NotImplementedError(
+                f"Unsupported node type {type(node)} with {tag=}."
+            )
 
 
 IgnoreTagLoader.add_multi_constructor("!", IgnoreTagLoader.construct_with_tag)
 IgnoreTagLoader.add_multi_constructor("tag:", IgnoreTagLoader.construct_with_tag)
+
+
+class SplitTagLoader(SafeLoader):
+    """SafeLoader that store tags inside value.
+
+    Examples
+    ========
+
+    ```python
+    >>> dumped = "a: !!python/tuple\n- 1\n- 2"
+    >>> yaml.load(dumped, Loader=SplitTagLoader)
+    ... {'a': {'_target_': 'yaml.org,2002:python/tuple', '_args_': [1, 2]}}
+    ```
+    """
+
+    def __init__(
+        self, stream, *, tag_key: str = "_target_", args_key: str = "_args_"
+    ) -> None:
+        super().__init__(stream)
+        self.tag_key = tag_key
+        self.args_key = args_key
+
+    def construct_with_tag(self, tag: str, node: Node) -> Any:
+        if isinstance(node, MappingNode):
+            result = self.construct_mapping(node)
+        elif isinstance(node, ScalarNode):
+            result = self.construct_scalar(node)
+        elif isinstance(node, SequenceNode):
+            result = self.construct_sequence(node)
+        else:
+            raise NotImplementedError(
+                f"Unsupported node type {type(node)} with {tag=}."
+            )
+
+        result = {
+            self.tag_key: tag,
+            self.args_key: result,
+        }
+        return result
+
+
+SplitTagLoader.add_multi_constructor("!", SplitTagLoader.construct_with_tag)
+SplitTagLoader.add_multi_constructor("tag:", SplitTagLoader.construct_with_tag)
 
 
 @deprecated_alias(dump_yaml)

@@ -3,6 +3,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [0.6.1] UNRELEASED
+### Added
+- `SplitTagLoader` to load yaml tag without instantiating them.
+
 ### Fixed
 - `checksum` with `np.generic` instances.
 - Move serializations functions aliases in global context.
