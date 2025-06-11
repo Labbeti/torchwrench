@@ -181,7 +181,11 @@ class SplitTagLoader(SafeLoader):
     """
 
     def __init__(
-        self, stream, *, tag_key: str = "_target_", args_key: str = "_args_"
+        self,
+        stream,
+        *,
+        tag_key: str = "_target_",
+        args_key: str = "_args_",
     ) -> None:
         super().__init__(stream)
         self.tag_key = tag_key
@@ -195,9 +199,8 @@ class SplitTagLoader(SafeLoader):
         elif isinstance(node, SequenceNode):
             result = self.construct_sequence(node)
         else:
-            raise NotImplementedError(
-                f"Unsupported node type {type(node)} with {tag=}."
-            )
+            msg = f"Unsupported node type {type(node)} with {tag=}."
+            raise NotImplementedError(msg)
 
         result = {
             self.tag_key: tag,
