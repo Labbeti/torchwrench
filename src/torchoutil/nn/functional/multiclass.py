@@ -25,7 +25,7 @@ from torchoutil.nn.functional.others import ndim, shape
 from torchoutil.nn.functional.transform import to_item
 from torchoutil.pyoutil.collections import prod
 from torchoutil.pyoutil.warnings import warn_once
-from torchoutil.types import LongTensor, is_number_like
+from torchoutil.types import LongTensor, SizedGetitem, SizedIterable, is_number_like
 from torchoutil.types._typing import TensorOrArray
 
 T_Name = TypeVar("T_Name", bound=Hashable)
@@ -91,7 +91,7 @@ def one_hot(
 
 def index_to_name(
     index: Union[Sequence[int], TensorOrArray, Sequence],
-    idx_to_name: Union[Mapping[int, T_Name], Sequence[T_Name]],
+    idx_to_name: Union[Mapping[int, T_Name], SizedGetitem[T_Name]],
     *,
     is_number_fn: Callable[[Any], bool] = is_number_like,
 ) -> List[T_Name]:
@@ -145,7 +145,7 @@ def onehot_to_index(
 
 def onehot_to_name(
     onehot: Tensor,
-    idx_to_name: Union[Mapping[int, T_Name], Sequence[T_Name]],
+    idx_to_name: Union[Mapping[int, T_Name], SizedGetitem[T_Name]],
     *,
     dim: int = -1,
 ) -> List[T_Name]:
@@ -163,7 +163,7 @@ def onehot_to_name(
 
 def name_to_index(
     name: List[T_Name],
-    idx_to_name: Union[Mapping[int, T_Name], Sequence[T_Name]],
+    idx_to_name: Union[Mapping[int, T_Name], Iterable[T_Name]],
 ) -> Tensor:
     """Convert names to indices of labels for **multiclass** classification.
 
@@ -193,7 +193,7 @@ def name_to_index(
 
 def name_to_onehot(
     name: List[T_Name],
-    idx_to_name: Union[Mapping[int, T_Name], Sequence[T_Name]],
+    idx_to_name: Union[Mapping[int, T_Name], SizedIterable[T_Name]],
     *,
     device: DeviceLike = None,
     dtype: DTypeLike = torch.bool,
@@ -222,7 +222,7 @@ def probs_to_index(
         probs: Output probabilities for each classes.
         dim: Dimension of classes. defaults to -1.
     """
-    index = probs.argmax(dim=dim)
+    index = probs.argmax(dim)
     return index  # type: ignore
 
 
@@ -250,7 +250,7 @@ def probs_to_onehot(
 
 def probs_to_name(
     probs: Tensor,
-    idx_to_name: Union[Mapping[int, T_Name], Sequence[T_Name]],
+    idx_to_name: Union[Mapping[int, T_Name], SizedGetitem[T_Name]],
     *,
     dim: int = -1,
 ) -> List[T_Name]:
