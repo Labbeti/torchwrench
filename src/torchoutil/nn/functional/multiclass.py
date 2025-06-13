@@ -24,6 +24,7 @@ from torchoutil.core.make import DeviceLike, DTypeLike, as_device, as_dtype
 from torchoutil.nn.functional.others import ndim, shape
 from torchoutil.nn.functional.transform import to_item
 from torchoutil.pyoutil.collections import prod
+from torchoutil.pyoutil.functools import function_alias
 from torchoutil.pyoutil.warnings import warn_once
 from torchoutil.types import LongTensor, SizedGetitem, SizedIterable, is_number_like
 from torchoutil.types._typing import TensorOrArray
@@ -71,6 +72,7 @@ def index_to_onehot(
     return onehot
 
 
+@function_alias(index_to_onehot)
 def one_hot(
     tensor: Union[Sequence[int], TensorOrArray, Sequence],
     num_classes: int,
@@ -79,14 +81,7 @@ def one_hot(
     device: DeviceLike = None,
     dtype: DTypeLike = torch.bool,
 ) -> Tensor:
-    """Alias of :func:`~torchoutil.nn.functional.multiclass.index_to_onehot`."""
-    return index_to_onehot(
-        tensor,
-        num_classes,
-        padding_idx=padding_idx,
-        device=device,
-        dtype=dtype,
-    )
+    ...
 
 
 def index_to_name(

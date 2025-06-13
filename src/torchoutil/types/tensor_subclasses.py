@@ -37,6 +37,8 @@ from typing import (
     Tuple,
     Type,
     Union,
+    get_args,
+    get_origin,
     overload,
 )
 
@@ -56,11 +58,12 @@ _DEFAULT_T_COMPLEX = _bool
 _DEFAULT_T_SIGNED = _bool
 
 T_Tensor = TypeVar("T_Tensor", bound="_TensorNDBase")
-T_DType = TypeVar("T_DType", "DTypeEnum", None)
-T_NDim = TypeVar("T_NDim", bound=_int)
-T_Floating = TypeVar("T_Floating", bound=_bool)
-T_Complex = TypeVar("T_Complex", bound=_bool)
-T_Signed = TypeVar("T_Signed", bound=_bool)
+
+T_DType = TypeVar("T_DType", "DTypeEnum", None, default=None)
+T_NDim = TypeVar("T_NDim", bound=_int, default=_int)
+T_Floating = TypeVar("T_Floating", bound=_bool, default=_bool)
+T_Complex = TypeVar("T_Complex", bound=_bool, default=_bool)
+T_Signed = TypeVar("T_Signed", bound=_bool, default=_bool)
 
 _TORCH_BASE_CLASSES: Final[Dict[str, Type]] = {
     "float32": torch.FloatTensor,
@@ -118,15 +121,20 @@ class _GenericsValues(NamedTuple):
 def _get_generics(
     cls: Union["_TensorNDMeta", "_TensorNDBase"],
 ) -> _GenericsValues:
-    if not hasattr(cls, "__orig_class__"):
+    if hasattr(cls, "__orig_class__"):
+        orig = cls.__orig_class__  # type: ignore
+        if orig.__origin__ is not _TensorNDMeta:
+            return _GenericsValues()
+
+        generic_args = orig.__args__  # type: ignore
+        generic_args = generic_args  # currently only check dtype and ndim
+
+    elif get_origin(cls) is not None:
+        args = get_args(cls)
+        generic_args = args + _GenericsValues()[len(args) :]
+    else:
         return _GenericsValues()
 
-    orig = cls.__orig_class__  # type: ignore
-    if orig.__origin__ is not _TensorNDMeta:
-        return _GenericsValues()
-
-    generic_args = orig.__args__  # type: ignore
-    generic_args = generic_args  # currently only check dtype and ndim
     assert len(generic_args) == 6
 
     t_dtype = generic_args[0]
