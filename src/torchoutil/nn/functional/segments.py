@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from typing import List, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 import torch
 from torch import Tensor
@@ -152,7 +152,9 @@ def segments_list_to_activity(
 
 
 def _segments_list_tensor_to_activity(
-    segments_list: Tensor, maxsize: int | None, device: DeviceLike
+    segments_list: Tensor,
+    maxsize: Optional[int],
+    device: DeviceLike,
 ) -> BoolTensor:
     if device is None and isinstance(segments_list, Tensor):
         device = segments_list.device
@@ -185,7 +187,7 @@ def activity_to_segments_list(x: Tensor) -> Union[List[Tuple[int, int]], list]:
     return segments_lst
 
 
-def segments_to_activity(x: Tensor, maxsize: int | None = None) -> BoolTensor:
+def segments_to_activity(x: Tensor, maxsize: Optional[int] = None) -> BoolTensor:
     """Convert stacked list/tensor of starts end stops separated to activity boolean tensor.
 
     Args:
