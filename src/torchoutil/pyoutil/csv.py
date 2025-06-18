@@ -54,7 +54,7 @@ def dump_csv(
     elif not header and isinstance_guard(data, Iterable[str]):
         data_lst = [{"0": data_i} for data_i in data]
     elif not header and isinstance_guard(data, Iterable[Iterable]):
-        data_lst = [dict(zip(map(str, range(len(data_i))))) for data_i in data]
+        data_lst = [dict(zip(map(str, range(len(data_i))), data)) for data_i in data]
     elif not header and isinstance_guard(data, Iterable):
         data_lst = [{"0": data_i} for data_i in data]
     else:
