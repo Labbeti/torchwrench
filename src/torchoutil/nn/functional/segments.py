@@ -121,7 +121,7 @@ def segments_list_to_activity(
     else:
         device = as_device(device)
 
-    ndim = F.ndim(segments_list)
+    ndim = F.get_ndim(segments_list)
     if ndim == 1 and len(segments_list) == 0:
         if maxsize is None:
             num_elems = 0
@@ -135,7 +135,7 @@ def segments_list_to_activity(
         segments_list = F.as_tensor(segments_list)
         return _segments_list_tensor_to_activity(segments_list, maxsize, device)
 
-    elif ndim > 2 and F.shape(segments_list, return_valid=True).valid:
+    elif ndim > 2 and F.get_shape(segments_list, return_valid=True).valid:
         segments_list = F.as_tensor(segments_list)
         return _segments_list_tensor_to_activity(segments_list, maxsize, device)
 

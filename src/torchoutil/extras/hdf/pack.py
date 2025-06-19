@@ -296,7 +296,7 @@ def pack_to_hdf(
             for item in batch:
                 for attr_name, value in item.items():
                     hdf_dset = hdf_dsets[attr_name]
-                    shape = to.shape(value)
+                    shape = to.get_shape(value)
 
                     # Check every shape
                     if len(shape) != hdf_dset.ndim - 1:

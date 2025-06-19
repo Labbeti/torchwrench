@@ -21,7 +21,7 @@ from torch import Tensor
 from torch.nn import functional as F
 
 from torchoutil.core.make import DeviceLike, DTypeLike, as_device, as_dtype
-from torchoutil.nn.functional.others import ndim, shape
+from torchoutil.nn.functional.others import get_ndim, get_shape
 from torchoutil.nn.functional.transform import to_item
 from torchoutil.pyoutil.collections import prod
 from torchoutil.pyoutil.functools import function_alias
@@ -97,8 +97,8 @@ def index_to_name(
         idx_to_name: Mapping to convert a class index to its name.
         is_number_fn: Type guard to check if a value is a scalar number. defaults to `is_number_like`.
     """
-    index_ndim = ndim(index)
-    if index_ndim > 1 and prod(shape(index)[:-1]) == 0:
+    index_ndim = get_ndim(index)
+    if index_ndim > 1 and prod(get_shape(index)[:-1]) == 0:
         msg = f"Found 0 elements in {index=} but {index_ndim=} > 1, which means that we will lose information about shape when converting to names."
         warn_once(msg)
 

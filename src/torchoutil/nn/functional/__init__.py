@@ -72,6 +72,8 @@ from .others import (
     count_parameters,
     deep_equal,
     find,
+    get_ndim,
+    get_shape,
     mse,
     ndim,
     nelement,
