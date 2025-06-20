@@ -6,7 +6,7 @@ from unittest import TestCase
 
 import torch
 
-from torchoutil.core.dtype_enum import DTypeEnum
+from torchwrench.core.dtype_enum import DTypeEnum
 
 
 class TestDTypeEnum(TestCase):

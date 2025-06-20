@@ -1,3 +1,4 @@
+
 # Change log
 
 All notable changes to this project will be documented in this file.
@@ -13,7 +14,7 @@ All notable changes to this project will be documented in this file.
 ## [0.6.0] 2025-04-09
 ### Added
 - Functions `unsqueeze`, `squeeze` and `one_hot`.
-- Function `isinstance_guard` to check parametrized types.
+- Function `isinstance_generic` to check parametrized types.
 - Function `randstr` to generate random strings.
 
 ### Modified

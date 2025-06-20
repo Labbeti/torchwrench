@@ -4,8 +4,8 @@
 import unittest
 from unittest import TestCase
 
-import torchoutil as to
-from torchoutil.utils.data.split import balanced_monolabel_split, random_split
+import torchwrench as to
+from torchwrench.utils.data.split import balanced_monolabel_split, random_split
 
 
 class TestSplit(TestCase):

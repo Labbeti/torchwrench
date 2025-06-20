@@ -6,7 +6,7 @@ from unittest import TestCase
 
 import torch
 
-from torchoutil.nn.functional.multiclass import (
+from torchwrench.nn.functional.multiclass import (
     index_to_name,
     index_to_onehot,
     onehot_to_index,

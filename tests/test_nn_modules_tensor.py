@@ -9,9 +9,9 @@ from unittest import TestCase
 import torch
 from torch import nn
 
-from torchoutil.nn.functional import deep_equal
-from torchoutil.nn.modules import tensor as tensor_module
-from torchoutil.pyoutil.inspect import get_fullname
+from torchwrench.nn.functional import deep_equal
+from torchwrench.nn.modules import tensor as tensor_module
+from pythonwrench.inspect import get_fullname
 
 
 def module_name_to_fn_name(x: str) -> str:

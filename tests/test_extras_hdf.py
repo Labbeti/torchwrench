@@ -13,17 +13,17 @@ from torch import Tensor
 from torch.utils.data.dataset import Subset
 from torchvision.datasets import CIFAR10
 
-from torchoutil.extras.hdf import HDFDataset, pack_to_hdf
-from torchoutil.hub.paths import get_tmp_dir
-from torchoutil.nn import ESequential, IndexToOnehot, ToList, ToNumpy
-from torchoutil.nn.functional import as_tensor
-from torchoutil.pyoutil import dict_list_to_list_dict
+from torchwrench.extras.hdf import HDFDataset, pack_to_hdf
+from torchwrench.hub.paths import get_tmp_dir
+from torchwrench.nn import ESequential, IndexToOnehot, ToList, ToNumpy
+from torchwrench.nn.functional import as_tensor
+from pythonwrench import dict_list_to_list_dict
 
 
 class TestHDF(TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        tmpdir = get_tmp_dir().joinpath("torchoutil_tests")
+        tmpdir = get_tmp_dir().joinpath("torchwrench_tests")
         tmpdir.mkdir(parents=True, exist_ok=True)
         cls.tmpdir = tmpdir
 

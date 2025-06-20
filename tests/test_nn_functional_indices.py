@@ -7,7 +7,7 @@ from unittest import TestCase
 import torch
 from torch import Tensor
 
-from torchoutil.nn.functional.indices import (
+from torchwrench.nn.functional.indices import (
     get_inverse_perm,
     get_perm_indices,
     randperm_diff,

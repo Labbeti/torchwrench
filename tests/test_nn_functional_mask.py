@@ -7,8 +7,8 @@ from unittest import TestCase
 
 import torch
 
-from torchoutil import as_tensor
-from torchoutil.nn.functional.mask import (
+from torchwrench import as_tensor
+from torchwrench.nn.functional.mask import (
     generate_square_subsequent_mask,
     lengths_to_non_pad_mask,
     lengths_to_pad_mask,

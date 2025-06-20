@@ -6,7 +6,7 @@ from unittest import TestCase
 
 import torch
 
-from torchoutil.nn.functional.segments import (
+from torchwrench.nn.functional.segments import (
     activity_to_segments,
     segments_list_to_activity,
     segments_to_segments_list,

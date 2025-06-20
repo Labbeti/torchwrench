@@ -6,12 +6,12 @@ from unittest import TestCase
 
 import torch
 
-import pyoutil as po
-import torchoutil as to
-from torchoutil.core.packaging import _NUMPY_AVAILABLE
-from torchoutil.extras.numpy import np
-from torchoutil.nn.functional.others import deep_equal
-from torchoutil.nn.functional.transform import (
+import pythonwrench as pw
+import torchwrench as to
+from torchwrench.core.packaging import _NUMPY_AVAILABLE
+from torchwrench.extras.numpy import np
+from torchwrench.nn.functional.others import deep_equal
+from torchwrench.nn.functional.transform import (
     flatten,
     move_to,
     repeat_interleave_nd,
@@ -19,7 +19,7 @@ from torchoutil.nn.functional.transform import (
     shuffled,
     top_p,
 )
-from torchoutil.utils import return_types
+from torchwrench.utils import return_types
 
 
 class TestTopP(TestCase):
@@ -137,7 +137,7 @@ class TestFlatten(TestCase):
             (np.float64(1.0), 0, None),
         ]
         expected = [
-            np.zeros(po.prod(shape)),
+            np.zeros(pw.prod(shape)),
             np.zeros((10, 12, 5)),
             np.zeros((30, 4, 5)),
             np.ones(1, dtype=np.float64),

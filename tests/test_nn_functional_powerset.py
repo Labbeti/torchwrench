@@ -6,7 +6,7 @@ from unittest import TestCase
 
 import torch
 
-from torchoutil.nn.functional.powerset import (
+from torchwrench.nn.functional.powerset import (
     multilabel_to_powerset,
     powerset_to_multilabel,
 )

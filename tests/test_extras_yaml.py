@@ -7,8 +7,8 @@ from unittest import TestCase
 import yaml
 from yaml.constructor import ConstructorError
 
-from torchoutil.core.packaging import _YAML_AVAILABLE
-from torchoutil.extras.yaml import FullLoader, IgnoreTagLoader, SafeLoader
+from torchwrench.core.packaging import _YAML_AVAILABLE
+from torchwrench.extras.yaml import FullLoader, IgnoreTagLoader, SafeLoader
 
 
 class TestYaml(TestCase):

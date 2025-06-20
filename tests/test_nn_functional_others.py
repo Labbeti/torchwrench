@@ -7,10 +7,10 @@ from unittest import TestCase
 
 import torch
 
-import torchoutil as to
-from torchoutil.core.packaging import _NUMPY_AVAILABLE
-from torchoutil.extras.numpy import np
-from torchoutil.nn.functional.others import deep_equal, get_ndim, get_shape
+import torchwrench as to
+from torchwrench.core.packaging import _NUMPY_AVAILABLE
+from torchwrench.extras.numpy import np
+from torchwrench.nn.functional.others import deep_equal, get_ndim, get_shape
 
 
 class TestNDimShape(TestCase):

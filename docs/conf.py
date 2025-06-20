@@ -15,19 +15,19 @@ import sys
 
 sys.path.insert(0, os.path.abspath(".."))
 
-import torchoutil
+import torchwrench
 
 # -- Project information -----------------------------------------------------
 
-project = torchoutil.__name__
-copyright = f"{torchoutil.__author__}"
-author = torchoutil.__author__
+project = torchwrench.__name__
+copyright = f"{torchwrench.__author__}"
+author = torchwrench.__author__
 
 # The short X.Y version
-version = torchoutil.__version__
+version = torchwrench.__version__
 
 # The full version, including alpha/beta/rc tags
-release = f"{torchoutil.__status__}-{torchoutil.__version__}"
+release = f"{torchwrench.__status__}-{torchwrench.__version__}"
 
 
 # -- General configuration ---------------------------------------------------
@@ -69,8 +69,8 @@ html_theme = "press"
 
 html_theme_options = {
     "external_links": [
-        ("Github", "https://github.com/Labbeti/torchoutil"),
-        ("PyPI", "https://pypi.org/project/torchoutil/"),
+        ("Github", "https://github.com/Labbeti/torchwrench"),
+        ("PyPI", "https://pypi.org/project/torchwrench/"),
     ],
 }
 

@@ -6,8 +6,8 @@ from unittest import TestCase
 
 import torch
 
-from torchoutil.core.make import as_device
-from torchoutil.nn.functional.multilabel import (
+from torchwrench.core.make import as_device
+from torchwrench.nn.functional.multilabel import (
     indices_to_multihot,
     indices_to_multinames,
     multihot_to_indices,

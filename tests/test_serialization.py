@@ -10,12 +10,12 @@ from unittest import TestCase
 
 import torch
 
-import pyoutil as po
-import torchoutil as to
-from torchoutil.extras import _NUMPY_AVAILABLE, _SAFETENSORS_AVAILABLE, _YAML_AVAILABLE
-from torchoutil.hub.paths import get_tmp_dir
-from torchoutil.nn.functional import deep_equal
-from torchoutil.serialization.common import (
+import pythonwrench as pw
+import torchwrench as to
+from torchwrench.extras import _NUMPY_AVAILABLE, _SAFETENSORS_AVAILABLE, _YAML_AVAILABLE
+from torchwrench.hub.paths import get_tmp_dir
+from torchwrench.nn.functional import deep_equal
+from torchwrench.serialization.common import (
     SavingBackend,
     _fpath_to_saving_backend,
     to_builtin,
@@ -61,9 +61,9 @@ class TestSaving(TestCase):
             "empty": to.empty(n, 2),
         }
         data2: Dict[str, Any] = copy.copy(data1)
-        data2.update({"randstr": [po.randstr(2) for _ in range(n)]})
+        data2.update({"randstr": [pw.randstr(2) for _ in range(n)]})
 
-        assert po.is_full(map(len, data2.values()))
+        assert pw.is_full(map(len, data2.values()))
 
         tests: List[Tuple[SavingBackend, Any, bool, dict]] = [
             ("json", data2, True, dict()),
@@ -71,7 +71,7 @@ class TestSaving(TestCase):
         ]
 
         if _NUMPY_AVAILABLE:
-            from torchoutil.extras.numpy import to_ndarray
+            from torchwrench.extras.numpy import to_ndarray
 
             added_tests: List[Tuple[SavingBackend, Any, bool, dict]] = [
                 ("numpy", to_ndarray(v), False, dict()) for k, v in data2.items()
@@ -95,7 +95,7 @@ class TestSaving(TestCase):
             if to_builtins:
                 data = to.to_builtin(data)
             if backend == "safetensors":
-                data = po.sorted_dict(data)
+                data = pw.sorted_dict(data)
 
             fpath = get_tmp_dir().joinpath(f"tmp.{backend}")
             to.dump(data, fpath, saving_backend=backend)

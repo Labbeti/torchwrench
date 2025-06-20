@@ -9,9 +9,9 @@ from unittest import TestCase
 import torch
 from torch import Tensor
 
-import torchoutil as to
-from torchoutil.pyoutil.inspect import get_fullname
-from torchoutil.pyoutil.typing import SizedIterable, isinstance_guard
+import torchwrench as to
+from pythonwrench.inspect import get_fullname
+from pythonwrench.typing import SupportsIterLen, isinstance_generic
 
 
 class TestFunctionsCompat(TestCase):
@@ -94,9 +94,9 @@ class TestFunctionsCompat(TestCase):
                     pass
                 elif isinstance(result, Tensor) and isinstance(expected, Tensor):
                     assert torch.equal(result, expected), msg
-                elif isinstance_guard(
-                    result, SizedIterable[Tensor]
-                ) and isinstance_guard(expected, SizedIterable[Tensor]):
+                elif isinstance_generic(
+                    result, SupportsIterLen[Tensor]
+                ) and isinstance_generic(expected, SupportsIterLen[Tensor]):
                     assert len(result) == len(expected), msg
                     for result_i, expected_i in zip(result, expected):
                         assert torch.equal(result_i, expected_i), msg

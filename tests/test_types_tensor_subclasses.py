@@ -8,8 +8,8 @@ from unittest import TestCase
 
 import torch
 
-from torchoutil.types import tensor_subclasses
-from torchoutil.types.tensor_subclasses import (
+from torchwrench.types import tensor_subclasses
+from torchwrench.types.tensor_subclasses import (
     BoolTensor,
     BoolTensor1D,
     ByteTensor,

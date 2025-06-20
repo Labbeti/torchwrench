@@ -6,8 +6,8 @@ from unittest import TestCase
 
 import torch
 
-from torchoutil.core.packaging import _NUMPY_AVAILABLE
-from torchoutil.extras.numpy import (
+from torchwrench.core.packaging import _NUMPY_AVAILABLE
+from torchwrench.extras.numpy import (
     np,
     numpy_is_complex,
     numpy_is_complex_dtype,

@@ -8,15 +8,15 @@ from unittest import TestCase
 
 import torch
 
-from torchoutil.core.packaging import _NUMPY_AVAILABLE
-from torchoutil.extras.numpy import np
-from torchoutil.nn import functional as F
-from torchoutil.pyoutil.typing import (
+from torchwrench.core.packaging import _NUMPY_AVAILABLE
+from torchwrench.extras.numpy import np
+from torchwrench.nn import functional as F
+from pythonwrench.typing import (
     is_builtin_number,
     is_builtin_scalar,
-    isinstance_guard,
+    isinstance_generic,
 )
-from torchoutil.types import (
+from torchwrench.types import (
     Tensor0D,
     is_number_like,
     is_numpy_number_like,
@@ -70,7 +70,7 @@ class TestGuards(TestCase):
             x_is_np_number = is_numpy_number_like(x)
             x_is_np_scalar = is_numpy_scalar_like(x)
 
-            msg = f"{x=} ({type(x)=}, {is_builtin_number(x)=}, {isinstance_guard(x, Tensor0D)=}, {x_is_np_number=})"
+            msg = f"{x=} ({type(x)=}, {is_builtin_number(x)=}, {isinstance_generic(x, Tensor0D)=}, {x_is_np_number=})"
             assert x_is_number == expected_is_num, msg
             assert x_is_np_number == expected_is_np_num, msg
             assert x_is_np_scalar == expected_is_np_sca, msg

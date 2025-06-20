@@ -7,9 +7,9 @@ from unittest import TestCase
 
 import torch
 
-from torchoutil.core.packaging import _NUMPY_AVAILABLE
-from torchoutil.extras.numpy import np
-from torchoutil.nn.functional.predicate import (
+from torchwrench.core.packaging import _NUMPY_AVAILABLE
+from torchwrench.extras.numpy import np
+from torchwrench.nn.functional.predicate import (
     all_eq,
     is_convertible_to_tensor,
     is_stackable,

@@ -6,9 +6,9 @@ from unittest import TestCase
 
 from torch import Tensor
 
-from torchoutil.hub.download import _get_filename_from_url
-from torchoutil.hub.paths import get_tmp_dir
-from torchoutil.hub.registry import RegistryHub
+from torchwrench.hub.download import _get_filename_from_url
+from torchwrench.hub.paths import get_tmp_dir
+from torchwrench.hub.registry import RegistryHub
 
 
 class TestFilename(TestCase):
@@ -33,7 +33,7 @@ class TestFilename(TestCase):
 class TestRegistryHub(TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        tmpdir = get_tmp_dir().joinpath("torchoutil_tests")
+        tmpdir = get_tmp_dir().joinpath("torchwrench_tests")
         tmpdir.mkdir(parents=True, exist_ok=True)
         cls.tmpdir = tmpdir
 

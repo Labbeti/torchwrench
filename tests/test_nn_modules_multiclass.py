@@ -6,8 +6,8 @@ from unittest import TestCase
 
 import torch
 
-from torchoutil.nn.modules import ESequential
-from torchoutil.nn.modules.multiclass import (
+from torchwrench.nn.modules import ESequential
+from torchwrench.nn.modules.multiclass import (
     IndexToName,
     IndexToOnehot,
     NameToIndex,

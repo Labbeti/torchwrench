@@ -6,14 +6,14 @@ from unittest import TestCase
 
 import torch
 
-import torchoutil as to
-from torchoutil import Tensor, nn
-from torchoutil.hub.paths import get_tmp_dir
-from torchoutil.nn.modules._mixins import _DEFAULT_DEVICE_DETECT_MODE
+import torchwrench as to
+from torchwrench import Tensor, nn
+from torchwrench.hub.paths import get_tmp_dir
+from torchwrench.nn.modules._mixins import _DEFAULT_DEVICE_DETECT_MODE
 
 
 class Intermediate(torch.nn.Module):
-    """Subclass of torch Module instead of torchoutil EModule here."""
+    """Subclass of torch Module instead of torchwrench EModule here."""
 
     def __init__(self, in_features: int, out_features: int) -> None:
         super().__init__()
@@ -42,7 +42,7 @@ class MyModule(nn.EModule[Tensor, Tensor]):
 class TestInheritEModule(TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        tmpdir = get_tmp_dir().joinpath("torchoutil_tests")
+        tmpdir = get_tmp_dir().joinpath("torchwrench_tests")
         cls.tmpdir = tmpdir
 
     def test_multiple(self) -> None:

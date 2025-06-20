@@ -6,7 +6,7 @@ from unittest import TestCase
 
 import torch
 
-from torchoutil import (
+from torchwrench import (
     get_inverse_perm,
     insert_at_indices,
     lengths_to_non_pad_mask,

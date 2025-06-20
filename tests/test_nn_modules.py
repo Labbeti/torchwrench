@@ -6,7 +6,7 @@ from unittest import TestCase
 
 import torch
 
-from torchoutil.nn.modules import (
+from torchwrench.nn.modules import (
     Abs,
     Angle,
     AsTensor,
@@ -26,7 +26,7 @@ from torchoutil.nn.modules import (
     Transpose,
     Unsqueeze,
 )
-from torchoutil.nn.modules import ESequential
+from torchwrench.nn.modules import ESequential
 
 
 class TestSequential(TestCase):

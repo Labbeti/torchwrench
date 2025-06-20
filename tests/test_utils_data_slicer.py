@@ -6,7 +6,7 @@ import unittest
 from typing import Union
 from unittest import TestCase
 
-from torchoutil.utils.data.slicer import DatasetSlicer, DatasetSlicerWrapper
+from torchwrench.utils.data.slicer import DatasetSlicer, DatasetSlicerWrapper
 
 
 class DummySequence1:
