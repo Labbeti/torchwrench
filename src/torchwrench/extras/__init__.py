@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from torchwrench.core.packaging import (  # noqa: F401
+from torchwrench.core.packaging import (
     _COLORLOG_AVAILABLE,
     _H5PY_AVAILABLE,
     _NUMPY_AVAILABLE,

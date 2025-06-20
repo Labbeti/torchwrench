@@ -12,6 +12,13 @@ __status__ = "Development"
 __version__ = "0.6.0"
 
 # Import global functions and classes from torch
+# Imports from pythonwrench
+from pythonwrench.semver import Version
+from pythonwrench.typing.checks import (
+    is_dataclass_instance,
+    is_namedtuple_instance,
+    isinstance_generic,
+)
 from torch import *  # type: ignore
 from torch import (
     complex64,
@@ -41,27 +48,17 @@ from . import optim as optim
 from . import serialization as serialization
 from . import types as types
 from . import utils as utils
-
-# Imports from pythonwrench
-from pythonwrench.semver import Version
-from pythonwrench.typing.checks import (
-    is_dataclass_instance,
-    is_namedtuple_instance,
-    isinstance_generic,
-)
-
-# Global imports
-from .extras.numpy import to_ndarray, tensor_to_ndarray, ndarray_to_tensor
-
-
 from .core.dtype_enum import DTypeEnum
 from .core.dtype_enum import DTypeEnum as dtype_enum
-from .core.make import (  # noqa: F401
+from .core.make import (
     CUDA_IF_AVAILABLE,
     DeviceLike,
     DTypeLike,
     GeneratorLike,
 )
+
+# Global imports
+from .extras.numpy import ndarray_to_tensor, tensor_to_ndarray, to_ndarray
 from .hub.download import download_file
 from .hub.paths import get_cache_dir, get_tmp_dir
 from .nn.functional import *
