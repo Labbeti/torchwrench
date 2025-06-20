@@ -4,10 +4,10 @@
 import unittest
 from unittest import TestCase
 
+import pythonwrench as pw
 import torch
 
-import pythonwrench as pw
-import torchwrench as to
+import torchwrench as tw
 from torchwrench.core.packaging import _NUMPY_AVAILABLE
 from torchwrench.extras.numpy import np
 from torchwrench.nn.functional.others import deep_equal
@@ -24,20 +24,20 @@ from torchwrench.utils import return_types
 
 class TestTopP(TestCase):
     def test_example(self) -> None:
-        values = to.as_tensor([0.2, 0.1, 0.5, 0.0, 0.2])
+        values = tw.as_tensor([0.2, 0.1, 0.5, 0.0, 0.2])
         assert deep_equal(
             top_p(values, 0.55),
-            return_types.top_p([to.as_tensor([0.5]), to.as_tensor([2])]),
+            return_types.top_p([tw.as_tensor([0.5]), tw.as_tensor([2])]),
         )
 
 
 class TestMoveTo(TestCase):
     def test_example(self) -> None:
-        x1 = to.randint(0, 100, (100,))
-        x2 = to.rand((100,))
+        x1 = tw.randint(0, 100, (100,))
+        x2 = tw.rand((100,))
         x = {"x1": x1, "x2": x2}
         expected = {"x1": x1.double(), "x2": x2.double()}
-        assert deep_equal(move_to(x, dtype=to.double), expected)
+        assert deep_equal(move_to(x, dtype=tw.double), expected)
 
 
 class TestShuffled(TestCase):

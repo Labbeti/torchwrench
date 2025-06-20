@@ -28,10 +28,14 @@ from typing import (
 import h5py
 import numpy as np
 from h5py import Dataset as HDFRawDataset
+from pythonwrench.collections import all_eq
+from pythonwrench.difflib import find_closest_in_list
+from pythonwrench.inspect import get_current_fn_name
+from pythonwrench.typing import is_iterable_bytes_or_list, is_iterable_str
 from torch import Tensor
 from typing_extensions import TypeAlias, override
 
-import torchwrench as to
+import torchwrench as tw
 from torchwrench.extras.hdf.common import (
     _DEFAULTS_RAW_HDF_ATTRIBUTES,
     _DUMPED_JSON_KEYS,
@@ -41,10 +45,6 @@ from torchwrench.extras.hdf.common import (
 )
 from torchwrench.extras.numpy.scan_info import numpy_dtype_to_torch_dtype
 from torchwrench.nn.functional.indices import get_inverse_perm
-from pythonwrench.collections import all_eq
-from pythonwrench.difflib import find_closest_in_list
-from pythonwrench.inspect import get_current_fn_name
-from pythonwrench.typing import is_iterable_bytes_or_list, is_iterable_str
 from torchwrench.types._typing import ScalarLike
 from torchwrench.types.guards import is_scalar_like
 from torchwrench.utils.data import DatasetSlicer
@@ -244,24 +244,21 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
         self,
         index: int,
         column: None = None,
-    ) -> T:
-        ...
+    ) -> T: ...
 
     @overload
     def get_item(
         self,
         index: Union[Iterable[int], slice, None],
         column: str,
-    ) -> List:
-        ...
+    ) -> List: ...
 
     @overload
     def get_item(
         self,
         index: Union[Iterable[int], slice, None],
         column: Union[List[str], None] = None,
-    ) -> Dict[str, List]:
-        ...
+    ) -> Dict[str, List]: ...
 
     @overload
     def get_item(
@@ -269,8 +266,7 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
         index: Any,
         column: Any,
         raw: bool = False,
-    ) -> Any:
-        ...
+    ) -> Any: ...
 
     @override
     def get_item(
@@ -286,9 +282,9 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
         if index is None:
             index = slice(None)
         elif is_scalar_like(index):
-            index = to.to_item(index)  # type: ignore
+            index = tw.to_item(index)  # type: ignore
         elif isinstance(index, Iterable):
-            index = to.to_numpy(index)
+            index = tw.to_ndarray(index)
         elif isinstance(index, (int, slice)):
             pass
         else:
@@ -466,19 +462,16 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
             self.close()
 
     @overload
-    def __getitem__(self, index: int) -> U:
-        ...
+    def __getitem__(self, index: int) -> U: ...
 
     @overload
     def __getitem__(
         self,
         index: Union[Iterable[int], slice, None],
-    ) -> Dict[str, list]:
-        ...
+    ) -> Dict[str, list]: ...
 
     @overload
-    def __getitem__(self, index: Any) -> Any:
-        ...
+    def __getitem__(self, index: Any) -> Any: ...
 
     def __getitem__(  # type: ignore
         self,
@@ -563,7 +556,7 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
         ):
             hdf_value: Any = self._hdf_file[column][index]
             if self._load_as_complex.get(column, False):
-                hdf_value = to.view_as_complex(hdf_value)
+                hdf_value = tw.view_as_complex(hdf_value)
             hdf_value = np.array(hdf_value)
 
         elif (
@@ -579,11 +572,11 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
             hdf_value: Any = self._hdf_file[column][uniq]
 
             hdf_value = np.repeat(hdf_value, counts, axis=0)
-            inv_local_idxs = get_inverse_perm(to.numpy_to_tensor(local_idxs)).numpy()
+            inv_local_idxs = get_inverse_perm(tw.ndarray_to_tensor(local_idxs)).numpy()
             hdf_value = hdf_value[inv_local_idxs]
 
             if self._load_as_complex.get(column, False):
-                hdf_value = [to.view_as_complex(value) for value in hdf_value]
+                hdf_value = [tw.view_as_complex(value) for value in hdf_value]
 
         else:
             raise TypeError(f"Invalid argument type {type(index)=}.")
@@ -625,18 +618,18 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
             return hdf_values
 
         elif self._cast == "to_torch_or_builtin":
-            valid = to.get_shape(hdf_values, return_valid=True).valid
+            valid = tw.get_shape(hdf_values, return_valid=True).valid
             if valid and hdf_dtype.kind not in ("V", "S", "O"):
-                result = to.as_tensor(hdf_values)
+                result = tw.as_tensor(hdf_values)
             elif isinstance(hdf_values, np.ndarray):
                 result = hdf_values.tolist()
             else:
                 result = to_builtin(hdf_values)
 
         elif self._cast == "to_torch_or_numpy":
-            valid = to.get_shape(hdf_values, return_valid=True).valid
+            valid = tw.get_shape(hdf_values, return_valid=True).valid
             if valid and hdf_dtype.kind not in ("V", "S", "O"):
-                result = to.as_tensor(hdf_values)
+                result = tw.as_tensor(hdf_values)
             else:
                 result = np.array(hdf_values)
 
@@ -648,7 +641,7 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
 
         elif self._cast == "to_numpy_src":
             assert isinstance(hdf_values, np.ndarray), f"{type(hdf_values)=}"
-            valid = to.get_shape(hdf_values, return_valid=True).valid
+            valid = tw.get_shape(hdf_values, return_valid=True).valid
             src_np_dtypes = self.attrs["src_np_dtypes"]
             target_np_dtype = src_np_dtypes.get(column, hdf_values.dtype)
 
@@ -661,16 +654,16 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
 
         elif self._cast == "to_torch_src":
             assert isinstance(hdf_values, np.ndarray), f"{type(hdf_values)=}"
-            valid = to.get_shape(hdf_values, return_valid=True).valid
+            valid = tw.get_shape(hdf_values, return_valid=True).valid
             src_np_dtypes = self.attrs["src_np_dtypes"]
             target_np_dtype = src_np_dtypes.get(column, hdf_values.dtype)
             target_pt_dtype = numpy_dtype_to_torch_dtype(target_np_dtype, invalid=None)
 
             if isinstance(hdf_values, np.ndarray):
                 hdf_values_view = hdf_values.view(target_np_dtype)
-                result = to.numpy_to_tensor(hdf_values_view)
+                result = tw.ndarray_to_tensor(hdf_values_view)
             elif valid:
-                result = to.as_tensor(hdf_values, dtype=target_pt_dtype)
+                result = tw.as_tensor(hdf_values, dtype=target_pt_dtype)
             else:
                 result = hdf_values
 

@@ -6,7 +6,7 @@ from unittest import TestCase
 
 import torch
 
-import torchwrench as to
+import torchwrench as tw
 from torchwrench import Tensor, nn
 from torchwrench.hub.paths import get_tmp_dir
 from torchwrench.nn.modules._mixins import _DEFAULT_DEVICE_DETECT_MODE
@@ -72,9 +72,9 @@ class TestInheritEModule(TestCase):
         path = self.tmpdir.joinpath("state_dict.pt")
         path.parent.mkdir(parents=True, exist_ok=True)
         with open(path, "wb") as file:
-            to.save(module1.state_dict(), file)
+            tw.save(module1.state_dict(), file)
 
-        state_dict = to.load(path)
+        state_dict = tw.load(path)
         module2 = MyModule(in_features, out_features, p=0.25)
         module2.load_state_dict(state_dict)
 

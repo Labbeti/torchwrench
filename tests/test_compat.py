@@ -7,11 +7,11 @@ from typing import Any, Callable, List, Tuple
 from unittest import TestCase
 
 import torch
-from torch import Tensor
-
-import torchwrench as to
 from pythonwrench.inspect import get_fullname
 from pythonwrench.typing import SupportsIterLen, isinstance_generic
+from torch import Tensor
+
+import torchwrench as tw
 
 
 class TestFunctionsCompat(TestCase):
@@ -61,7 +61,7 @@ class TestFunctionsCompat(TestCase):
 
             targets += fn_targets
 
-        seed = to.randint(0, 10**6, ()).item()
+        seed = tw.randint(0, 10**6, ()).item()
         args_lst = [(torch.rand(10),)]
         for tgt_fn, src_fn, fn_name in targets:
             for args in args_lst:
@@ -78,13 +78,13 @@ class TestFunctionsCompat(TestCase):
                     continue
 
                 try:
-                    to.set_default_generator(seed)
+                    tw.set_default_generator(seed)
                     result = tgt_fn(*args)
                 except Exception as err:
                     result = err
 
                 try:
-                    to.set_default_generator(seed)
+                    tw.set_default_generator(seed)
                     expected = src_fn(*args)
                 except Exception as err:
                     expected = err

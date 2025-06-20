@@ -8,10 +8,10 @@ from pathlib import Path
 from typing import Any, Dict, List, Tuple
 from unittest import TestCase
 
+import pythonwrench as pw
 import torch
 
-import pythonwrench as pw
-import torchwrench as to
+import torchwrench as tw
 from torchwrench.extras import _NUMPY_AVAILABLE, _SAFETENSORS_AVAILABLE, _YAML_AVAILABLE
 from torchwrench.hub.paths import get_tmp_dir
 from torchwrench.nn.functional import deep_equal
@@ -51,14 +51,14 @@ class TestSaving(TestCase):
     def test_save_load(self) -> None:
         n = 1
         data1 = {
-            "arange": to.arange(n),
-            "full": to.full((n, 5), 9),
-            "ones": to.ones(n, 5),
-            "rand": to.rand(n),
-            "randint": to.randint(0, 100, (n,)),
-            "randperm": to.randperm(n),
-            "zeros": to.zeros(n, 1),
-            "empty": to.empty(n, 2),
+            "arange": tw.arange(n),
+            "full": tw.full((n, 5), 9),
+            "ones": tw.ones(n, 5),
+            "rand": tw.rand(n),
+            "randint": tw.randint(0, 100, (n,)),
+            "randperm": tw.randperm(n),
+            "zeros": tw.zeros(n, 1),
+            "empty": tw.empty(n, 2),
         }
         data2: Dict[str, Any] = copy.copy(data1)
         data2.update({"randstr": [pw.randstr(2) for _ in range(n)]})
@@ -93,13 +93,13 @@ class TestSaving(TestCase):
 
         for i, (backend, data, to_builtins, load_kwds) in enumerate(tests):
             if to_builtins:
-                data = to.to_builtin(data)
+                data = tw.to_builtin(data)
             if backend == "safetensors":
                 data = pw.sorted_dict(data)
 
             fpath = get_tmp_dir().joinpath(f"tmp.{backend}")
-            to.dump(data, fpath, saving_backend=backend)
-            result = to.load(fpath, saving_backend=backend, **load_kwds)
+            tw.dump(data, fpath, saving_backend=backend)
+            result = tw.load(fpath, saving_backend=backend, **load_kwds)
 
             assert deep_equal(data, result), f"{backend=}, {i=}/{len(tests)}"
 

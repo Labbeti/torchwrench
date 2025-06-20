@@ -4,14 +4,14 @@
 import unittest
 from unittest import TestCase
 
-import torchwrench as to
+import torchwrench as tw
 from torchwrench.utils.data.split import balanced_monolabel_split, random_split
 
 
 class TestSplit(TestCase):
     def test_balanced_monolabel_split(self) -> None:
         num_classes = 5
-        targets_indices = to.randint(0, num_classes, (100,))
+        targets_indices = tw.randint(0, num_classes, (100,))
         splitted = balanced_monolabel_split(targets_indices, num_classes, [0.1, 0.2])
 
         assert len(splitted) == 2

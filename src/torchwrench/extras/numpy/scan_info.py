@@ -6,11 +6,10 @@ from typing import Any, Generic, Iterable, Tuple, TypeVar, Union
 
 import pythonwrench as pw
 import torch
+from pythonwrench import BuiltinScalar, get_current_fn_name
 from torch import Tensor
 
-import torchwrench as to
-from pythonwrench import BuiltinScalar, get_current_fn_name
-
+import torchwrench as tw
 from torchwrench.extras.numpy.definitions import ACCEPTED_NUMPY_DTYPES, np
 
 T_Invalid = TypeVar("T_Invalid", covariant=True)
@@ -56,7 +55,7 @@ def scan_shape_dtypes(
     empty_np: T_EmptyNp = np.dtype("V"),
 ) -> ShapeDTypeInfo[InvalidTorchDType, T_EmptyTorch, T_EmptyNp]:
     """Returns the shape and the hdf_dtype for an input."""
-    valid_shape, shape = to.get_shape(x, return_valid=True)
+    valid_shape, shape = tw.get_shape(x, return_valid=True)
     if not accept_heterogeneous_shape and not valid_shape:
         msg = f"Invalid argument {x} for {get_current_fn_name()}. (cannot compute shape for heterogeneous data)"
         raise ValueError(msg)
@@ -142,7 +141,7 @@ def scan_numpy_dtype(
 
 def torch_dtype_to_numpy_dtype(dtype: torch.dtype) -> np.dtype:
     x = torch.empty((0,), dtype=dtype)
-    x = to.tensor_to_ndarray(x)
+    x = tw.tensor_to_ndarray(x)
     return x.dtype
 
 
@@ -153,7 +152,7 @@ def numpy_dtype_to_torch_dtype(
 ) -> Union[torch.dtype, T_Invalid]:
     if dtype in ACCEPTED_NUMPY_DTYPES:
         x = np.empty((0,), dtype=dtype)
-        x = to.numpy_to_tensor(x)
+        x = tw.numpy_to_tensor(x)
         return x.dtype
     else:
         return invalid

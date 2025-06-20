@@ -39,7 +39,12 @@ except ImportError:
 
 
 import pythonwrench as pw
-import torchwrench as to
+from pythonwrench.collections import all_eq
+from pythonwrench.datetime import now_iso
+from pythonwrench.functools import Compose
+from pythonwrench.typing import is_dataclass_instance, isinstance_generic
+
+import torchwrench as tw
 from torchwrench import nn
 from torchwrench.extras.hdf.common import (
     _DUMPED_JSON_KEYS,
@@ -57,10 +62,6 @@ from torchwrench.extras.numpy import (
     numpy_is_complex_dtype,
     scan_shape_dtypes,
 )
-from pythonwrench.collections import all_eq
-from pythonwrench.datetime import now_iso
-from pythonwrench.functools import Compose
-from pythonwrench.typing import is_dataclass_instance, isinstance_generic
 from torchwrench.serialization.common import to_builtin
 from torchwrench.types import BuiltinScalar
 from torchwrench.utils.data.dataloader import get_auto_num_cpus
@@ -296,7 +297,7 @@ def pack_to_hdf(
             for item in batch:
                 for attr_name, value in item.items():
                     hdf_dset = hdf_dsets[attr_name]
-                    shape = to.get_shape(value)
+                    shape = tw.get_shape(value)
 
                     # Check every shape
                     if len(shape) != hdf_dset.ndim - 1:
@@ -329,7 +330,7 @@ def pack_to_hdf(
                         hdf_shapes_dset = hdf_dsets[shape_name]
                         hdf_shapes_dset[i] = shape
 
-                    global_hash_value += to.checksum(value)
+                    global_hash_value += tw.checksum(value)
 
                 i += 1
 
@@ -368,7 +369,7 @@ def pack_to_hdf(
             "store_complex_as_real": False,  # for backward compatibility only
             "store_str_as_vlen": store_str_as_vlen,
             "user_attrs": to_builtin(user_attrs),
-            "torchwrench_version": str(to.__version__),
+            "torchwrench_version": str(tw.__version__),
         }
         for name in _DUMPED_JSON_KEYS:
             attributes[name] = json.dumps(attributes[name])
@@ -496,13 +497,13 @@ def _scan_dataset(
         return x
 
     def encode_dict_array(x: Dict[str, np.ndarray]) -> Dict[str, Any]:
-        return {k: encode_array(to.to_numpy(v)) for k, v in x.items()}  # type: ignore
+        return {k: encode_array(tw.to_numpy(v)) for k, v in x.items()}  # type: ignore
 
     to_dict_fn: Callable[[T], Dict[str, Any]]
 
     if isinstance_generic(item_0, Dict[str, Any]):
         item_type = "dict"
-        to_dict_fn = to.identity  # type: ignore
+        to_dict_fn = tw.identity  # type: ignore
     elif isinstance(item_0, tuple):
         item_type = "tuple"
         to_dict_fn = _tuple_to_dict  # type: ignore
@@ -511,7 +512,7 @@ def _scan_dataset(
         raise ValueError(msg)
     del item_0
 
-    encode_dict_fn = to.identity if store_str_as_vlen else encode_dict_array
+    encode_dict_fn = tw.identity if store_str_as_vlen else encode_dict_array
 
     dict_pre_transform: Callable[[T], Dict[str, Any]] = Compose(
         pre_transform,
@@ -552,7 +553,7 @@ def _scan_dataset(
                 else:
                     src_np_dtypes[attr_name] = {np_dtype}  # type: ignore
 
-                value = to.to_numpy(value)
+                value = tw.to_numpy(value)
                 if kind == "U" and not store_str_as_vlen:
                     value = encode_array(value)  # type: ignore
                     # update shape and np_dtype after encoding

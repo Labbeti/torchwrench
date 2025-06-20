@@ -7,7 +7,7 @@ from unittest import TestCase
 
 import torch
 
-import torchwrench as to
+import torchwrench as tw
 from torchwrench.core.packaging import _NUMPY_AVAILABLE
 from torchwrench.extras.numpy import np
 from torchwrench.nn.functional.others import deep_equal, get_ndim, get_shape
@@ -107,24 +107,24 @@ class TestDeepEqual(TestCase):
     def test_examples(self) -> None:
         tests = [
             (0, 0.0, True),
-            (to.as_tensor(math.nan), math.nan, True),
+            (tw.as_tensor(math.nan), math.nan, True),
             ([math.nan], math.nan, False),
-            ({"a": math.nan}, {"a": to.as_tensor(math.nan)}, True),
+            ({"a": math.nan}, {"a": tw.as_tensor(math.nan)}, True),
             ("a", 0, False),
             (torch.rand(10), 0, False),
             ("a", math.nan, False),
             (
                 {
-                    "arange": to.as_tensor([0]),
-                    "empty": to.as_tensor([[math.nan, 3.0744e-41]]),
-                    "full": to.as_tensor([[9, 9, 9, 9, 9]]),
-                    "ones": to.as_tensor([[1.0, 1.0, 1.0, 1.0, 1.0]]),
+                    "arange": tw.as_tensor([0]),
+                    "empty": tw.as_tensor([[math.nan, 3.0744e-41]]),
+                    "full": tw.as_tensor([[9, 9, 9, 9, 9]]),
+                    "ones": tw.as_tensor([[1.0, 1.0, 1.0, 1.0, 1.0]]),
                 },
                 {
-                    "arange": to.as_tensor([0]),
-                    "empty": to.as_tensor([[math.nan, 3.0744e-41]]),
-                    "full": to.as_tensor([[9, 9, 9, 9, 9]]),
-                    "ones": to.as_tensor([[1.0, 1.0, 1.0, 1.0, 1.0]]),
+                    "arange": tw.as_tensor([0]),
+                    "empty": tw.as_tensor([[math.nan, 3.0744e-41]]),
+                    "full": tw.as_tensor([[9, 9, 9, 9, 9]]),
+                    "ones": tw.as_tensor([[1.0, 1.0, 1.0, 1.0, 1.0]]),
                 },
                 True,
             ),
