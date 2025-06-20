@@ -59,7 +59,7 @@ jobs:
       if: matrix.torch-version == 'torch-latest'
       shell: bash
       run: |
-        uv add . --dev --all-extras
+        uv add . --dev --extra extras
 
     - name: Install package with PyTorch ${{ matrix.torch-version }}
       if: matrix.torch-version != 'torch-latest'
@@ -163,7 +163,7 @@ jobs:
       if: matrix.torch-version == 'torch-latest'
       shell: bash
       run: |
-        uv add . --dev --all-extras
+        uv add . --dev --extra extras
 
     - name: Install package with PyTorch ${{ matrix.torch-version }}
       if: matrix.torch-version != 'torch-latest'
