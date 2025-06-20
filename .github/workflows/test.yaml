@@ -66,7 +66,7 @@ jobs:
       shell: bash
       run: |
         uv add torch==${{ matrix.torch-version }}
-        uv sync --all-extras --dev
+        uv add . --editable --all-extras --dev
 
     - name: Additional install soundfile (Ubuntu)
       if: matrix.os == 'ubuntu-latest'
@@ -171,7 +171,7 @@ jobs:
       shell: bash
       run: |
         uv add torch==${{ matrix.torch-version }}
-        uv sync --all-extras --dev
+        uv add . --editable --all-extras --dev
 
     - name: Additional install soundfile (Ubuntu)
       if: matrix.os == 'ubuntu-latest'
