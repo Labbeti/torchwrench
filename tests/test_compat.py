@@ -39,8 +39,8 @@ class TestFunctionsCompat(TestCase):
         num_modules = 0
         targets: List[Tuple[Callable, Any, str]] = []
 
-        for fn_name in dir(to):
-            tgt_fn = getattr(to, fn_name)
+        for fn_name in dir(tw):
+            tgt_fn = getattr(tw, fn_name)
             if not inspect.isfunction(tgt_fn) and not inspect.ismethod(tgt_fn):
                 continue
 

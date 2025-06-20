@@ -1,34 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from pythonwrench.typing import *
 from torch.types import *  # type: ignore
 
 from torchwrench.core.dtype_enum import DTypeEnum
 from torchwrench.core.make import DeviceLike, DTypeLike, GeneratorLike
-from pythonwrench.typing import *
 
 from ._typing import T_Tensor, T_TensorOrArray, TensorOrArray
 from .guards import (
-    is_bool_tensor,
-    is_bool_tensor1d,
     is_builtin_number,
     is_builtin_scalar,
-    is_complex_tensor,
-    is_dict_str_tensor,
-    is_floating_tensor,
     is_integral_dtype,
-    is_integral_tensor,
-    is_integral_tensor1d,
-    is_iterable_tensor,
-    is_list_tensor,
     is_number_like,
     is_numpy_number_like,
     is_numpy_scalar_like,
     is_scalar_like,
-    is_tensor0d,
     is_tensor_or_array,
-    is_tuple_tensor,
-    isinstance_generic,
 )
 from .tensor_subclasses import (
     BoolTensor,
