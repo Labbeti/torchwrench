@@ -59,13 +59,13 @@ jobs:
       if: matrix.torch-version == 'torch-latest'
       shell: bash
       run: |
-        uv add . --dev --extra extras
+        uv pip install .[dev,extras]
 
     - name: Install package with PyTorch ${{ matrix.torch-version }}
       if: matrix.torch-version != 'torch-latest'
       shell: bash
       run: |
-        uv add torch==${{ matrix.torch-version }} . --extra extras --dev
+        uv pip install torch==${{ matrix.torch-version }} .[dev,extras]
 
     - name: Additional install soundfile (Ubuntu)
       if: matrix.os == 'ubuntu-latest'
@@ -163,13 +163,13 @@ jobs:
       if: matrix.torch-version == 'torch-latest'
       shell: bash
       run: |
-        uv add . --dev --extra extras
+        uv pip install .[dev]
 
     - name: Install package with PyTorch ${{ matrix.torch-version }}
       if: matrix.torch-version != 'torch-latest'
       shell: bash
       run: |
-        uv add torch==${{ matrix.torch-version }} . --dev
+        uv pip install torch==${{ matrix.torch-version }} .[dev]
 
     - name: Additional install soundfile (Ubuntu)
       if: matrix.os == 'ubuntu-latest'
