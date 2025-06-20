@@ -22,5 +22,5 @@ if len(_MISSING_DEPS) > 0:
 
 del _MISSING_DEPS
 
-from .dataset import HDFDataset
-from .pack import pack_to_hdf
+from .dataset import HDFDataset  # noqa: E402
+from .pack import pack_to_hdf  # noqa: E402
