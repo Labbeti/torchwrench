@@ -7,10 +7,10 @@ import os.path as osp
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, TypedDict, Union
 
+from pythonwrench.warnings import deprecated_alias
 from typing_extensions import NotRequired
 
 from torchwrench.core.packaging import _TENSORBOARD_AVAILABLE
-from pythonwrench.warnings import deprecated_alias
 
 if not _TENSORBOARD_AVAILABLE:
     msg = "Cannot import tensorboard objects because optional dependency 'tensorboard' is not installed. Please install it using 'pip install torchwrench[extras]'"
@@ -177,20 +177,16 @@ def get_tfevents_duration(
 
 
 @deprecated_alias(load_tfevents)
-def load_with_tensorboard(*args, **kwargs):
-    ...
+def load_with_tensorboard(*args, **kwargs): ...
 
 
 @deprecated_alias(load_tfevents)
-def load_event_file(*args, **kwargs):
-    ...
+def load_event_file(*args, **kwargs): ...
 
 
 @deprecated_alias(load_tfevents_files)
-def load_event_files(*args, **kwargs):
-    ...
+def load_event_files(*args, **kwargs): ...
 
 
 @deprecated_alias(get_tfevents_duration)
-def get_duration(*args, **kwargs):
-    ...
+def get_duration(*args, **kwargs): ...

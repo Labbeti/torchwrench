@@ -5,9 +5,8 @@ import os
 import tempfile
 from pathlib import Path
 
-from torch.hub import get_dir
-
 from pythonwrench.functools import function_alias
+from torch.hub import get_dir
 
 
 def get_tmp_dir(mkdir: bool = False, make_parents: bool = True) -> Path:
@@ -39,5 +38,4 @@ def get_cache_dir(mkdir: bool = False, make_parents: bool = True) -> Path:
 
 
 @function_alias(get_dir)
-def get_torch_cache_dir(*args, **kwargs):
-    ...
+def get_torch_cache_dir(*args, **kwargs): ...

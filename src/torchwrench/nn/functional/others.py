@@ -18,16 +18,16 @@ from typing import (
 )
 
 import torch
-from torch import Tensor, nn
-
-from torchwrench.extras.numpy import np
-from torchwrench.nn import functional as F
 from pythonwrench.collections import all_eq as builtin_all_eq
 from pythonwrench.collections import prod as builtin_prod
 from pythonwrench.collections import unzip
 from pythonwrench.functools import function_alias, identity
 from pythonwrench.semver import Version
 from pythonwrench.typing import BuiltinNumber, SupportsIterLen, T_BuiltinNumber
+from torch import Tensor, nn
+
+from torchwrench.extras.numpy import np
+from torchwrench.nn import functional as F
 from torchwrench.types._typing import (
     LongTensor,
     ScalarLike,
@@ -93,8 +93,7 @@ def get_ndim(
     x: Union[ScalarLike, Tensor, np.ndarray, Iterable],
     *,
     return_valid: Literal[False] = False,
-) -> int:
-    ...
+) -> int: ...
 
 
 @overload
@@ -102,8 +101,7 @@ def get_ndim(
     x: Union[ScalarLike, Tensor, np.ndarray, Iterable],
     *,
     return_valid: Literal[True],
-) -> return_types.ndim:
-    ...
+) -> return_types.ndim: ...
 
 
 def get_ndim(
@@ -161,8 +159,7 @@ def get_ndim(
 
 
 @function_alias(get_ndim)
-def ndim(*args, **kwargs):
-    ...
+def ndim(*args, **kwargs): ...
 
 
 @overload
@@ -171,8 +168,7 @@ def get_shape(
     *,
     output_type: Callable[[Tuple[int, ...]], T] = identity,
     return_valid: Literal[False] = False,
-) -> T:
-    ...
+) -> T: ...
 
 
 @overload
@@ -181,8 +177,7 @@ def get_shape(
     *,
     output_type: Callable[[Tuple[int, ...]], T] = identity,
     return_valid: Literal[True],
-) -> return_types.shape[T]:
-    ...
+) -> return_types.shape[T]: ...
 
 
 def get_shape(
@@ -244,8 +239,7 @@ def get_shape(
 
 
 @function_alias(get_shape)
-def shape(*args, **kwargs):
-    ...
+def shape(*args, **kwargs): ...
 
 
 def ranks(x: Tensor, dim: int = -1, descending: bool = False) -> LongTensor:
@@ -269,8 +263,7 @@ def prod(
     *,
     dim: Optional[int] = None,
     start: Any = 1,
-) -> T_TensorOrArray:
-    ...
+) -> T_TensorOrArray: ...
 
 
 @overload
@@ -279,8 +272,7 @@ def prod(
     *,
     dim: Any = None,
     start: T_BuiltinNumber = 1,
-) -> T_BuiltinNumber:
-    ...
+) -> T_BuiltinNumber: ...
 
 
 def prod(
@@ -386,8 +378,7 @@ def stack(
     dim: int = 0,
     *,
     out: Optional[Tensor1D] = None,
-) -> Tensor1D:
-    ...
+) -> Tensor1D: ...
 
 
 @overload
@@ -396,8 +387,7 @@ def stack(
     dim: int = 0,
     *,
     out: Optional[Tensor2D] = None,
-) -> Tensor2D:
-    ...
+) -> Tensor2D: ...
 
 
 @overload
@@ -406,8 +396,7 @@ def stack(
     dim: int = 0,
     *,
     out: Optional[Tensor3D] = None,
-) -> Tensor3D:
-    ...
+) -> Tensor3D: ...
 
 
 @overload
@@ -416,8 +405,7 @@ def stack(
     dim: int = 0,
     *,
     out: Optional[Tensor] = None,
-) -> Tensor:
-    ...
+) -> Tensor: ...
 
 
 def stack(
@@ -439,5 +427,4 @@ def cat(
 
 
 @function_alias(cat)
-def concat(*args, **kwargs):
-    ...
+def concat(*args, **kwargs): ...

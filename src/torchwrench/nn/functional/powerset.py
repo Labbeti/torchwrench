@@ -35,12 +35,12 @@ from itertools import combinations
 from typing import Optional, overload
 
 import torch
+from pythonwrench.warnings import warn_once
 from torch import Tensor
 from torch.nn import functional as F
 
 from torchwrench.core.make import DeviceLike, DTypeLike, as_device, as_dtype
 from torchwrench.nn.functional.multiclass import probs_to_onehot
-from pythonwrench.warnings import warn_once
 from torchwrench.types.tensor_subclasses import Tensor2D, Tensor3D
 
 
@@ -50,8 +50,7 @@ def multilabel_to_powerset(
     *,
     num_classes: int,
     max_set_size: int,
-) -> Tensor3D:
-    ...
+) -> Tensor3D: ...
 
 
 @overload
@@ -59,8 +58,7 @@ def multilabel_to_powerset(
     multilabel: Tensor,
     *,
     mapping: Tensor,
-) -> Tensor3D:
-    ...
+) -> Tensor3D: ...
 
 
 def multilabel_to_powerset(
@@ -106,8 +104,7 @@ def powerset_to_multilabel(
     *,
     num_classes: int,
     max_set_size: int,
-) -> Tensor3D:
-    ...
+) -> Tensor3D: ...
 
 
 @overload
@@ -116,8 +113,7 @@ def powerset_to_multilabel(
     soft: bool = False,
     *,
     mapping: Tensor,
-) -> Tensor3D:
-    ...
+) -> Tensor3D: ...
 
 
 def powerset_to_multilabel(

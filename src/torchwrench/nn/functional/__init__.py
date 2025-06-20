@@ -6,7 +6,7 @@
 from torch.nn.functional import *  # type: ignore
 
 from .activation import log_softmax_multidim, softmax_multidim
-from .checksum import checksum_any 
+from .checksum import checksum_any
 from .cropping import crop_dim, crop_dims
 from .indices import (
     get_inverse_perm,

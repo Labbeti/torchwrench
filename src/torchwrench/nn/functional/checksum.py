@@ -7,11 +7,19 @@ import struct
 from typing import Callable, Union
 
 import torch
-from torch import Tensor, nn
-from pythonwrench.checksum import register_checksum_fn, checksum_dict, checksum_float, _checksum_iterable, checksum_bytes, _cached_checksum_str, checksum_str
-from pythonwrench.checksum import checksum_any  # noqa: F401
+from pythonwrench.checksum import (
+    _cached_checksum_str,
+    _checksum_iterable,
+    checksum_any,  # noqa: F401
+    checksum_bytes,
+    checksum_dict,
+    checksum_float,
+    checksum_str,
+    register_checksum_fn,
+)
 from pythonwrench.importlib import Placeholder
 from pythonwrench.inspect import get_fullname
+from torch import Tensor, nn
 
 from torchwrench.core.packaging import _NUMPY_AVAILABLE, _PANDAS_AVAILABLE
 from torchwrench.extras.numpy import np
@@ -23,8 +31,7 @@ if _PANDAS_AVAILABLE:
     DataFrame = pd.DataFrame  # type: ignore
 else:
 
-    class DataFrame(Placeholder):
-        ...
+    class DataFrame(Placeholder): ...
 
 
 @register_checksum_fn(DataFrame)
@@ -102,6 +109,7 @@ def checksum_tensor(x: Tensor, **kwargs) -> int:
         nan_to_num_fn=torch.nan_to_num,
         **kwargs,
     )
+
 
 @torch.inference_mode()
 @register_checksum_fn((np.ndarray, np.generic))

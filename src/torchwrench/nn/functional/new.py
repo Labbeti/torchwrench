@@ -4,6 +4,8 @@
 from typing import Any, Literal, Optional, Sequence, Tuple, Union, overload
 
 import torch
+from pythonwrench.semver import Version
+from pythonwrench.typing import BuiltinNumber
 from torch import Tensor
 from torch.types import Number
 from typing_extensions import Never
@@ -17,8 +19,6 @@ from torchwrench.core.make import (
     as_dtype,
     as_generator,
 )
-from pythonwrench.semver import Version
-from pythonwrench.typing import BuiltinNumber
 from torchwrench.types import (
     BoolTensor0D,
     BoolTensor1D,
@@ -67,8 +67,7 @@ def arange(
     device: DeviceLike = None,
     requires_grad: bool = False,
     pin_memory: bool = False,
-) -> LongTensor1D:
-    ...
+) -> LongTensor1D: ...
 
 
 @overload
@@ -81,8 +80,7 @@ def arange(
     device: DeviceLike = None,
     requires_grad: bool = False,
     pin_memory: bool = False,
-) -> LongTensor1D:
-    ...
+) -> LongTensor1D: ...
 
 
 @overload
@@ -96,8 +94,7 @@ def arange(
     device: DeviceLike = None,
     requires_grad: bool = False,
     pin_memory: bool = False,
-) -> LongTensor1D:
-    ...
+) -> LongTensor1D: ...
 
 
 @overload
@@ -109,8 +106,7 @@ def arange(
     device: DeviceLike = None,
     requires_grad: bool = False,
     pin_memory: bool = False,
-) -> Tensor1D:
-    ...
+) -> Tensor1D: ...
 
 
 @overload
@@ -123,8 +119,7 @@ def arange(
     device: DeviceLike = None,
     requires_grad: bool = False,
     pin_memory: bool = False,
-) -> Tensor1D:
-    ...
+) -> Tensor1D: ...
 
 
 @overload
@@ -138,8 +133,7 @@ def arange(
     device: DeviceLike = None,
     requires_grad: bool = False,
     pin_memory: bool = False,
-) -> Tensor1D:
-    ...
+) -> Tensor1D: ...
 
 
 def arange(
@@ -186,8 +180,7 @@ def empty(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor0D:
-    ...
+) -> Tensor0D: ...
 
 
 @overload
@@ -202,8 +195,7 @@ def empty(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor1D:
-    ...
+) -> Tensor1D: ...
 
 
 @overload
@@ -218,8 +210,7 @@ def empty(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor2D:
-    ...
+) -> Tensor2D: ...
 
 
 @overload
@@ -234,8 +225,7 @@ def empty(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor3D:
-    ...
+) -> Tensor3D: ...
 
 
 @overload
@@ -250,8 +240,7 @@ def empty(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor1D:
-    ...
+) -> Tensor1D: ...
 
 
 @overload
@@ -267,8 +256,7 @@ def empty(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor2D:
-    ...
+) -> Tensor2D: ...
 
 
 @overload
@@ -285,8 +273,7 @@ def empty(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor3D:
-    ...
+) -> Tensor3D: ...
 
 
 def empty(
@@ -338,8 +325,7 @@ def full(  # type: ignore
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> BoolTensor0D:
-    ...
+) -> BoolTensor0D: ...
 
 
 @overload
@@ -353,8 +339,7 @@ def full(  # type: ignore
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> BoolTensor1D:
-    ...
+) -> BoolTensor1D: ...
 
 
 @overload
@@ -368,8 +353,7 @@ def full(  # type: ignore
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> BoolTensor2D:
-    ...
+) -> BoolTensor2D: ...
 
 
 @overload
@@ -383,8 +367,7 @@ def full(  # type: ignore
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> BoolTensor3D:
-    ...
+) -> BoolTensor3D: ...
 
 
 # int
@@ -399,8 +382,7 @@ def full(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> LongTensor0D:
-    ...
+) -> LongTensor0D: ...
 
 
 @overload
@@ -414,8 +396,7 @@ def full(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> LongTensor1D:
-    ...
+) -> LongTensor1D: ...
 
 
 @overload
@@ -429,8 +410,7 @@ def full(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> LongTensor2D:
-    ...
+) -> LongTensor2D: ...
 
 
 @overload
@@ -444,8 +424,7 @@ def full(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> LongTensor3D:
-    ...
+) -> LongTensor3D: ...
 
 
 # float
@@ -460,8 +439,7 @@ def full(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> FloatTensor0D:
-    ...
+) -> FloatTensor0D: ...
 
 
 @overload
@@ -475,8 +453,7 @@ def full(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> FloatTensor1D:
-    ...
+) -> FloatTensor1D: ...
 
 
 @overload
@@ -490,8 +467,7 @@ def full(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> FloatTensor2D:
-    ...
+) -> FloatTensor2D: ...
 
 
 @overload
@@ -505,8 +481,7 @@ def full(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> FloatTensor3D:
-    ...
+) -> FloatTensor3D: ...
 
 
 # complex
@@ -521,8 +496,7 @@ def full(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> CFloatTensor0D:
-    ...
+) -> CFloatTensor0D: ...
 
 
 @overload
@@ -536,8 +510,7 @@ def full(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> CFloatTensor1D:
-    ...
+) -> CFloatTensor1D: ...
 
 
 @overload
@@ -551,8 +524,7 @@ def full(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> CFloatTensor2D:
-    ...
+) -> CFloatTensor2D: ...
 
 
 @overload
@@ -566,8 +538,7 @@ def full(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> CFloatTensor3D:
-    ...
+) -> CFloatTensor3D: ...
 
 
 # BuiltinNumber
@@ -582,8 +553,7 @@ def full(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor0D:
-    ...
+) -> Tensor0D: ...
 
 
 @overload
@@ -597,8 +567,7 @@ def full(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor1D:
-    ...
+) -> Tensor1D: ...
 
 
 @overload
@@ -612,8 +581,7 @@ def full(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor2D:
-    ...
+) -> Tensor2D: ...
 
 
 @overload
@@ -627,8 +595,7 @@ def full(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor3D:
-    ...
+) -> Tensor3D: ...
 
 
 def full(
@@ -680,8 +647,7 @@ def ones(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor0D:
-    ...
+) -> Tensor0D: ...
 
 
 @overload
@@ -695,8 +661,7 @@ def ones(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor1D:
-    ...
+) -> Tensor1D: ...
 
 
 @overload
@@ -710,8 +675,7 @@ def ones(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor2D:
-    ...
+) -> Tensor2D: ...
 
 
 @overload
@@ -725,8 +689,7 @@ def ones(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor3D:
-    ...
+) -> Tensor3D: ...
 
 
 @overload
@@ -740,8 +703,7 @@ def ones(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor1D:
-    ...
+) -> Tensor1D: ...
 
 
 @overload
@@ -756,8 +718,7 @@ def ones(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor2D:
-    ...
+) -> Tensor2D: ...
 
 
 @overload
@@ -773,8 +734,7 @@ def ones(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor3D:
-    ...
+) -> Tensor3D: ...
 
 
 def ones(
@@ -822,8 +782,7 @@ def rand(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> FloatTensor0D:
-    ...
+) -> FloatTensor0D: ...
 
 
 @overload
@@ -838,8 +797,7 @@ def rand(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> FloatTensor1D:
-    ...
+) -> FloatTensor1D: ...
 
 
 @overload
@@ -854,8 +812,7 @@ def rand(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> FloatTensor2D:
-    ...
+) -> FloatTensor2D: ...
 
 
 @overload
@@ -870,8 +827,7 @@ def rand(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> FloatTensor3D:
-    ...
+) -> FloatTensor3D: ...
 
 
 @overload
@@ -886,8 +842,7 @@ def rand(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> FloatTensor1D:
-    ...
+) -> FloatTensor1D: ...
 
 
 @overload
@@ -903,8 +858,7 @@ def rand(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> FloatTensor2D:
-    ...
+) -> FloatTensor2D: ...
 
 
 @overload
@@ -921,8 +875,7 @@ def rand(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> FloatTensor3D:
-    ...
+) -> FloatTensor3D: ...
 
 
 @overload
@@ -937,8 +890,7 @@ def rand(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor0D:
-    ...
+) -> Tensor0D: ...
 
 
 @overload
@@ -953,8 +905,7 @@ def rand(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor1D:
-    ...
+) -> Tensor1D: ...
 
 
 @overload
@@ -969,8 +920,7 @@ def rand(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor2D:
-    ...
+) -> Tensor2D: ...
 
 
 @overload
@@ -985,8 +935,7 @@ def rand(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor3D:
-    ...
+) -> Tensor3D: ...
 
 
 @overload
@@ -1001,8 +950,7 @@ def rand(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor1D:
-    ...
+) -> Tensor1D: ...
 
 
 @overload
@@ -1018,8 +966,7 @@ def rand(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor2D:
-    ...
+) -> Tensor2D: ...
 
 
 @overload
@@ -1036,8 +983,7 @@ def rand(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor3D:
-    ...
+) -> Tensor3D: ...
 
 
 def rand(
@@ -1090,8 +1036,7 @@ def randint(
     device: DeviceLike = None,
     requires_grad: bool = False,
     pin_memory: bool = False,
-) -> LongTensor0D:
-    ...
+) -> LongTensor0D: ...
 
 
 @overload
@@ -1105,8 +1050,7 @@ def randint(
     device: DeviceLike = None,
     requires_grad: bool = False,
     pin_memory: bool = False,
-) -> LongTensor1D:
-    ...
+) -> LongTensor1D: ...
 
 
 @overload
@@ -1120,8 +1064,7 @@ def randint(
     device: DeviceLike = None,
     requires_grad: bool = False,
     pin_memory: bool = False,
-) -> LongTensor2D:
-    ...
+) -> LongTensor2D: ...
 
 
 @overload
@@ -1135,8 +1078,7 @@ def randint(
     device: DeviceLike = None,
     requires_grad: bool = False,
     pin_memory: bool = False,
-) -> LongTensor3D:
-    ...
+) -> LongTensor3D: ...
 
 
 @overload
@@ -1150,8 +1092,7 @@ def randint(
     device: DeviceLike = None,
     requires_grad: bool = False,
     pin_memory: bool = False,
-) -> Tensor0D:
-    ...
+) -> Tensor0D: ...
 
 
 @overload
@@ -1165,8 +1106,7 @@ def randint(
     device: DeviceLike = None,
     requires_grad: bool = False,
     pin_memory: bool = False,
-) -> Tensor1D:
-    ...
+) -> Tensor1D: ...
 
 
 @overload
@@ -1180,8 +1120,7 @@ def randint(
     device: DeviceLike = None,
     requires_grad: bool = False,
     pin_memory: bool = False,
-) -> Tensor2D:
-    ...
+) -> Tensor2D: ...
 
 
 @overload
@@ -1195,8 +1134,7 @@ def randint(
     device: DeviceLike = None,
     requires_grad: bool = False,
     pin_memory: bool = False,
-) -> Tensor3D:
-    ...
+) -> Tensor3D: ...
 
 
 def randint(
@@ -1246,8 +1184,7 @@ def randperm(
     device: DeviceLike = None,
     pin_memory: Optional[bool] = False,
     requires_grad: Optional[bool] = False,
-) -> LongTensor1D:
-    ...
+) -> LongTensor1D: ...
 
 
 @overload
@@ -1261,8 +1198,7 @@ def randperm(
     device: DeviceLike = None,
     pin_memory: Optional[bool] = False,
     requires_grad: Optional[bool] = False,
-) -> Tensor1D:
-    ...
+) -> Tensor1D: ...
 
 
 def randperm(
@@ -1313,8 +1249,7 @@ def zeros(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor0D:
-    ...
+) -> Tensor0D: ...
 
 
 @overload
@@ -1328,8 +1263,7 @@ def zeros(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor1D:
-    ...
+) -> Tensor1D: ...
 
 
 @overload
@@ -1343,8 +1277,7 @@ def zeros(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor2D:
-    ...
+) -> Tensor2D: ...
 
 
 @overload
@@ -1358,8 +1291,7 @@ def zeros(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor3D:
-    ...
+) -> Tensor3D: ...
 
 
 @overload
@@ -1373,8 +1305,7 @@ def zeros(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor1D:
-    ...
+) -> Tensor1D: ...
 
 
 @overload
@@ -1389,8 +1320,7 @@ def zeros(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor2D:
-    ...
+) -> Tensor2D: ...
 
 
 @overload
@@ -1406,8 +1336,7 @@ def zeros(
     layout: Union[torch.layout, None] = None,
     pin_memory: Union[bool, None] = False,
     requires_grad: Union[bool, None] = False,
-) -> Tensor3D:
-    ...
+) -> Tensor3D: ...
 
 
 def zeros(

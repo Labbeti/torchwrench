@@ -25,13 +25,12 @@ from typing import (
 )
 
 import torch
-from torch import Tensor, nn
-from torch.nn.parameter import Parameter
-from typing_extensions import TypeAlias
-
 from pythonwrench.collections import dump_dict
 from pythonwrench.re import match_patterns
 from pythonwrench.typing import NoneType, isinstance_generic
+from torch import Tensor, nn
+from torch.nn.parameter import Parameter
+from typing_extensions import TypeAlias
 
 from torchwrench.nn.functional.checksum import checksum_module
 from torchwrench.nn.functional.others import count_parameters
@@ -53,11 +52,9 @@ pylog = logging.getLogger(__name__)
 
 @runtime_checkable
 class SupportsTypedForward(Protocol[InType, OutType]):
-    def __call__(self, *args, **kwargs):
-        ...
+    def __call__(self, *args, **kwargs): ...
 
-    def forward(self, x: InType, /) -> OutType:
-        ...
+    def forward(self, x: InType, /) -> OutType: ...
 
 
 TypedModuleLike: TypeAlias = Union[
@@ -414,12 +411,10 @@ class EModule(
     def chain(
         self,
         *others: TypedModuleLike[Any, OutType],
-    ) -> "ESequential[InType, OutType]":
-        ...
+    ) -> "ESequential[InType, OutType]": ...
 
     @overload
-    def chain(self, *others: nn.Module) -> "ESequential[InType, Any]":
-        ...
+    def chain(self, *others: nn.Module) -> "ESequential[InType, Any]": ...
 
     def chain(self, *others):
         return ESequential(self, *others)
@@ -458,8 +453,7 @@ class ESequential(
         strict_load: bool = False,
         config_to_extra_repr: bool = False,
         device_detect_mode: DeviceDetectMode = _DEFAULT_DEVICE_DETECT_MODE,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
     def __init__(
@@ -472,8 +466,7 @@ class ESequential(
         config_to_extra_repr: bool = False,
         device_detect_mode: DeviceDetectMode = _DEFAULT_DEVICE_DETECT_MODE,
         unpack_dict: bool = False,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
     def __init__(
@@ -487,8 +480,7 @@ class ESequential(
         strict_load: bool = False,
         config_to_extra_repr: bool = False,
         device_detect_mode: DeviceDetectMode = _DEFAULT_DEVICE_DETECT_MODE,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
     def __init__(
@@ -503,8 +495,7 @@ class ESequential(
         strict_load: bool = False,
         config_to_extra_repr: bool = False,
         device_detect_mode: DeviceDetectMode = _DEFAULT_DEVICE_DETECT_MODE,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
     def __init__(
@@ -520,8 +511,7 @@ class ESequential(
         strict_load: bool = False,
         config_to_extra_repr: bool = False,
         device_detect_mode: DeviceDetectMode = _DEFAULT_DEVICE_DETECT_MODE,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
     def __init__(
@@ -538,8 +528,7 @@ class ESequential(
         strict_load: bool = False,
         config_to_extra_repr: bool = False,
         device_detect_mode: DeviceDetectMode = _DEFAULT_DEVICE_DETECT_MODE,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
     def __init__(
@@ -557,8 +546,7 @@ class ESequential(
         strict_load: bool = False,
         config_to_extra_repr: bool = False,
         device_detect_mode: DeviceDetectMode = _DEFAULT_DEVICE_DETECT_MODE,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
     def __init__(
@@ -577,8 +565,7 @@ class ESequential(
         strict_load: bool = False,
         config_to_extra_repr: bool = False,
         device_detect_mode: DeviceDetectMode = _DEFAULT_DEVICE_DETECT_MODE,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
     def __init__(
@@ -598,8 +585,7 @@ class ESequential(
         strict_load: bool = False,
         config_to_extra_repr: bool = False,
         device_detect_mode: DeviceDetectMode = _DEFAULT_DEVICE_DETECT_MODE,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
     def __init__(
@@ -620,8 +606,7 @@ class ESequential(
         strict_load: bool = False,
         config_to_extra_repr: bool = False,
         device_detect_mode: DeviceDetectMode = _DEFAULT_DEVICE_DETECT_MODE,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
     def __init__(
@@ -643,8 +628,7 @@ class ESequential(
         strict_load: bool = False,
         config_to_extra_repr: bool = False,
         device_detect_mode: DeviceDetectMode = _DEFAULT_DEVICE_DETECT_MODE,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
     def __init__(
@@ -657,8 +641,7 @@ class ESequential(
         strict_load: bool = False,
         config_to_extra_repr: bool = False,
         device_detect_mode: DeviceDetectMode = _DEFAULT_DEVICE_DETECT_MODE,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
     def __init__(
@@ -671,8 +654,7 @@ class ESequential(
         strict_load: bool = False,
         config_to_extra_repr: bool = False,
         device_detect_mode: DeviceDetectMode = _DEFAULT_DEVICE_DETECT_MODE,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
     def __init__(
@@ -683,8 +665,7 @@ class ESequential(
         strict_load: bool = False,
         config_to_extra_repr: bool = False,
         device_detect_mode: DeviceDetectMode = _DEFAULT_DEVICE_DETECT_MODE,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     def __init__(
         self,

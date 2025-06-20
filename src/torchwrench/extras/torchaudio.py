@@ -8,12 +8,12 @@ from pathlib import Path
 from typing import Any, BinaryIO, Optional, Union
 
 import torch
-
-from torchwrench.core.packaging import _TORCHAUDIO_AVAILABLE
 from pythonwrench.functools import function_alias
 from pythonwrench.importlib import Placeholder
 from pythonwrench.io import _setup_path
 from pythonwrench.warnings import deprecated_alias
+
+from torchwrench.core.packaging import _TORCHAUDIO_AVAILABLE
 
 if not _TORCHAUDIO_AVAILABLE:
     msg = f"Cannot use python module {__file__} since torchaudio package is not installed."
@@ -25,8 +25,7 @@ try:
     from torchaudio.io import CodecConfig  # type: ignore
 except (ImportError, AttributeError):
 
-    class CodecConfig(Placeholder):
-        ...
+    class CodecConfig(Placeholder): ...
 
 
 def dump_with_torchaudio(
@@ -99,15 +98,12 @@ def load_with_torchaudio(
 
 
 @function_alias(dump_with_torchaudio)
-def dump_audio(*args, **kwargs):
-    ...
+def dump_audio(*args, **kwargs): ...
 
 
 @function_alias(load_with_torchaudio)
-def load_audio(*args, **kwargs):
-    ...
+def load_audio(*args, **kwargs): ...
 
 
 @deprecated_alias(dump_with_torchaudio)
-def to_torchaudio(*args, **kwargs):
-    ...
+def to_torchaudio(*args, **kwargs): ...

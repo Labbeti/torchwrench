@@ -7,15 +7,15 @@ from typing import Sized
 from unittest import TestCase
 
 import torch
-
-from torchwrench.core.packaging import _NUMPY_AVAILABLE
-from torchwrench.extras.numpy import np
-from torchwrench.nn import functional as F
 from pythonwrench.typing import (
     is_builtin_number,
     is_builtin_scalar,
     isinstance_generic,
 )
+
+from torchwrench.core.packaging import _NUMPY_AVAILABLE
+from torchwrench.extras.numpy import np
+from torchwrench.nn import functional as F
 from torchwrench.types import (
     Tensor0D,
     is_number_like,
@@ -104,9 +104,9 @@ class TestGuards(TestCase):
 
                 # Impl: scalar => (nelements == 1)
                 nelements = F.nelement(x)  # type: ignore
-                assert not x_is_scalar or (
-                    nelements == 1
-                ), f"{type(x)=} ; {x=}; {x_is_scalar=}, {nelements=}"
+                assert not x_is_scalar or (nelements == 1), (
+                    f"{type(x)=} ; {x=}; {x_is_scalar=}, {nelements=}"
+                )
 
                 xitem = F.to_item(x)  # type: ignore
                 assert is_builtin_scalar(xitem), f"{x=}"
@@ -115,8 +115,7 @@ class TestGuards(TestCase):
                 assert not x_is_scalar, f"{type(x)=} ; {x=} ; {err=}"
 
     def test_is_builtin_strict(self) -> None:
-        class subint(int):
-            ...
+        class subint(int): ...
 
         i1 = 100
         i2 = subint(100)

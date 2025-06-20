@@ -23,6 +23,16 @@ from typing import (
 )
 
 import torch
+from pythonwrench.importlib import Placeholder
+from pythonwrench.typing import (
+    BuiltinNumber,
+    DataclassInstance,
+    NamedTupleInstance,
+    T_BuiltinScalar,
+    is_builtin_scalar,
+    is_dataclass_instance,
+    is_namedtuple_instance,
+)
 from torch import Tensor
 
 from torchwrench.core.packaging import (
@@ -34,16 +44,6 @@ from torchwrench.core.packaging import (
     _TORCHAUDIO_AVAILABLE,
     _YAML_AVAILABLE,
 )
-from pythonwrench.importlib import Placeholder
-from pythonwrench.typing import (
-    BuiltinNumber,
-    DataclassInstance,
-    NamedTupleInstance,
-    T_BuiltinScalar,
-    is_builtin_scalar,
-    is_dataclass_instance,
-    is_namedtuple_instance,
-)
 
 if _OMEGACONF_AVAILABLE:
     from omegaconf import DictConfig, ListConfig, OmegaConf  # type: ignore
@@ -54,8 +54,7 @@ if _PANDAS_AVAILABLE:
     DataFrame = pd.DataFrame  # type: ignore
 else:
 
-    class DataFrame(Placeholder):
-        ...
+    class DataFrame(Placeholder): ...
 
 
 pylog = logging.getLogger(__name__)
@@ -166,8 +165,7 @@ def to_builtin(
     x: Enum,
     *,
     unk_mode: UnkMode = "error",
-) -> str:
-    ...
+) -> str: ...
 
 
 @overload
@@ -175,8 +173,7 @@ def to_builtin(
     x: Path,
     *,
     unk_mode: UnkMode = "error",
-) -> str:
-    ...
+) -> str: ...
 
 
 @overload
@@ -184,8 +181,7 @@ def to_builtin(
     x: Pattern,
     *,
     unk_mode: UnkMode = "error",
-) -> str:
-    ...
+) -> str: ...
 
 
 @overload
@@ -193,8 +189,7 @@ def to_builtin(
     x: Namespace,
     *,
     unk_mode: UnkMode = "error",
-) -> Dict[str, Any]:
-    ...
+) -> Dict[str, Any]: ...
 
 
 @overload
@@ -202,8 +197,7 @@ def to_builtin(
     x: Tensor,
     *,
     unk_mode: UnkMode = "error",
-) -> Union[List, BuiltinNumber]:
-    ...
+) -> Union[List, BuiltinNumber]: ...
 
 
 @overload
@@ -211,8 +205,7 @@ def to_builtin(
     x: Mapping[K, V],
     *,
     unk_mode: UnkMode = "error",
-) -> Dict[K, V]:
-    ...
+) -> Dict[K, V]: ...
 
 
 @overload
@@ -220,8 +213,7 @@ def to_builtin(
     x: DataclassInstance,
     *,
     unk_mode: UnkMode = "error",
-) -> Dict[str, Any]:
-    ...
+) -> Dict[str, Any]: ...
 
 
 @overload
@@ -229,8 +221,7 @@ def to_builtin(
     x: NamedTupleInstance,
     *,
     unk_mode: UnkMode = "error",
-) -> Dict[str, Any]:
-    ...
+) -> Dict[str, Any]: ...
 
 
 @overload
@@ -238,8 +229,7 @@ def to_builtin(
     x: T_BuiltinScalar,
     *,
     unk_mode: UnkMode = "error",
-) -> T_BuiltinScalar:
-    ...
+) -> T_BuiltinScalar: ...
 
 
 @overload
@@ -247,8 +237,7 @@ def to_builtin(
     x: Any,
     *,
     unk_mode: UnkMode = "error",
-) -> Any:
-    ...
+) -> Any: ...
 
 
 def to_builtin(

@@ -5,11 +5,11 @@ import math
 from typing import Callable, Iterable, List, Optional, Union
 
 import torch
+from pythonwrench.collections import flat_list_of_list
 from torch import Tensor
 
 from torchwrench.core.make import GeneratorLike, as_generator
 from torchwrench.nn.functional.transform import as_tensor
-from pythonwrench.collections import flat_list_of_list
 
 
 def random_split(
@@ -68,9 +68,9 @@ def balanced_monolabel_split(
         targets_indices = as_tensor(targets_indices)
 
     assert (0 <= targets_indices).all(), "Target classes indices must be positive."
-    assert (
-        targets_indices < num_classes
-    ).all(), f"Target classes indices must be lower than {num_classes=}."
+    assert (targets_indices < num_classes).all(), (
+        f"Target classes indices must be lower than {num_classes=}."
+    )
 
     lengths = list(lengths)
     generator = as_generator(generator)

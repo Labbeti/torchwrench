@@ -82,8 +82,7 @@ def load(
     *args,
     saving_backend: SavingBackend = "torch",
     **kwargs,
-) -> Any:
-    ...
+) -> Any: ...
 
 
 @overload
@@ -92,8 +91,7 @@ def load(
     *args,
     saving_backend: Optional[SavingBackend] = "torch",
     **kwargs,
-) -> Any:
-    ...
+) -> Any: ...
 
 
 def load(

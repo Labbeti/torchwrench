@@ -15,6 +15,8 @@ from typing import (
 )
 
 import torch
+from pythonwrench.collections import dump_dict
+from pythonwrench.typing import BuiltinScalar, SupportsIterLen
 from torch import Tensor, nn
 
 from torchwrench.core.make import DeviceLike, DTypeLike, GeneratorLike
@@ -44,8 +46,6 @@ from torchwrench.nn.functional.transform import (
     view_as_complex,
     view_as_real,
 )
-from pythonwrench.collections import dump_dict
-from pythonwrench.typing import BuiltinScalar, SupportsIterLen
 from torchwrench.types._typing import (
     ComplexFloatingTensor,
     LongTensor,
@@ -99,12 +99,10 @@ class Flatten(Module):
         ...
 
     @overload
-    def forward(self, x: Union[np.ndarray, np.generic]) -> np.ndarray:
-        ...
+    def forward(self, x: Union[np.ndarray, np.generic]) -> np.ndarray: ...
 
     @overload
-    def forward(self, x: T_BuiltinScalar) -> List[T_BuiltinScalar]:
-        ...
+    def forward(self, x: T_BuiltinScalar) -> List[T_BuiltinScalar]: ...
 
     @overload
     def forward(self, x: Iterable[T_BuiltinScalar]) -> List[T_BuiltinScalar]:  # type: ignore

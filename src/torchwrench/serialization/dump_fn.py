@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 from typing import Any, BinaryIO, Callable, Dict, Optional, Union, overload
 
+from pythonwrench.functools import function_alias
 from typing_extensions import TypeAlias
 
 from torchwrench.core.packaging import (
@@ -14,7 +15,6 @@ from torchwrench.core.packaging import (
     _TORCHAUDIO_AVAILABLE,
     _YAML_AVAILABLE,
 )
-from pythonwrench.functools import function_alias
 
 from .common import SavingBackend, _fpath_to_saving_backend
 from .csv import dump_csv
@@ -66,8 +66,7 @@ def dump(
     *args,
     saving_backend: SavingBackend = "torch",
     **kwargs,
-) -> Union[str, bytes]:
-    ...
+) -> Union[str, bytes]: ...
 
 
 @overload
@@ -77,8 +76,7 @@ def dump(
     *args,
     saving_backend: Optional[SavingBackend] = "torch",
     **kwargs,
-) -> Union[str, bytes]:
-    ...
+) -> Union[str, bytes]: ...
 
 
 def dump(
@@ -109,5 +107,4 @@ def dump(
 
 
 @function_alias(dump)
-def save(*args, **kwargs):
-    ...
+def save(*args, **kwargs): ...

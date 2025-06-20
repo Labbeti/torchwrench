@@ -17,16 +17,21 @@ from typing import (
 )
 
 import torch
+from pythonwrench.collections import prod
+from pythonwrench.functools import function_alias
+from pythonwrench.warnings import warn_once
 from torch import Tensor
 from torch.nn import functional as F
 
 from torchwrench.core.make import DeviceLike, DTypeLike, as_device, as_dtype
 from torchwrench.nn.functional.others import get_ndim, get_shape
 from torchwrench.nn.functional.transform import to_item
-from pythonwrench.collections import prod
-from pythonwrench.functools import function_alias
-from pythonwrench.warnings import warn_once
-from torchwrench.types import LongTensor, SupportsGetitemLen, SupportsIterLen, is_number_like
+from torchwrench.types import (
+    LongTensor,
+    SupportsGetitemLen,
+    SupportsIterLen,
+    is_number_like,
+)
 from torchwrench.types._typing import TensorOrArray
 
 T_Name = TypeVar("T_Name", bound=Hashable)
@@ -80,8 +85,7 @@ def one_hot(
     padding_idx: Optional[int] = None,
     device: DeviceLike = None,
     dtype: DTypeLike = torch.bool,
-) -> Tensor:
-    ...
+) -> Tensor: ...
 
 
 def index_to_name(

@@ -39,5 +39,4 @@ def dump_json(
 
 
 @deprecated_alias(dump_json)
-def to_json(*args, **kwargs):
-    ...
+def to_json(*args, **kwargs): ...

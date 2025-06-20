@@ -4,15 +4,15 @@
 from pathlib import Path
 from typing import Any, Dict, Literal, Optional, Tuple, Union, overload
 
+from pythonwrench.inspect import get_fullname
+from pythonwrench.io import _setup_path
+from pythonwrench.typing.checks import isinstance_generic
+from pythonwrench.warnings import deprecated_alias
 from safetensors import safe_open
 from safetensors.torch import save
 from torch import Tensor
 
 from torchwrench.nn import functional as F
-from pythonwrench.inspect import get_fullname
-from pythonwrench.io import _setup_path
-from pythonwrench.typing.checks import isinstance_generic
-from pythonwrench.warnings import deprecated_alias
 
 
 @overload
@@ -21,8 +21,7 @@ def load_safetensors(
     *,
     device: str = "cpu",
     return_metadata: Literal[False] = False,
-) -> Dict[str, Tensor]:
-    ...
+) -> Dict[str, Tensor]: ...
 
 
 @overload
@@ -31,8 +30,7 @@ def load_safetensors(
     *,
     device: str = "cpu",
     return_metadata: Literal[True],
-) -> Tuple[Dict[str, Tensor], Dict[str, str]]:
-    ...
+) -> Tuple[Dict[str, Tensor], Dict[str, str]]: ...
 
 
 def load_safetensors(
@@ -64,8 +62,7 @@ def dump_safetensors(
     overwrite: bool = True,
     make_parents: bool = True,
     convert_to_tensor: Literal[False] = False,
-) -> bytes:
-    ...
+) -> bytes: ...
 
 
 @overload
@@ -77,8 +74,7 @@ def dump_safetensors(
     overwrite: bool = True,
     make_parents: bool = True,
     convert_to_tensor: Literal[True],
-) -> bytes:
-    ...
+) -> bytes: ...
 
 
 def dump_safetensors(
@@ -105,5 +101,4 @@ def dump_safetensors(
 
 
 @deprecated_alias(dump_safetensors)
-def to_safetensors(*args, **kwargs):
-    ...
+def to_safetensors(*args, **kwargs): ...

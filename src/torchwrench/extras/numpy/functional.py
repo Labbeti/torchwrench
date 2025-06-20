@@ -4,10 +4,6 @@
 from typing import Any, Iterable, List, Literal, Tuple, Union, overload
 
 import torch
-from torch import Tensor
-from typing_extensions import TypeGuard
-
-from torchwrench.core.make import DeviceLike, DTypeLike, as_device, as_dtype
 from pythonwrench import (
     BuiltinScalar,
     function_alias,
@@ -18,7 +14,10 @@ from pythonwrench import (
     reduce_or,
 )
 from pythonwrench.semver import Version
+from torch import Tensor
+from typing_extensions import TypeGuard
 
+from torchwrench.core.make import DeviceLike, DTypeLike, as_device, as_dtype
 from torchwrench.extras.numpy.definitions import NumpyNumberLike, NumpyScalarLike, np
 
 
@@ -165,16 +164,14 @@ def numpy_item(x: Union[np.ndarray, np.generic, BuiltinScalar]) -> np.generic:
 def numpy_all_eq(
     x: Union[np.generic, np.ndarray],
     dim: Literal[None] = None,
-) -> bool:
-    ...
+) -> bool: ...
 
 
 @overload
 def numpy_all_eq(
     x: Union[np.generic, np.ndarray],
     dim: int,
-) -> np.ndarray:
-    ...
+) -> np.ndarray: ...
 
 
 def numpy_all_eq(
@@ -203,25 +200,20 @@ def numpy_all_ne(x: Union[np.generic, np.ndarray]) -> bool:
 
 
 @function_alias(reduce_and)
-def logical_and_lst(*args, **kwargs):
-    ...
+def logical_and_lst(*args, **kwargs): ...
 
 
 @function_alias(reduce_or)
-def logical_or_lst(*args, **kwargs):
-    ...
+def logical_or_lst(*args, **kwargs): ...
 
 
 @function_alias(to_numpy)
-def to_ndarray(*args, **kwargs):
-    ...
+def to_ndarray(*args, **kwargs): ...
 
 
 @function_alias(tensor_to_numpy)
-def tensor_to_ndarray(*args, **kwargs):
-    ...
+def tensor_to_ndarray(*args, **kwargs): ...
 
 
 @function_alias(tensor_to_numpy)
-def ndarray_to_tensor(*args, **kwargs):
-    ...
+def ndarray_to_tensor(*args, **kwargs): ...

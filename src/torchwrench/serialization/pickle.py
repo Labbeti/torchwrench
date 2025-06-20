@@ -27,5 +27,4 @@ def dump_pickle(
 
 
 @deprecated_alias(dump_pickle)
-def to_pickle(*args, **kwargs):
-    ...
+def to_pickle(*args, **kwargs): ...

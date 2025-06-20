@@ -10,13 +10,12 @@ from pathlib import Path
 from typing import IO, Any, BinaryIO, Callable, Dict, Optional, Union
 
 import torch
-from torch.serialization import DEFAULT_PROTOCOL
-from torch.types import Storage
-from typing_extensions import TypeAlias
-
 from pythonwrench.io import _setup_path
 from pythonwrench.semver import Version
 from pythonwrench.warnings import deprecated_alias
+from torch.serialization import DEFAULT_PROTOCOL
+from torch.types import Storage
+from typing_extensions import TypeAlias
 
 FileLike: TypeAlias = Union[str, os.PathLike, BinaryIO, IO[bytes]]
 MapLocationLike: TypeAlias = Optional[
@@ -92,5 +91,4 @@ def load_torch(
 
 
 @deprecated_alias(dump_torch)
-def to_torch(*args, **kwargs):
-    ...
+def to_torch(*args, **kwargs): ...

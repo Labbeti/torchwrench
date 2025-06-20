@@ -6,12 +6,12 @@ from typing import Callable, Dict, Generic, Iterable, List, Mapping, Optional, o
 from torch import nn
 from typing_extensions import Concatenate, ParamSpec
 
-from ._mixins import EModule  # noqa: F401
-from ._mixins import ESequential  # noqa: F401
 from ._mixins import (
     _DEFAULT_DEVICE_DETECT_MODE,
     ConfigModule,
     DeviceDetectMode,
+    EModule,  # noqa: F401
+    ESequential,  # noqa: F401
     InType,
     OutType,
     OutType3,
@@ -41,8 +41,7 @@ class EModuleList(
         strict_load: bool = False,
         config_to_extra_repr: bool = False,
         device_detect_mode: DeviceDetectMode = _DEFAULT_DEVICE_DETECT_MODE,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
     def __init__(
@@ -52,8 +51,7 @@ class EModuleList(
         strict_load: bool = False,
         config_to_extra_repr: bool = False,
         device_detect_mode: DeviceDetectMode = _DEFAULT_DEVICE_DETECT_MODE,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     def __init__(
         self,
@@ -94,8 +92,7 @@ class EModuleDict(
         strict_load: bool = False,
         config_to_extra_repr: bool = False,
         device_detect_mode: DeviceDetectMode = _DEFAULT_DEVICE_DETECT_MODE,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
     def __init__(
@@ -105,8 +102,7 @@ class EModuleDict(
         strict_load: bool = False,
         config_to_extra_repr: bool = False,
         device_detect_mode: DeviceDetectMode = _DEFAULT_DEVICE_DETECT_MODE,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     def __init__(
         self,

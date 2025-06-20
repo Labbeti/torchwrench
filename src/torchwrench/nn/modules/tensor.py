@@ -6,13 +6,13 @@
 from typing import List, Optional, Sequence, Tuple, Union, overload
 
 import torch
+from pythonwrench.collections import dump_dict
+from pythonwrench.semver import Version
 from torch import Tensor
 from torch.nn import functional as F
 from torch.types import Number
 
 from torchwrench.nn.functional.make import DTypeLike, as_dtype
-from pythonwrench.collections import dump_dict
-from pythonwrench.semver import Version
 from torchwrench.utils import return_types
 
 from .module import Module
@@ -512,16 +512,13 @@ class Transpose(Module):
 
 class View(Module):
     @overload
-    def __init__(self, dtype: torch.dtype, /) -> None:
-        ...
+    def __init__(self, dtype: torch.dtype, /) -> None: ...
 
     @overload
-    def __init__(self, size: Sequence[int], /) -> None:
-        ...
+    def __init__(self, size: Sequence[int], /) -> None: ...
 
     @overload
-    def __init__(self, *size: int) -> None:
-        ...
+    def __init__(self, *size: int) -> None: ...
 
     def __init__(self, *args) -> None:
         super().__init__()

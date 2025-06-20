@@ -5,10 +5,9 @@
 
 from typing import Generic, NamedTuple
 
+from pythonwrench.semver import Version
 from torch import Tensor, __version__
 from typing_extensions import TypeVar
-
-from pythonwrench.semver import Version
 
 T = TypeVar("T")
 T_Values = TypeVar("T_Values", bound=Tensor, covariant=True)
@@ -38,17 +37,13 @@ class _namedtuple_values_indices(Generic[T_Values, T_Indices], tuple):
 
 if Version(str(__version__)) < Version("2.0.0"):
 
-    class max(_namedtuple_values_indices[Tensor, Tensor]):
-        ...
+    class max(_namedtuple_values_indices[Tensor, Tensor]): ...
 
-    class min(_namedtuple_values_indices[Tensor, Tensor]):
-        ...
+    class min(_namedtuple_values_indices[Tensor, Tensor]): ...
 
-    class sort(_namedtuple_values_indices[Tensor, Tensor]):
-        ...
+    class sort(_namedtuple_values_indices[Tensor, Tensor]): ...
 
-    class topk(_namedtuple_values_indices[Tensor, Tensor]):
-        ...
+    class topk(_namedtuple_values_indices[Tensor, Tensor]): ...
 
 else:
     from torch.return_types import max, min, sort, topk  # type: ignore # noqa: F401
@@ -75,5 +70,4 @@ class ndim(NamedTuple):
     ndim: int
 
 
-class top_p(_namedtuple_values_indices):
-    ...
+class top_p(_namedtuple_values_indices): ...

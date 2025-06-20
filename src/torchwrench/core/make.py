@@ -6,8 +6,11 @@ from typing import Literal, Optional, Union, overload
 import torch
 from typing_extensions import TypeAlias
 
-from torchwrench.core.dtype_enum import DTypeEnum, enum_dtype_to_torch_dtype, str_to_torch_dtype
-
+from torchwrench.core.dtype_enum import (
+    DTypeEnum,
+    enum_dtype_to_torch_dtype,
+    str_to_torch_dtype,
+)
 
 DeviceLike: TypeAlias = Union[
     torch.device, None, Literal["default", "cuda_if_available"], str, int
@@ -44,15 +47,13 @@ def set_default_generator(generator: GeneratorLike) -> None:
 
 
 @overload
-def as_device(device: Literal[None]) -> None:
-    ...
+def as_device(device: Literal[None]) -> None: ...
 
 
 @overload
 def as_device(
     device: Union[str, int, torch.device] = CUDA_IF_AVAILABLE,
-) -> torch.device:
-    ...
+) -> torch.device: ...
 
 
 def as_device(device: DeviceLike = CUDA_IF_AVAILABLE) -> Optional[torch.device]:
@@ -71,13 +72,11 @@ def as_device(device: DeviceLike = CUDA_IF_AVAILABLE) -> Optional[torch.device]:
 
 
 @overload
-def as_dtype(dtype: Literal[None] = None) -> None:
-    ...
+def as_dtype(dtype: Literal[None] = None) -> None: ...
 
 
 @overload
-def as_dtype(dtype: Union[str, DTypeEnum, torch.dtype]) -> torch.dtype:
-    ...
+def as_dtype(dtype: Union[str, DTypeEnum, torch.dtype]) -> torch.dtype: ...
 
 
 def as_dtype(dtype: DTypeLike = None) -> Optional[torch.dtype]:
@@ -96,15 +95,13 @@ def as_dtype(dtype: DTypeLike = None) -> Optional[torch.dtype]:
 
 
 @overload
-def as_generator(generator: Literal[None] = None) -> None:
-    ...
+def as_generator(generator: Literal[None] = None) -> None: ...
 
 
 @overload
 def as_generator(
     generator: Union[int, torch.Generator, Literal["default"]],
-) -> torch.Generator:
-    ...
+) -> torch.Generator: ...
 
 
 def as_generator(generator: GeneratorLike = None) -> Optional[torch.Generator]:

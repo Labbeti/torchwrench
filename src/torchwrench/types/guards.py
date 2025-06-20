@@ -4,16 +4,16 @@
 from typing import Any, Dict, Iterable, List, Tuple
 
 import torch
-from torch import Tensor
-from typing_extensions import TypeGuard, TypeIs
-
-from torchwrench.extras.numpy import is_numpy_number_like, is_numpy_scalar_like, np
 from pythonwrench.typing import (
     is_builtin_number,
     is_builtin_scalar,
     isinstance_generic,
 )
 from pythonwrench.warnings import deprecated_alias, deprecated_function
+from torch import Tensor
+from typing_extensions import TypeGuard, TypeIs
+
+from torchwrench.extras.numpy import is_numpy_number_like, is_numpy_scalar_like, np
 
 from ._typing import (
     BoolTensor,
@@ -58,8 +58,7 @@ def is_tensor_or_array(x: Any) -> TypeIs[TensorOrArray]:
 
 
 @deprecated_alias(is_tensor_or_array)
-def is_tensor_like(*args, **kwargs):
-    ...
+def is_tensor_like(*args, **kwargs): ...
 
 
 def is_integral_dtype(dtype: torch.dtype) -> bool:

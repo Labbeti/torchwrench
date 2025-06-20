@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import math
-from typing import Any, Callable, Dict
-from typing import Generator as PythonGenerator
 from typing import (
+    Any,
+    Callable,
+    Dict,
     Iterable,
     List,
     Literal,
@@ -17,8 +18,23 @@ from typing import (
     get_args,
     overload,
 )
+from typing import Generator as PythonGenerator
 
 import torch
+from pythonwrench.collections import all_eq
+from pythonwrench.collections import flatten as builtin_flatten
+from pythonwrench.collections import prod as builtin_prod
+from pythonwrench.functools import (
+    function_alias,
+    identity,  # noqa: F401
+)
+from pythonwrench.typing import (
+    BuiltinNumber,
+    BuiltinScalar,
+    SupportsIterLen,
+    T_BuiltinScalar,
+    is_builtin_scalar,
+)
 from torch import Tensor, nn
 from typing_extensions import Never
 
@@ -34,18 +50,6 @@ from torchwrench.extras.numpy import np, numpy_view_as_complex, numpy_view_as_re
 from torchwrench.nn.functional.cropping import crop_dim
 from torchwrench.nn.functional.others import nelement
 from torchwrench.nn.functional.padding import PadMode, PadValue, pad_dim
-from pythonwrench.collections import all_eq
-from pythonwrench.collections import flatten as builtin_flatten
-from pythonwrench.collections import prod as builtin_prod
-from pythonwrench.functools import identity  # noqa: F401
-from pythonwrench.functools import function_alias
-from pythonwrench.typing import (
-    BuiltinNumber,
-    BuiltinScalar,
-    SupportsIterLen,
-    T_BuiltinScalar,
-    is_builtin_scalar,
-)
 from torchwrench.types import ComplexFloatingTensor, is_builtin_number, is_scalar_like
 from torchwrench.types._typing import (
     BoolTensor0D,
@@ -295,8 +299,7 @@ def flatten(  # type: ignore
     x: Tensor,
     start_dim: int = 0,
     end_dim: Optional[int] = None,
-) -> Tensor1D:
-    ...
+) -> Tensor1D: ...
 
 
 @overload
@@ -304,8 +307,7 @@ def flatten(
     x: Union[np.ndarray, np.generic],
     start_dim: int = 0,
     end_dim: Optional[int] = None,
-) -> np.ndarray:
-    ...
+) -> np.ndarray: ...
 
 
 @overload
@@ -313,8 +315,7 @@ def flatten(
     x: T_BuiltinScalar,
     start_dim: int = 0,
     end_dim: Optional[int] = None,
-) -> List[T_BuiltinScalar]:
-    ...
+) -> List[T_BuiltinScalar]: ...
 
 
 @overload
@@ -322,8 +323,7 @@ def flatten(  # type: ignore
     x: Iterable[T_BuiltinScalar],
     start_dim: int = 0,
     end_dim: Optional[int] = None,
-) -> List[T_BuiltinScalar]:
-    ...
+) -> List[T_BuiltinScalar]: ...
 
 
 def flatten(
@@ -499,8 +499,7 @@ def __unsqueeze_impl_array(
 
 
 @overload
-def to_item(x: T_BuiltinScalar) -> T_BuiltinScalar:
-    ...
+def to_item(x: T_BuiltinScalar) -> T_BuiltinScalar: ...
 
 
 @overload
@@ -522,18 +521,15 @@ def to_item(x: Union[ScalarLike, Tensor, np.ndarray, SupportsIterLen]) -> Builti
 
 
 @overload
-def view_as_real(x: Tensor) -> Tensor:
-    ...
+def view_as_real(x: Tensor) -> Tensor: ...
 
 
 @overload
-def view_as_real(x: np.ndarray) -> np.ndarray:
-    ...
+def view_as_real(x: np.ndarray) -> np.ndarray: ...
 
 
 @overload
-def view_as_real(x: complex) -> Tuple[float, float]:
-    ...
+def view_as_real(x: complex) -> Tuple[float, float]: ...
 
 
 def view_as_real(
@@ -549,18 +545,15 @@ def view_as_real(
 
 
 @overload
-def view_as_complex(x: Tensor) -> ComplexFloatingTensor:
-    ...
+def view_as_complex(x: Tensor) -> ComplexFloatingTensor: ...
 
 
 @overload
-def view_as_complex(x: np.ndarray) -> np.ndarray:
-    ...
+def view_as_complex(x: np.ndarray) -> np.ndarray: ...
 
 
 @overload
-def view_as_complex(x: Tuple[float, float]) -> complex:
-    ...
+def view_as_complex(x: Tuple[float, float]) -> complex: ...
 
 
 def view_as_complex(
@@ -588,8 +581,7 @@ def move_to(
     x: Mapping[T, U],
     predicate: Optional[Callable[[Union[Tensor, nn.Module]], bool]] = None,
     **kwargs,
-) -> Dict[T, U]:
-    ...
+) -> Dict[T, U]: ...
 
 
 @overload
@@ -597,8 +589,7 @@ def move_to(
     x: T,
     predicate: Optional[Callable[[Union[Tensor, nn.Module]], bool]] = None,
     **kwargs,
-) -> T:
-    ...
+) -> T: ...
 
 
 def move_to(
@@ -636,8 +627,7 @@ def move_to(
 
 
 @function_alias(move_to)
-def move_to_rec(*args, **kwargs):
-    ...
+def move_to_rec(*args, **kwargs): ...
 
 
 # ----------
@@ -651,8 +641,7 @@ def as_tensor(  # type: ignore
     data: Sequence[Never],
     dtype: Literal[None] = None,
     device: DeviceLike = None,
-) -> Tensor1D:
-    ...
+) -> Tensor1D: ...
 
 
 @overload
@@ -660,8 +649,7 @@ def as_tensor(
     data: Sequence[Sequence[Never]],
     dtype: Literal[None] = None,
     device: DeviceLike = None,
-) -> Tensor2D:
-    ...
+) -> Tensor2D: ...
 
 
 @overload
@@ -669,8 +657,7 @@ def as_tensor(
     data: Sequence[Sequence[Sequence[Never]]],
     dtype: Literal[None] = None,
     device: DeviceLike = None,
-) -> Tensor3D:
-    ...
+) -> Tensor3D: ...
 
 
 # bool
@@ -679,8 +666,7 @@ def as_tensor(  # type: ignore
     data: bool,
     dtype: Literal[None, "bool"] = None,
     device: DeviceLike = None,
-) -> BoolTensor0D:
-    ...
+) -> BoolTensor0D: ...
 
 
 @overload
@@ -688,8 +674,7 @@ def as_tensor(  # type: ignore
     data: Sequence[bool],
     dtype: Literal[None, "bool"] = None,
     device: DeviceLike = None,
-) -> BoolTensor1D:
-    ...
+) -> BoolTensor1D: ...
 
 
 @overload
@@ -697,8 +682,7 @@ def as_tensor(
     data: Sequence[Sequence[bool]],
     dtype: Literal[None, "bool"] = None,
     device: DeviceLike = None,
-) -> BoolTensor2D:
-    ...
+) -> BoolTensor2D: ...
 
 
 @overload
@@ -706,8 +690,7 @@ def as_tensor(
     data: Sequence[Sequence[Sequence[bool]]],
     dtype: Literal[None, "bool"] = None,
     device: DeviceLike = None,
-) -> BoolTensor3D:
-    ...
+) -> BoolTensor3D: ...
 
 
 # int
@@ -716,8 +699,7 @@ def as_tensor(
     data: int,
     dtype: Literal[None, "int64", "long"] = None,
     device: DeviceLike = None,
-) -> LongTensor0D:
-    ...
+) -> LongTensor0D: ...
 
 
 @overload
@@ -725,8 +707,7 @@ def as_tensor(
     data: Sequence[int],
     dtype: Literal[None, "int64", "long"] = None,
     device: DeviceLike = None,
-) -> LongTensor1D:
-    ...
+) -> LongTensor1D: ...
 
 
 @overload
@@ -734,8 +715,7 @@ def as_tensor(
     data: Sequence[Sequence[int]],
     dtype: Literal[None, "int64", "long"] = None,
     device: DeviceLike = None,
-) -> LongTensor2D:
-    ...
+) -> LongTensor2D: ...
 
 
 @overload
@@ -743,8 +723,7 @@ def as_tensor(
     data: Sequence[Sequence[Sequence[int]]],
     dtype: Literal[None, "int64", "long"] = None,
     device: DeviceLike = None,
-) -> LongTensor3D:
-    ...
+) -> LongTensor3D: ...
 
 
 # float
@@ -753,8 +732,7 @@ def as_tensor(
     data: float,
     dtype: Literal[None, "float32", "float"] = None,
     device: DeviceLike = None,
-) -> FloatTensor0D:
-    ...
+) -> FloatTensor0D: ...
 
 
 @overload
@@ -762,8 +740,7 @@ def as_tensor(
     data: Sequence[float],
     dtype: Literal[None, "float32", "float"] = None,
     device: DeviceLike = None,
-) -> FloatTensor1D:
-    ...
+) -> FloatTensor1D: ...
 
 
 @overload
@@ -771,8 +748,7 @@ def as_tensor(
     data: Sequence[Sequence[float]],
     dtype: Literal[None, "float32", "float"] = None,
     device: DeviceLike = None,
-) -> FloatTensor2D:
-    ...
+) -> FloatTensor2D: ...
 
 
 @overload
@@ -780,8 +756,7 @@ def as_tensor(
     data: Sequence[Sequence[Sequence[float]]],
     dtype: Literal[None, "float32", "float"] = None,
     device: DeviceLike = None,
-) -> FloatTensor3D:
-    ...
+) -> FloatTensor3D: ...
 
 
 # complex
@@ -790,8 +765,7 @@ def as_tensor(
     data: complex,
     dtype: Literal[None, "complex64", "cfloat"] = None,
     device: DeviceLike = None,
-) -> CFloatTensor0D:
-    ...
+) -> CFloatTensor0D: ...
 
 
 @overload
@@ -799,8 +773,7 @@ def as_tensor(
     data: Sequence[complex],
     dtype: Literal[None, "complex64", "cfloat"] = None,
     device: DeviceLike = None,
-) -> CFloatTensor1D:
-    ...
+) -> CFloatTensor1D: ...
 
 
 @overload
@@ -808,8 +781,7 @@ def as_tensor(
     data: Sequence[Sequence[complex]],
     dtype: Literal[None, "complex64", "cfloat"] = None,
     device: DeviceLike = None,
-) -> CFloatTensor2D:
-    ...
+) -> CFloatTensor2D: ...
 
 
 @overload
@@ -817,8 +789,7 @@ def as_tensor(
     data: Sequence[Sequence[Sequence[complex]]],
     dtype: Literal[None, "complex64", "cfloat"] = None,
     device: DeviceLike = None,
-) -> CFloatTensor3D:
-    ...
+) -> CFloatTensor3D: ...
 
 
 # BuiltinNumber
@@ -827,8 +798,7 @@ def as_tensor(
     data: BuiltinNumber,
     dtype: DTypeLike = None,
     device: DeviceLike = None,
-) -> Tensor0D:
-    ...
+) -> Tensor0D: ...
 
 
 @overload
@@ -836,8 +806,7 @@ def as_tensor(
     data: Sequence[BuiltinNumber],
     dtype: DTypeLike = None,
     device: DeviceLike = None,
-) -> Tensor1D:
-    ...
+) -> Tensor1D: ...
 
 
 @overload
@@ -845,8 +814,7 @@ def as_tensor(
     data: Sequence[Sequence[BuiltinNumber]],
     dtype: DTypeLike = None,
     device: DeviceLike = None,
-) -> Tensor2D:
-    ...
+) -> Tensor2D: ...
 
 
 @overload
@@ -854,8 +822,7 @@ def as_tensor(
     data: Sequence[Sequence[Sequence[BuiltinNumber]]],
     dtype: DTypeLike = None,
     device: DeviceLike = None,
-) -> Tensor3D:
-    ...
+) -> Tensor3D: ...
 
 
 @overload
@@ -863,8 +830,7 @@ def as_tensor(
     data: Any,
     dtype: DTypeLike = None,
     device: DeviceLike = None,
-) -> torch.Tensor:
-    ...
+) -> torch.Tensor: ...
 
 
 def as_tensor(
@@ -931,8 +897,7 @@ def topk(
     *,
     return_values: Literal[True] = True,
     return_indices: Literal[True] = True,
-) -> return_types.topk:
-    ...
+) -> return_types.topk: ...
 
 
 @overload
@@ -945,8 +910,7 @@ def topk(
     *,
     return_values: Literal[True] = True,
     return_indices: Literal[False],
-) -> T_Tensor:
-    ...
+) -> T_Tensor: ...
 
 
 @overload
@@ -959,8 +923,7 @@ def topk(
     *,
     return_values: Literal[False],
     return_indices: Literal[True] = True,
-) -> LongTensor:
-    ...
+) -> LongTensor: ...
 
 
 @overload
@@ -973,8 +936,7 @@ def topk(
     *,
     return_values: bool = True,
     return_indices: bool = True,
-) -> Union[T_Tensor, LongTensor, return_types.topk]:
-    ...
+) -> Union[T_Tensor, LongTensor, return_types.topk]: ...
 
 
 def topk(
@@ -1013,8 +975,7 @@ def top_p(
     *,
     return_values: Literal[True] = True,
     return_indices: Literal[True] = True,
-) -> return_types.top_p:
-    ...
+) -> return_types.top_p: ...
 
 
 @overload
@@ -1026,8 +987,7 @@ def top_p(
     *,
     return_values: Literal[True] = True,
     return_indices: Literal[False],
-) -> T_Tensor:
-    ...
+) -> T_Tensor: ...
 
 
 @overload
@@ -1039,8 +999,7 @@ def top_p(
     *,
     return_values: Literal[False],
     return_indices: Literal[True] = True,
-) -> LongTensor:
-    ...
+) -> LongTensor: ...
 
 
 @overload
@@ -1052,8 +1011,7 @@ def top_p(
     *,
     return_values: bool = True,
     return_indices: bool = True,
-) -> Union[T_Tensor, LongTensor, return_types.top_p]:
-    ...
+) -> Union[T_Tensor, LongTensor, return_types.top_p]: ...
 
 
 def top_p(
@@ -1082,10 +1040,8 @@ def top_p(
 
 
 @function_alias(as_tensor)
-def to_tensor(*args, **kwargs):
-    ...
+def to_tensor(*args, **kwargs): ...
 
 
 @function_alias(topk)
-def top_k(*args, **kwargs):
-    ...
+def top_k(*args, **kwargs): ...

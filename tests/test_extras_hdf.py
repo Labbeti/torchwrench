@@ -9,6 +9,7 @@ from unittest import TestCase
 
 import numpy as np
 import torch
+from pythonwrench import dict_list_to_list_dict
 from torch import Tensor
 from torch.utils.data.dataset import Subset
 from torchvision.datasets import CIFAR10
@@ -17,7 +18,6 @@ from torchwrench.extras.hdf import HDFDataset, pack_to_hdf
 from torchwrench.hub.paths import get_tmp_dir
 from torchwrench.nn import ESequential, IndexToOnehot, ToList, ToNumpy
 from torchwrench.nn.functional import as_tensor
-from pythonwrench import dict_list_to_list_dict
 
 
 class TestHDF(TestCase):
@@ -88,9 +88,9 @@ class TestHDF(TestCase):
 
             data_i = item["data"]
             assert isinstance(data_i, Tensor)
-            assert (
-                data_i.shape == data_shape[i]
-            ), f"{i=}; {data_i.shape=}; {data_shape[i]=}"
+            assert data_i.shape == data_shape[i], (
+                f"{i=}; {data_i.shape=}; {data_shape[i]=}"
+            )
 
         hdf_dataset.close(remove_file=True)
 

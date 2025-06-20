@@ -4,6 +4,12 @@
 from typing import Any, Iterable, List, Sized, Tuple, TypeVar, Union, overload
 
 import torch
+from pythonwrench.collections import all_eq as builtin_all_eq
+from pythonwrench.collections import all_ne as builtin_all_ne
+from pythonwrench.collections import is_sorted as builtin_is_sorted
+from pythonwrench.functools import function_alias
+from pythonwrench.typing import is_builtin_number, isinstance_generic
+from pythonwrench.warnings import deprecated_alias
 from torch import Tensor
 from typing_extensions import TypeGuard
 
@@ -16,12 +22,6 @@ from torchwrench.extras.numpy import (
     numpy_is_floating_point,
 )
 from torchwrench.nn.functional.others import nelement
-from pythonwrench.collections import all_eq as builtin_all_eq
-from pythonwrench.collections import all_ne as builtin_all_ne
-from pythonwrench.collections import is_sorted as builtin_is_sorted
-from pythonwrench.functools import function_alias
-from pythonwrench.typing import is_builtin_number, isinstance_generic
-from pythonwrench.warnings import deprecated_alias
 from torchwrench.types._typing import (
     ComplexFloatingTensor,
     FloatingTensor,
@@ -99,25 +99,21 @@ def __can_be_converted_to_tensor_nested(
 
 
 @overload
-def is_floating_point(x: Tensor) -> TypeGuard[FloatingTensor]:
-    ...
+def is_floating_point(x: Tensor) -> TypeGuard[FloatingTensor]: ...
 
 
 @overload
-def is_floating_point(x: np.ndarray) -> TypeGuard[np.ndarray]:
-    ...
+def is_floating_point(x: np.ndarray) -> TypeGuard[np.ndarray]: ...
 
 
 @overload
-def is_floating_point(x: float) -> TypeGuard[float]:
-    ...
+def is_floating_point(x: float) -> TypeGuard[float]: ...
 
 
 @overload
 def is_floating_point(
     x: Any,
-) -> TypeGuard[Union[FloatingTensor, np.ndarray, float]]:
-    ...
+) -> TypeGuard[Union[FloatingTensor, np.ndarray, float]]: ...
 
 
 def is_floating_point(x: Any) -> TypeGuard[Union[FloatingTensor, np.ndarray, float]]:
@@ -131,25 +127,21 @@ def is_floating_point(x: Any) -> TypeGuard[Union[FloatingTensor, np.ndarray, flo
 
 
 @overload
-def is_complex(x: Tensor) -> TypeGuard[ComplexFloatingTensor]:
-    ...
+def is_complex(x: Tensor) -> TypeGuard[ComplexFloatingTensor]: ...
 
 
 @overload
-def is_complex(x: np.ndarray) -> TypeGuard[np.ndarray]:
-    ...
+def is_complex(x: np.ndarray) -> TypeGuard[np.ndarray]: ...
 
 
 @overload
-def is_complex(x: complex) -> TypeGuard[complex]:
-    ...
+def is_complex(x: complex) -> TypeGuard[complex]: ...
 
 
 @overload
 def is_complex(
     x: Any,
-) -> TypeGuard[Union[ComplexFloatingTensor, np.ndarray, complex]]:
-    ...
+) -> TypeGuard[Union[ComplexFloatingTensor, np.ndarray, complex]]: ...
 
 
 def is_complex(x: Any) -> TypeGuard[Union[ComplexFloatingTensor, np.ndarray, complex]]:
@@ -200,16 +192,14 @@ def is_sorted(
 def all_eq(
     x: Union[Tensor, np.ndarray, ScalarLike, Iterable],
     dim: None = None,
-) -> bool:
-    ...
+) -> bool: ...
 
 
 @overload
 def all_eq(
     x: T_TensorOrArray,
     dim: int,
-) -> T_TensorOrArray:
-    ...
+) -> T_TensorOrArray: ...
 
 
 def all_eq(
@@ -272,15 +262,12 @@ def is_full(x: TensorOrArray, target: Any = ...) -> bool:
 
 
 @function_alias(all_ne)
-def is_unique(*args, **kwargs):
-    ...
+def is_unique(*args, **kwargs): ...
 
 
 @deprecated_alias(is_stackable)
-def can_be_stacked(*args, **kwargs):
-    ...
+def can_be_stacked(*args, **kwargs): ...
 
 
 @deprecated_alias(is_convertible_to_tensor)
-def can_be_converted_to_tensor(*args, **kwargs):
-    ...
+def can_be_converted_to_tensor(*args, **kwargs): ...

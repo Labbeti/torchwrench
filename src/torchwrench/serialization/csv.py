@@ -16,12 +16,13 @@ from typing import (
     overload,
 )
 
-from torchwrench.core.packaging import _PANDAS_AVAILABLE
 from pythonwrench.csv import Orient, _setup_path
 from pythonwrench.csv import dump_csv as _dump_csv_base
 from pythonwrench.csv import load_csv as _load_csv_base
 from pythonwrench.importlib import Placeholder
 from pythonwrench.warnings import deprecated_alias, warn_once
+
+from torchwrench.core.packaging import _PANDAS_AVAILABLE
 
 from .common import to_builtin
 
@@ -31,8 +32,7 @@ if _PANDAS_AVAILABLE:
     DataFrame = pd.DataFrame  # type: ignore
 else:
 
-    class DataFrame(Placeholder):
-        ...
+    class DataFrame(Placeholder): ...
 
 
 CSVBackend = Literal["csv", "pandas", "auto"]
@@ -101,8 +101,7 @@ def load_csv(
     # CSV reader kwargs
     delimiter: Optional[str] = None,
     **backend_kwds,
-) -> Dict[str, List[Any]]:
-    ...
+) -> Dict[str, List[Any]]: ...
 
 
 @overload
@@ -118,8 +117,7 @@ def load_csv(
     # CSV reader kwargs
     delimiter: Optional[str] = None,
     **backend_kwds,
-) -> List[Dict[str, Any]]:
-    ...
+) -> List[Dict[str, Any]]: ...
 
 
 def load_csv(
@@ -237,5 +235,4 @@ def _load_csv_with_pandas(
 
 
 @deprecated_alias(dump_csv)
-def to_csv(*args, **kwargs):
-    ...
+def to_csv(*args, **kwargs): ...

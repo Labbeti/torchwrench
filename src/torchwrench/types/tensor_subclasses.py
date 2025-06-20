@@ -43,13 +43,13 @@ from typing import (
 )
 
 import torch
+from pythonwrench import BuiltinNumber, T_BuiltinNumber
 from torch._C import _TensorMeta
 from torch.types import Device, _bool, _float, _int
 from typing_extensions import TypeVar
 
 from torchwrench.core.dtype_enum import DTypeEnum
 from torchwrench.core.make import DeviceLike, DTypeLike, as_device, as_dtype
-from pythonwrench import BuiltinNumber, T_BuiltinNumber
 
 _DEFAULT_T_DTYPE = Literal[None]
 _DEFAULT_T_NDIM = _int
@@ -211,8 +211,7 @@ class _TensorNDBase(
         layout: Union[torch.layout, None] = None,
         pin_memory: Union[_bool, None] = False,
         requires_grad: Union[_bool, None] = False,
-    ) -> T_Tensor:
-        ...
+    ) -> T_Tensor: ...
 
     @overload
     def __new__(
@@ -222,8 +221,7 @@ class _TensorNDBase(
         *,
         dtype: DTypeLike = None,
         device: DeviceLike = None,
-    ) -> T_Tensor:
-        ...
+    ) -> T_Tensor: ...
 
     def __new__(
         cls: Type[T_Tensor],
@@ -339,8 +337,7 @@ class _TensorNDBase(
         layout: Union[torch.layout, None] = None,
         pin_memory: Union[_bool, None] = False,
         requires_grad: Union[_bool, None] = False,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
     def __init__(
@@ -350,8 +347,7 @@ class _TensorNDBase(
         *,
         dtype: DTypeLike = None,
         device: DeviceLike = None,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     def __init__(
         self,
@@ -363,8 +359,7 @@ class _TensorNDBase(
         layout: Union[torch.layout, None] = None,
         pin_memory: Union[_bool, None] = False,
         requires_grad: Union[_bool, None] = False,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
     def __eq__(self, other: Any) -> "BoolTensor":  # type: ignore
@@ -399,12 +394,10 @@ class _TensorNDBase(
         ...
 
     @overload
-    def __getitem__(self: T_Tensor, sl: slice, /) -> T_Tensor:
-        ...
+    def __getitem__(self: T_Tensor, sl: slice, /) -> T_Tensor: ...
 
     @overload
-    def __getitem__(self, *args) -> "Tensor":
-        ...
+    def __getitem__(self, *args) -> "Tensor": ...
 
     @overload
     def __ne__(self, other: Any) -> "BoolTensor":  # type: ignore
@@ -431,8 +424,7 @@ class _TensorNDBase(
         self,
         dim: Union[_int, Tuple[_int, ...]],
         keepdim: _bool = False,
-    ) -> "BoolTensor":
-        ...
+    ) -> "BoolTensor": ...
 
     @overload
     def any(self, dim: Literal[None] = None) -> "BoolTensor0D":  # type: ignore
@@ -443,8 +435,7 @@ class _TensorNDBase(
         self,
         dim: Union[_int, Tuple[_int, ...]],
         keepdim: _bool = False,
-    ) -> "BoolTensor":
-        ...
+    ) -> "BoolTensor": ...
 
     @overload
     def bool(self: T_Tensor) -> "BoolTensor":  # type: ignore
@@ -515,8 +506,7 @@ class _TensorNDBase(
         ...
 
     @overload
-    def mean(self: "Tensor0D", dim: _int) -> "Tensor0D":
-        ...
+    def mean(self: "Tensor0D", dim: _int) -> "Tensor0D": ...
 
     @overload
     def mean(self: "Tensor1D", dim: _int) -> "Tensor0D":  # type: ignore
@@ -543,24 +533,19 @@ class _TensorNDBase(
         ...
 
     @overload
-    def reshape(self, size: Tuple[_int, _int]) -> "Tensor2D":
-        ...
+    def reshape(self, size: Tuple[_int, _int]) -> "Tensor2D": ...
 
     @overload
-    def reshape(self, size: Tuple[_int, _int, _int]) -> "Tensor3D":
-        ...
+    def reshape(self, size: Tuple[_int, _int, _int]) -> "Tensor3D": ...
 
     @overload
-    def reshape(self, size: Tuple[_int, ...]) -> "Tensor":
-        ...
+    def reshape(self, size: Tuple[_int, ...]) -> "Tensor": ...
 
     @overload
-    def reshape(self, size0: _int) -> "Tensor1D":
-        ...
+    def reshape(self, size0: _int) -> "Tensor1D": ...
 
     @overload
-    def reshape(self, size0: _int, size1: _int) -> "Tensor2D":
-        ...
+    def reshape(self, size0: _int, size1: _int) -> "Tensor2D": ...
 
     @overload
     def reshape(self, size0: _int, size1: _int, size2: _int) -> "Tensor3D":  # type: ignore
@@ -579,8 +564,7 @@ class _TensorNDBase(
         ...
 
     @overload
-    def sum(self: "Tensor1D", dim: _int) -> "Tensor0D":
-        ...
+    def sum(self: "Tensor1D", dim: _int) -> "Tensor0D": ...
 
     @overload
     def sum(self: "Tensor2D", dim: _int) -> "Tensor1D":  # type: ignore
@@ -602,8 +586,7 @@ class _TensorNDBase(
         copy: _bool = False,
         *,
         memory_format: Optional[torch.memory_format] = None,
-    ) -> T_Tensor:
-        ...
+    ) -> T_Tensor: ...
 
     @overload
     def to(
@@ -614,8 +597,7 @@ class _TensorNDBase(
         copy: _bool = False,
         *,
         memory_format: Optional[torch.memory_format] = None,
-    ) -> T_Tensor:
-        ...
+    ) -> T_Tensor: ...
 
     @overload
     def to(
@@ -625,8 +607,7 @@ class _TensorNDBase(
         copy: _bool = False,
         *,
         memory_format: Optional[torch.memory_format] = None,
-    ) -> T_Tensor:
-        ...
+    ) -> T_Tensor: ...
 
     @overload
     def tolist(self) -> Union[list, T_BuiltinNumber]:  # type: ignore
@@ -657,28 +638,22 @@ class _TensorNDBase(
         ...
 
     @overload
-    def view(self, size: Tuple[_int, _int]) -> "Tensor2D":
-        ...
+    def view(self, size: Tuple[_int, _int]) -> "Tensor2D": ...
 
     @overload
-    def view(self, size: Tuple[_int, _int, _int]) -> "Tensor3D":
-        ...
+    def view(self, size: Tuple[_int, _int, _int]) -> "Tensor3D": ...
 
     @overload
-    def view(self, size: Tuple[_int, ...]) -> "Tensor":
-        ...
+    def view(self, size: Tuple[_int, ...]) -> "Tensor": ...
 
     @overload
-    def view(self, size0: _int) -> "Tensor1D":
-        ...
+    def view(self, size0: _int) -> "Tensor1D": ...
 
     @overload
-    def view(self, size0: _int, size1: _int) -> "Tensor2D":
-        ...
+    def view(self, size0: _int, size1: _int) -> "Tensor2D": ...
 
     @overload
-    def view(self, size0: _int, size1: _int, size2: _int) -> "Tensor3D":
-        ...
+    def view(self, size0: _int, size1: _int, size2: _int) -> "Tensor3D": ...
 
     @overload
     def view(self, *size: _int) -> "Tensor":  # type: ignore
@@ -728,8 +703,7 @@ class _TensorNDBase(
 class Tensor(
     _TensorNDBase[Literal[None], _int, BuiltinNumber, _bool, _bool, _bool],
     metaclass=_TensorNDMeta[Literal[None], _int, BuiltinNumber, _bool, _bool, _bool],
-):
-    ...
+): ...
 
 
 class Tensor0D(
@@ -737,8 +711,7 @@ class Tensor0D(
     metaclass=_TensorNDMeta[
         Literal[None], Literal[0], BuiltinNumber, _bool, _bool, _bool
     ],
-):
-    ...
+): ...
 
 
 class Tensor1D(
@@ -746,8 +719,7 @@ class Tensor1D(
     metaclass=_TensorNDMeta[
         Literal[None], Literal[1], BuiltinNumber, _bool, _bool, _bool
     ],
-):
-    ...
+): ...
 
 
 class Tensor2D(
@@ -755,8 +727,7 @@ class Tensor2D(
     metaclass=_TensorNDMeta[
         Literal[None], Literal[2], BuiltinNumber, _bool, _bool, _bool
     ],
-):
-    ...
+): ...
 
 
 class Tensor3D(
@@ -764,8 +735,7 @@ class Tensor3D(
     metaclass=_TensorNDMeta[
         Literal[None], Literal[3], BuiltinNumber, _bool, _bool, _bool
     ],
-):
-    ...
+): ...
 
 
 # ----------------------------------------
@@ -790,8 +760,7 @@ class BoolTensor(
         Literal[False],
         Literal[False],
     ],
-):
-    ...
+): ...
 
 
 class BoolTensor0D(
@@ -899,8 +868,7 @@ class ByteTensor(
         Literal[False],
         Literal[False],
     ],
-):
-    ...
+): ...
 
 
 class ByteTensor0D(
@@ -1008,8 +976,7 @@ class CharTensor(
         Literal[False],
         Literal[True],
     ],
-):
-    ...
+): ...
 
 
 class CharTensor0D(
@@ -1117,8 +1084,7 @@ class DoubleTensor(
         Literal[False],
         Literal[True],
     ],
-):
-    ...
+): ...
 
 
 class DoubleTensor0D(
@@ -1226,8 +1192,7 @@ class FloatTensor(
         Literal[False],
         Literal[True],
     ],
-):
-    ...
+): ...
 
 
 class FloatTensor0D(
@@ -1247,8 +1212,7 @@ class FloatTensor0D(
         Literal[False],
         Literal[True],
     ],
-):
-    ...
+): ...
 
 
 class FloatTensor1D(
@@ -1334,8 +1298,7 @@ class HalfTensor(
         Literal[False],
         Literal[True],
     ],
-):
-    ...
+): ...
 
 
 class HalfTensor0D(
@@ -1443,8 +1406,7 @@ class IntTensor(
         Literal[False],
         Literal[True],
     ],
-):
-    ...
+): ...
 
 
 class IntTensor0D(
@@ -1552,8 +1514,7 @@ class LongTensor(
         Literal[False],
         Literal[True],
     ],
-):
-    ...
+): ...
 
 
 class LongTensor0D(
@@ -1661,8 +1622,7 @@ class ShortTensor(
         Literal[False],
         Literal[True],
     ],
-):
-    ...
+): ...
 
 
 class ShortTensor0D(
@@ -1770,8 +1730,7 @@ class CFloatTensor(
         Literal[True],
         Literal[True],
     ],
-):
-    ...
+): ...
 
 
 class CFloatTensor0D(
@@ -1881,8 +1840,7 @@ if hasattr(torch, "complex32"):
             Literal[True],
             Literal[True],
         ],
-    ):
-        ...
+    ): ...
 
     class CHalfTensor0D(
         _TensorNDBase[
@@ -1986,8 +1944,7 @@ class CDoubleTensor(
         Literal[True],
         Literal[True],
     ],
-):
-    ...
+): ...
 
 
 class CDoubleTensor0D(

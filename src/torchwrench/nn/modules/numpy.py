@@ -5,7 +5,6 @@ from typing import Union
 
 from torch import Tensor
 
-from torchwrench.nn.modules.module import Module
 from torchwrench.core.make import DeviceLike, DTypeLike
 from torchwrench.core.packaging import _NUMPY_AVAILABLE
 from torchwrench.extras.numpy.definitions import np
@@ -14,6 +13,7 @@ from torchwrench.extras.numpy.functional import (
     tensor_to_numpy,
     to_numpy,
 )
+from torchwrench.nn.modules.module import Module
 
 
 class ToNumpy(Module):
@@ -53,7 +53,7 @@ class TensorToNumpy(Module):
         if not _NUMPY_AVAILABLE:
             msg = f"Cannot use {self.__class__.__name__} because numpy dependancy is not installed."
             raise RuntimeError(msg)
-        
+
         super().__init__()
         self.dtype = dtype
         self.force = force

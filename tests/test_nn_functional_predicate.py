@@ -65,9 +65,9 @@ class TestCanBeConvertedToTensor(TestCase):
                 stackable = False
 
             # note: is_convertible_to_tensor(example) => convertible, but not necessary equal
-            assert (
-                not is_convertible_to_tensor(example) or convertible
-            ), f"can_be_converted_to_tensor: {example=}"
+            assert not is_convertible_to_tensor(example) or convertible, (
+                f"can_be_converted_to_tensor: {example=}"
+            )
 
             assert is_stackable(example) == stackable, f"is_stackable: {example=}"
 

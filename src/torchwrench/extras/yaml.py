@@ -6,16 +6,17 @@ from io import TextIOBase
 from pathlib import Path
 from typing import Any, Iterable, Literal, Mapping, Optional, Type, Union
 
+from pythonwrench.warnings import deprecated_alias
 from typing_extensions import TypeAlias
 
 from torchwrench.core.packaging import _OMEGACONF_AVAILABLE, _YAML_AVAILABLE
-from pythonwrench.warnings import deprecated_alias
 
 if not _YAML_AVAILABLE:
     msg = f"Cannot use python module {__file__} since pyyaml package is not installed. Please install it with `pip install torchwrench[extras]`."
     raise ImportError(msg)
 
 import yaml
+from pythonwrench.typing import DataclassInstance, NamedTupleInstance
 from yaml import (
     BaseLoader,
     CBaseLoader,
@@ -35,7 +36,6 @@ from yaml import (
 from yaml.parser import ParserError
 from yaml.scanner import ScannerError
 
-from pythonwrench.typing import DataclassInstance, NamedTupleInstance
 from torchwrench.serialization.common import to_builtin
 
 if _OMEGACONF_AVAILABLE:
@@ -224,5 +224,4 @@ SplitTagLoader.add_multi_constructor("tag:", SplitTagLoader.construct_with_tag)
 
 
 @deprecated_alias(dump_yaml)
-def to_yaml(*args, **kwargs):
-    ...
+def to_yaml(*args, **kwargs): ...

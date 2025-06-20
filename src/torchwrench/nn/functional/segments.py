@@ -4,12 +4,12 @@
 from typing import List, Optional, Tuple, Union
 
 import torch
+from pythonwrench.warnings import deprecated_alias
 from torch import Tensor
 
 from torchwrench.core.make import DeviceLike, as_device
 from torchwrench.nn import functional as F
 from torchwrench.nn.functional.padding import pad_and_stack_rec, pad_dim
-from pythonwrench.warnings import deprecated_alias
 from torchwrench.types import BoolTensor, LongTensor
 
 
@@ -161,9 +161,9 @@ def _segments_list_tensor_to_activity(
     else:
         device = as_device(device)
 
-    assert (
-        segments_list.ndim >= 2 and segments_list.shape[-1] == 2
-    ), f"{segments_list.shape=}"
+    assert segments_list.ndim >= 2 and segments_list.shape[-1] == 2, (
+        f"{segments_list.shape=}"
+    )
     starts, ends = segments_list.permute(-1, *range(0, segments_list.ndim - 1))
 
     if maxsize is None:
@@ -205,10 +205,8 @@ def segments_to_activity(x: Tensor, maxsize: Optional[int] = None) -> BoolTensor
 
 
 @deprecated_alias(activity_to_segments)
-def extract_segments(*args, **kwargs):
-    ...
+def extract_segments(*args, **kwargs): ...
 
 
 @deprecated_alias(segments_to_segments_list)
-def segments_to_list(*args, **kwargs):
-    ...
+def segments_to_list(*args, **kwargs): ...
