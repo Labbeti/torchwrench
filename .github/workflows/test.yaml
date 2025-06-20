@@ -65,8 +65,7 @@ jobs:
       if: matrix.torch-version != 'torch-latest'
       shell: bash
       run: |
-        uv add torch==${{ matrix.torch-version }}
-        uv add . --editable --all-extras --dev
+        uv add torch==${{ matrix.torch-version }} . --extra extras --dev
 
     - name: Additional install soundfile (Ubuntu)
       if: matrix.os == 'ubuntu-latest'
@@ -170,8 +169,7 @@ jobs:
       if: matrix.torch-version != 'torch-latest'
       shell: bash
       run: |
-        uv add torch==${{ matrix.torch-version }}
-        uv add . --editable --all-extras --dev
+        uv add torch==${{ matrix.torch-version }} . --dev
 
     - name: Additional install soundfile (Ubuntu)
       if: matrix.os == 'ubuntu-latest'
