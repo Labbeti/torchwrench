@@ -157,7 +157,7 @@ def _checksum_tensor_array_like(
             xbytes = _serialize_tensor_to_bytes(x)
         csum = checksum_bytes(xbytes, **kwargs)
     else:
-        msg = f"invalid argument type {type(x)}. (expected ndarray or Tensor)"
+        msg = f"Invalid argument type {type(x)}. (expected ndarray or Tensor)"
         raise TypeError(msg)
 
     return csum
