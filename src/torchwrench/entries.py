@@ -30,8 +30,8 @@ def get_install_info() -> Dict[str, Union[str, int]]:
         "num_cpus": get_auto_num_cpus(),
         "num_gpus": get_auto_num_gpus(),
         "package_path": get_package_repository_path(),
-        "torchwrench_tmpdir": str(get_tmp_dir()),
-        "torchwrench_cachedir": str(get_cache_dir()),
+        "TORCHWRENCH_TMPDIR": str(get_tmp_dir()),
+        "TORCHWRENCH_CACHEDIR": str(get_cache_dir()),
         "torch_hub": get_dir(),
     }
     install_info.update({k: str(v) for k, v in _EXTRA_VERSION.items()})

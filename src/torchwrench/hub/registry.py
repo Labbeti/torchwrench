@@ -25,7 +25,7 @@ from typing_extensions import NotRequired
 
 from torchwrench.core.make import DeviceLike, as_device
 from pythonwrench.hashlib import HashName, hash_file
-from pythonwrench.warnings import deprecated_function, warn_once
+from pythonwrench.warnings import warn_once
 from torchwrench.serialization.json import dump_json, load_json
 from torchwrench.serialization.load_fn import LOAD_FNS, LoadFnLike, load_torch
 
@@ -252,12 +252,3 @@ class RegistryHub(Generic[T_Hashable]):
         path = Path(path).resolve().expanduser()
         name = path_to_name.get(path, None)
         return name
-
-
-@deprecated_function()
-def get_default_register_root() -> Path:
-    """Default register root path is `~/.cache/torch/hub/checkpoints`, which is based on `torch.hub.get_dir`."""
-    path = torch.hub.get_dir()
-    path = Path(path)
-    path = path.joinpath("checkpoints")
-    return path
