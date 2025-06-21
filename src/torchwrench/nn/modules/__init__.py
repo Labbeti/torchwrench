@@ -42,7 +42,7 @@ from .multilabel import (
     ProbsToMultihot,
     ProbsToMultinames,
 )
-from .numpy import NumpyToTensor, TensorToNumpy, ToNumpy
+from .numpy import NDArrayToTensor, TensorToNDArray, ToNDArray
 from .pad import PadAndStackRec, PadDim, PadDims
 from .powerset import MultilabelToPowerset, PowersetToMultilabel
 from .tensor import (

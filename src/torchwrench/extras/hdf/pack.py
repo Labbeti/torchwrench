@@ -62,7 +62,7 @@ from torchwrench.extras.numpy import (
     numpy_is_complex_dtype,
     scan_shape_dtypes,
 )
-from torchwrench.serialization.common import to_builtin
+from torchwrench.serialization.common import as_builtin
 from torchwrench.types import BuiltinScalar
 from torchwrench.utils.data.dataloader import get_auto_num_cpus
 from torchwrench.utils.data.dataset import IterableDataset, SizedDatasetLike
@@ -192,7 +192,7 @@ def pack_to_hdf(
         "all_eq_shapes": all_eq_shapes,
         "src_np_dtypes": src_np_dtypes,
     }
-    data = to_builtin(data)
+    data = as_builtin(data)
 
     with NamedTemporaryFile(
         "w",
@@ -358,7 +358,7 @@ def pack_to_hdf(
             "encoding": encoding,
             "file_kwds": file_kwds,
             "global_hash_value": global_hash_value,
-            "info": to_builtin(info),
+            "info": as_builtin(info),
             "item_type": item_type,
             "length": len(dataset),
             "load_as_complex": {},  # for backward compatibility only
@@ -368,7 +368,7 @@ def pack_to_hdf(
             "src_np_dtypes": src_np_dtypes_dumped,
             "store_complex_as_real": False,  # for backward compatibility only
             "store_str_as_vlen": store_str_as_vlen,
-            "user_attrs": to_builtin(user_attrs),
+            "user_attrs": as_builtin(user_attrs),
             "torchwrench_version": str(tw.__version__),
         }
         for name in _DUMPED_JSON_KEYS:

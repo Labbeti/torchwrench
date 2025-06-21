@@ -186,7 +186,7 @@ class TestHDF(TestCase):
         path = tmpdir.joinpath("test_slice.hdf")
         pack_to_hdf(ds_list, path, exists="overwrite", ds_kwds=dict(open_hdf=False))
 
-        hdf_dataset = HDFDataset(path, cast="to_builtin")
+        hdf_dataset = HDFDataset(path, cast="as_builtin")
 
         assert len(hdf_dataset) == len(ds_list)
         assert hdf_dataset[:, "a"] == ds_dict["a"]
@@ -228,7 +228,7 @@ class TestHDF(TestCase):
             ds_list,
             path,
             exists="overwrite",
-            ds_kwds=dict(cast="to_builtin"),
+            ds_kwds=dict(cast="as_builtin"),
         )
 
         assert hdf_dataset._src_is_unicode == {

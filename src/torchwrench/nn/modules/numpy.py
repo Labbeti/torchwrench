@@ -9,14 +9,14 @@ from torchwrench.core.make import DeviceLike, DTypeLike
 from torchwrench.core.packaging import _NUMPY_AVAILABLE
 from torchwrench.extras.numpy.definitions import np
 from torchwrench.extras.numpy.functional import (
-    numpy_to_tensor,
-    tensor_to_numpy,
-    to_numpy,
+    ndarray_to_tensor,
+    tensor_to_ndarray,
+    to_ndarray,
 )
 from torchwrench.nn.modules.module import Module
 
 
-class ToNumpy(Module):
+class ToNDArray(Module):
     """
     For more information, see :func:`~torchwrench.nn.functional.numpy.to_numpy`.
     """
@@ -36,10 +36,10 @@ class ToNumpy(Module):
         self.force = force
 
     def forward(self, x: Union[Tensor, np.ndarray, list]) -> np.ndarray:
-        return to_numpy(x, dtype=self.dtype, force=self.force)
+        return to_ndarray(x, dtype=self.dtype, force=self.force)
 
 
-class TensorToNumpy(Module):
+class TensorToNDArray(Module):
     """
     For more information, see :func:`~torchwrench.nn.functional.numpy.tensor_to_numpy`.
     """
@@ -59,10 +59,10 @@ class TensorToNumpy(Module):
         self.force = force
 
     def forward(self, x: Tensor) -> np.ndarray:
-        return tensor_to_numpy(x, dtype=self.dtype, force=self.force)
+        return tensor_to_ndarray(x, dtype=self.dtype, force=self.force)
 
 
-class NumpyToTensor(Module):
+class NDArrayToTensor(Module):
     """
     For more information, see :func:`~torchwrench.nn.functional.numpy.numpy_to_tensor`.
     """
@@ -82,4 +82,4 @@ class NumpyToTensor(Module):
         self.dtype = dtype
 
     def forward(self, x: np.ndarray) -> Tensor:
-        return numpy_to_tensor(x, dtype=self.dtype, device=self.device)
+        return ndarray_to_tensor(x, dtype=self.dtype, device=self.device)

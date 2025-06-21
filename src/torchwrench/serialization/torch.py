@@ -12,7 +12,6 @@ from typing import IO, Any, BinaryIO, Callable, Dict, Optional, Union
 import torch
 from pythonwrench.io import _setup_path
 from pythonwrench.semver import Version
-from pythonwrench.warnings import deprecated_alias
 from torch.serialization import DEFAULT_PROTOCOL
 from torch.types import Storage
 from typing_extensions import TypeAlias
@@ -88,7 +87,3 @@ def load_torch(
         **kwds,
         **pickle_load_args,
     )
-
-
-@deprecated_alias(dump_torch)
-def to_torch(*args, **kwargs): ...

@@ -87,8 +87,6 @@ from .powerset import multilabel_to_powerset, powerset_to_multilabel
 from .predicate import (
     all_eq,
     all_ne,
-    can_be_converted_to_tensor,
-    can_be_stacked,
     is_complex,
     is_convertible_to_tensor,
     is_floating_point,
@@ -100,10 +98,8 @@ from .predicate import (
 from .segments import (
     activity_to_segments,
     activity_to_segments_list,
-    extract_segments,
     segments_list_to_activity,
     segments_to_activity,
-    segments_to_list,
     segments_to_segments_list,
 )
 from .transform import (  # noqa: F811

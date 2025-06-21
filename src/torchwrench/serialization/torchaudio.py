@@ -4,5 +4,4 @@
 from torchwrench.extras.torchaudio import (  # noqa: F401
     dump_with_torchaudio,
     load_with_torchaudio,
-    to_torchaudio,
 )

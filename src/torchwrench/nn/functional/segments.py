@@ -4,7 +4,6 @@
 from typing import List, Optional, Tuple, Union
 
 import torch
-from pythonwrench.warnings import deprecated_alias
 from torch import Tensor
 
 from torchwrench.core.make import DeviceLike, as_device
@@ -202,11 +201,3 @@ def segments_to_activity(x: Tensor, maxsize: Optional[int] = None) -> BoolTensor
     segments_lst = segments_to_segments_list(x, maxsize)
     activity = segments_list_to_activity(segments_lst, maxsize)
     return activity
-
-
-@deprecated_alias(activity_to_segments)
-def extract_segments(*args, **kwargs): ...
-
-
-@deprecated_alias(segments_to_segments_list)
-def segments_to_list(*args, **kwargs): ...

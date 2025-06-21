@@ -12,10 +12,10 @@ from torchwrench.extras.numpy import (
     numpy_is_complex,
     numpy_is_complex_dtype,
     numpy_item,
-    numpy_to_tensor,
+    ndarray_to_tensor,
     numpy_view_as_complex,
     numpy_view_as_real,
-    tensor_to_numpy,
+    tensor_to_ndarray,
 )
 
 
@@ -25,8 +25,8 @@ class TestNumpyConversions(TestCase):
             return None
 
         x_tensor = torch.rand(3, 4, 5)
-        x_array = tensor_to_numpy(x_tensor)
-        result = numpy_to_tensor(x_array)
+        x_array = tensor_to_ndarray(x_tensor)
+        result = ndarray_to_tensor(x_array)
 
         assert torch.equal(x_tensor, result)
 

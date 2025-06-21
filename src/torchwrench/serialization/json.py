@@ -6,9 +6,8 @@ from typing import Any, Optional, Union
 
 from pythonwrench.json import dump_json as _dump_json_base
 from pythonwrench.json import load_json  # noqa: F401
-from pythonwrench.warnings import deprecated_alias
 
-from .common import to_builtin
+from .common import as_builtin
 
 
 def dump_json(
@@ -25,7 +24,7 @@ def dump_json(
 ) -> str:
     """Dump content to JSON format into a string and/or file."""
     if to_builtins:
-        data = to_builtin(data)
+        data = as_builtin(data)
 
     return _dump_json_base(
         data,
@@ -36,7 +35,3 @@ def dump_json(
         ensure_ascii=ensure_ascii,
         **json_dump_kwds,
     )
-
-
-@deprecated_alias(dump_json)
-def to_json(*args, **kwargs): ...

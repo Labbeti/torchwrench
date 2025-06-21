@@ -6,7 +6,6 @@ from io import TextIOBase
 from pathlib import Path
 from typing import Any, Iterable, Literal, Mapping, Optional, Type, Union
 
-from pythonwrench.warnings import deprecated_alias
 from typing_extensions import TypeAlias
 
 from torchwrench.core.packaging import _OMEGACONF_AVAILABLE, _YAML_AVAILABLE
@@ -36,7 +35,7 @@ from yaml import (
 from yaml.parser import ParserError
 from yaml.scanner import ScannerError
 
-from torchwrench.serialization.common import to_builtin
+from torchwrench.serialization.common import as_builtin
 
 if _OMEGACONF_AVAILABLE:
     from omegaconf import OmegaConf  # type: ignore
@@ -48,7 +47,6 @@ __all__ = [
     "dump_yaml",
     "IgnoreTagLoader",
     "SplitTagLoader",
-    "to_yaml",
 ]
 
 
@@ -108,7 +106,7 @@ def dump_yaml(
         data = OmegaConf.to_container(data, resolve=True)  # type: ignore
 
     if to_builtins:
-        data = to_builtin(data)
+        data = as_builtin(data)
 
     content = yaml.dump(
         data,
@@ -221,7 +219,3 @@ class SplitTagLoader(SafeLoader):
 
 SplitTagLoader.add_multi_constructor("!", SplitTagLoader.construct_with_tag)
 SplitTagLoader.add_multi_constructor("tag:", SplitTagLoader.construct_with_tag)
-
-
-@deprecated_alias(dump_yaml)
-def to_yaml(*args, **kwargs): ...

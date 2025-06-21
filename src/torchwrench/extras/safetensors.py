@@ -7,7 +7,6 @@ from typing import Any, Dict, Literal, Optional, Tuple, Union, overload
 from pythonwrench.inspect import get_fullname
 from pythonwrench.io import _setup_path
 from pythonwrench.typing.checks import isinstance_generic
-from pythonwrench.warnings import deprecated_alias
 from safetensors import safe_open
 from safetensors.torch import save
 from torch import Tensor
@@ -98,7 +97,3 @@ def dump_safetensors(
     if fpath is not None:
         fpath.write_bytes(content)
     return content
-
-
-@deprecated_alias(dump_safetensors)
-def to_safetensors(*args, **kwargs): ...

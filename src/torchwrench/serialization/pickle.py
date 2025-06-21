@@ -7,9 +7,8 @@ from typing import Any, Union
 
 from pythonwrench.pickle import dump_pickle as _dump_pickle_base
 from pythonwrench.pickle import load_pickle  # noqa: F401
-from pythonwrench.warnings import deprecated_alias
 
-from .common import to_builtin
+from .common import as_builtin
 
 
 def dump_pickle(
@@ -22,9 +21,5 @@ def dump_pickle(
 ) -> bytes:
     """Dump content to PICKLE format into a bytes and/or file."""
     if to_builtins:
-        obj = to_builtin(obj)
+        obj = as_builtin(obj)
     return _dump_pickle_base(obj, fpath, overwrite=overwrite, make_parents=make_parents)
-
-
-@deprecated_alias(dump_pickle)
-def to_pickle(*args, **kwargs): ...

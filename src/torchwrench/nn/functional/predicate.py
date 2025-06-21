@@ -9,7 +9,6 @@ from pythonwrench.collections import all_ne as builtin_all_ne
 from pythonwrench.collections import is_sorted as builtin_is_sorted
 from pythonwrench.functools import function_alias
 from pythonwrench.typing import is_builtin_number, isinstance_generic
-from pythonwrench.warnings import deprecated_alias
 from torch import Tensor
 from typing_extensions import TypeGuard
 
@@ -263,11 +262,3 @@ def is_full(x: TensorOrArray, target: Any = ...) -> bool:
 
 @function_alias(all_ne)
 def is_unique(*args, **kwargs): ...
-
-
-@deprecated_alias(is_stackable)
-def can_be_stacked(*args, **kwargs): ...
-
-
-@deprecated_alias(is_convertible_to_tensor)
-def can_be_converted_to_tensor(*args, **kwargs): ...

@@ -7,7 +7,6 @@ import os.path as osp
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, TypedDict, Union
 
-from pythonwrench.warnings import deprecated_alias
 from typing_extensions import NotRequired
 
 from torchwrench.core.packaging import _TENSORBOARD_AVAILABLE
@@ -174,19 +173,3 @@ def get_tfevents_duration(
     wall_times = [event["wall_time"] for event in events]
     duration = max(wall_times) - min(wall_times)
     return duration
-
-
-@deprecated_alias(load_tfevents)
-def load_with_tensorboard(*args, **kwargs): ...
-
-
-@deprecated_alias(load_tfevents)
-def load_event_file(*args, **kwargs): ...
-
-
-@deprecated_alias(load_tfevents_files)
-def load_event_files(*args, **kwargs): ...
-
-
-@deprecated_alias(get_tfevents_duration)
-def get_duration(*args, **kwargs): ...

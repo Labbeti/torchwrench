@@ -20,11 +20,11 @@ from pythonwrench.csv import Orient, _setup_path
 from pythonwrench.csv import dump_csv as _dump_csv_base
 from pythonwrench.csv import load_csv as _load_csv_base
 from pythonwrench.importlib import Placeholder
-from pythonwrench.warnings import deprecated_alias, warn_once
+from pythonwrench.warnings import warn_once
 
 from torchwrench.core.packaging import _PANDAS_AVAILABLE
 
-from .common import to_builtin
+from .common import as_builtin
 
 if _PANDAS_AVAILABLE:
     import pandas as pd  # type: ignore
@@ -60,7 +60,7 @@ def dump_csv(
         if isinstance(data, DataFrame) and backend == "pandas":
             msg = f"Inconsistent combinaison of arguments: {to_builtins=}, {backend=} and {type(data)=}."
             warn_once(msg)
-        data = to_builtin(data)
+        data = as_builtin(data)
 
     if backend == "csv":
         return _dump_csv_base(
@@ -232,7 +232,3 @@ def _load_csv_with_pandas(
     else:
         msg = f"Invalid argument {orient=}. (expected one of {get_args(Orient)})"
         raise ValueError(msg)
-
-
-@deprecated_alias(dump_csv)
-def to_csv(*args, **kwargs): ...

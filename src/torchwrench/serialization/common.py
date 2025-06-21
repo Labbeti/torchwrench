@@ -161,7 +161,7 @@ BACKEND_TO_PATTERN: Dict[SavingBackend, str] = {
 
 
 @overload
-def to_builtin(
+def as_builtin(
     x: Enum,
     *,
     unk_mode: UnkMode = "error",
@@ -169,7 +169,7 @@ def to_builtin(
 
 
 @overload
-def to_builtin(
+def as_builtin(
     x: Path,
     *,
     unk_mode: UnkMode = "error",
@@ -177,7 +177,7 @@ def to_builtin(
 
 
 @overload
-def to_builtin(
+def as_builtin(
     x: Pattern,
     *,
     unk_mode: UnkMode = "error",
@@ -185,7 +185,7 @@ def to_builtin(
 
 
 @overload
-def to_builtin(
+def as_builtin(
     x: Namespace,
     *,
     unk_mode: UnkMode = "error",
@@ -193,7 +193,7 @@ def to_builtin(
 
 
 @overload
-def to_builtin(
+def as_builtin(
     x: Tensor,
     *,
     unk_mode: UnkMode = "error",
@@ -201,7 +201,7 @@ def to_builtin(
 
 
 @overload
-def to_builtin(
+def as_builtin(
     x: Mapping[K, V],
     *,
     unk_mode: UnkMode = "error",
@@ -209,7 +209,7 @@ def to_builtin(
 
 
 @overload
-def to_builtin(
+def as_builtin(
     x: DataclassInstance,
     *,
     unk_mode: UnkMode = "error",
@@ -217,7 +217,7 @@ def to_builtin(
 
 
 @overload
-def to_builtin(
+def as_builtin(
     x: NamedTupleInstance,
     *,
     unk_mode: UnkMode = "error",
@@ -225,7 +225,7 @@ def to_builtin(
 
 
 @overload
-def to_builtin(
+def as_builtin(
     x: T_BuiltinScalar,
     *,
     unk_mode: UnkMode = "error",
@@ -233,14 +233,14 @@ def to_builtin(
 
 
 @overload
-def to_builtin(
+def as_builtin(
     x: Any,
     *,
     unk_mode: UnkMode = "error",
 ) -> Any: ...
 
 
-def to_builtin(
+def as_builtin(
     x: Any,
     *,
     unk_mode: UnkMode = "error",
@@ -277,25 +277,25 @@ def to_builtin(
 
     # Non-terminal cases (iterables and mappings)
     if _OMEGACONF_AVAILABLE and isinstance(x, (DictConfig, ListConfig)):  # type: ignore
-        return to_builtin(OmegaConf.to_container(x, resolve=False, enum_to_str=True))  # type: ignore
+        return as_builtin(OmegaConf.to_container(x, resolve=False, enum_to_str=True))  # type: ignore
     if _PANDAS_AVAILABLE and isinstance(x, DataFrame):  # type: ignore
-        return to_builtin(x.to_dict("list"))
+        return as_builtin(x.to_dict("list"))
     if isinstance(x, Namespace):
-        return to_builtin(x.__dict__)
+        return as_builtin(x.__dict__)
     if is_dataclass_instance(x):
-        return to_builtin(asdict(x))
+        return as_builtin(asdict(x))
     if is_namedtuple_instance(x):
-        return to_builtin(x._asdict())
+        return as_builtin(x._asdict())
     if isinstance(x, Mapping):
-        return {to_builtin(k): to_builtin(v) for k, v in x.items()}
+        return {as_builtin(k): as_builtin(v) for k, v in x.items()}
     if isinstance(x, Iterable):
-        return [to_builtin(xi) for xi in x]
+        return [as_builtin(xi) for xi in x]
 
     if unk_mode == "identity":
         return x
     elif unk_mode == "error":
-        raise TypeError(f"Unsupported argument type {type(x)}.")
+        msg = f"Unsupported argument type {type(x)}."
+        raise TypeError(msg)
     else:
-        raise ValueError(
-            f"Invalid argument {unk_mode=}. (expected one of {get_args(UnkMode)})"
-        )
+        msg = f"Invalid argument {unk_mode=}. (expected one of {get_args(UnkMode)})"
+        raise ValueError(msg)

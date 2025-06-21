@@ -18,7 +18,7 @@ from torchwrench.nn.functional import deep_equal
 from torchwrench.serialization.common import (
     SavingBackend,
     _fpath_to_saving_backend,
-    to_builtin,
+    as_builtin,
 )
 
 
@@ -34,7 +34,7 @@ class TestSaving(TestCase):
             ],
         ]
         expected = [[[list(range(3))], "a", "path", {"a": 3, "b": 1, "c": 1}, []]]
-        result = to_builtin(x)
+        result = as_builtin(x)
         assert result == expected, f"{result=}; {expected=}"
 
     def test_backend(self) -> None:
@@ -93,7 +93,7 @@ class TestSaving(TestCase):
 
         for i, (backend, data, to_builtins, load_kwds) in enumerate(tests):
             if to_builtins:
-                data = tw.to_builtin(data)
+                data = tw.as_builtin(data)
             if backend == "safetensors":
                 data = pw.sorted_dict(data)
 

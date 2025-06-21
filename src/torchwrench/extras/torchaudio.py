@@ -11,7 +11,6 @@ import torch
 from pythonwrench.functools import function_alias
 from pythonwrench.importlib import Placeholder
 from pythonwrench.io import _setup_path
-from pythonwrench.warnings import deprecated_alias
 
 from torchwrench.core.packaging import _TORCHAUDIO_AVAILABLE
 
@@ -103,7 +102,3 @@ def dump_audio(*args, **kwargs): ...
 
 @function_alias(load_with_torchaudio)
 def load_audio(*args, **kwargs): ...
-
-
-@deprecated_alias(dump_with_torchaudio)
-def to_torchaudio(*args, **kwargs): ...

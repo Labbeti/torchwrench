@@ -62,7 +62,7 @@ from .extras.numpy import ndarray_to_tensor, tensor_to_ndarray, to_ndarray
 from .hub.download import download_file
 from .hub.paths import get_cache_dir, get_tmp_dir
 from .nn.functional import *
-from .serialization.common import to_builtin
+from .serialization.common import as_builtin
 from .serialization.csv import dump_csv, load_csv
 from .serialization.dump_fn import dump, save
 from .serialization.json import dump_json, load_json

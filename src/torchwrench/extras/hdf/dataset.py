@@ -48,7 +48,7 @@ from torchwrench.nn.functional.indices import get_inverse_perm
 from torchwrench.types._typing import ScalarLike
 from torchwrench.types.guards import is_scalar_like
 from torchwrench.utils.data import DatasetSlicer
-from torchwrench.utils.saving import to_builtin
+from torchwrench.utils.saving import as_builtin
 
 T = TypeVar("T", covariant=True)
 U = TypeVar("U", covariant=False)
@@ -58,7 +58,7 @@ ColumnLike: TypeAlias = Union[str, Iterable[str], None]
 CastMode = Literal[
     "to_torch_or_builtin",
     "to_torch_or_numpy",
-    "to_builtin",
+    "as_builtin",
     "to_numpy_src",
     "to_torch_src",
     "none",
@@ -66,7 +66,7 @@ CastMode = Literal[
 CAST_MODES = (
     "to_torch_or_builtin",
     "to_torch_or_numpy",
-    "to_builtin",
+    "as_builtin",
     "to_numpy_src",
     "to_torch_src",
     "none",
@@ -624,7 +624,7 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
             elif isinstance(hdf_values, np.ndarray):
                 result = hdf_values.tolist()
             else:
-                result = to_builtin(hdf_values)
+                result = as_builtin(hdf_values)
 
         elif self._cast == "to_torch_or_numpy":
             valid = tw.get_shape(hdf_values, return_valid=True).valid
@@ -633,11 +633,11 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
             else:
                 result = np.array(hdf_values)
 
-        elif self._cast == "to_builtin":
+        elif self._cast == "as_builtin":
             if isinstance(hdf_values, np.ndarray):
                 result = hdf_values.tolist()
             else:
-                result = to_builtin(hdf_values)
+                result = as_builtin(hdf_values)
 
         elif self._cast == "to_numpy_src":
             assert isinstance(hdf_values, np.ndarray), f"{type(hdf_values)=}"

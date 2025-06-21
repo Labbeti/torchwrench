@@ -6,5 +6,4 @@ from torchwrench.extras.yaml import (  # noqa: F401
     SafeLoader,
     dump_yaml,
     load_yaml,
-    to_yaml,
 )
