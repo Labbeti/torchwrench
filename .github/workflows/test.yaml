@@ -24,20 +24,20 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-22.04
-            python-version: "3.9"
+          - os: ubuntu-20.04
+            python-version: "3.8"
             torch-version: "1.10"
           - os: ubuntu-latest
             python-version: "3.13"
             torch-version: "torch-latest"
           - os: windows-2019
-            python-version: "3.9"
+            python-version: "3.8"
             torch-version: "1.10"
           - os: windows-latest
             python-version: "3.13"
             torch-version: "torch-latest"
           - os: macos-13
-            python-version: "3.9"
+            python-version: "3.8"
             torch-version: "1.10"
           - os: macos-latest
             python-version: "3.13"
@@ -48,24 +48,23 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Install uv and set Python ${{ matrix.python-version }}
-      uses: astral-sh/setup-uv@v5
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-        enable-cache: true
-        cache-dependency-glob: "pyproject.toml"
+        cache: "pip"
 
     - name: Install package
       if: matrix.torch-version == 'torch-latest'
       shell: bash
       run: |
-        uv run pip install -e .[dev,extras]
+        python -m pip install .[dev,extras]
 
     - name: Install package with PyTorch ${{ matrix.torch-version }}
       if: matrix.torch-version != 'torch-latest'
       shell: bash
       run: |
-        uv run pip install torch==${{ matrix.torch-version }} -e .[dev,extras]
+        python -m pip install torch==${{ matrix.torch-version }} -e .[dev,extras]
 
     - name: Additional install soundfile (Ubuntu)
       if: matrix.os == 'ubuntu-latest'
@@ -88,11 +87,11 @@ jobs:
 
     - name: Test with pytest
       run: |
-        uv run coverage run -m pytest -v
+        coverage run -m pytest -v
 
     - name: Show coverage results
       run: |
-        uv run coverage report -m
+        coverage report -m
 
   build-minimal:
     runs-on: ${{ matrix.os }}
@@ -100,78 +99,75 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-24.04]
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
         torch-version: ["torch-latest"]
         include:
           - os: windows-2019
-            python-version: "3.9"
+            python-version: "3.8"
             torch-version: "1.10"
           - os: windows-latest
-            python-version: "3.12"
+            python-version: "3.13"
             torch-version: "torch-latest"
           - os: macos-13
-            python-version: "3.9"
+            python-version: "3.8"
             torch-version: "1.10"
           - os: macos-latest
-            python-version: "3.12"
+            python-version: "3.13"
             torch-version: "torch-latest"
           - os: ubuntu-24.04
-            python-version: "3.9"
+            python-version: "3.8"
             torch-version: "1.10"
           - os: ubuntu-24.04
-            python-version: "3.9"
+            python-version: "3.8"
             torch-version: "1.11"
           - os: ubuntu-24.04
-            python-version: "3.9"
+            python-version: "3.8"
             torch-version: "1.12"
           - os: ubuntu-24.04
-            python-version: "3.9"
+            python-version: "3.8"
             torch-version: "1.13"
           - os: ubuntu-24.04
-            python-version: "3.9"
+            python-version: "3.8"
             torch-version: "2.0"
           - os: ubuntu-24.04
-            python-version: "3.9"
+            python-version: "3.8"
             torch-version: "2.1"
           - os: ubuntu-24.04
-            python-version: "3.9"
+            python-version: "3.8"
             torch-version: "2.2"
           - os: ubuntu-24.04
-            python-version: "3.9"
+            python-version: "3.8"
             torch-version: "2.3"
           - os: ubuntu-24.04
-            python-version: "3.9"
+            python-version: "3.8"
             torch-version: "2.4"
+            # note: torch 2.5 is not available for python<=3.8
           - os: ubuntu-24.04
             python-version: "3.9"
             torch-version: "2.5"
-          - os: ubuntu-24.04
-            python-version: "3.9"
-            torch-version: "2.6"
 
     steps:
     # --- INSTALLATIONS ---
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Install uv and set Python ${{ matrix.python-version }}
-      uses: astral-sh/setup-uv@v5
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-        enable-cache: true
-        cache-dependency-glob: "pyproject.toml"
+        cache: "pip"
 
     - name: Install package
       if: matrix.torch-version == 'torch-latest'
       shell: bash
       run: |
-        uv run pip install -e .[dev,extras]
+        python -m pip install .[dev]
 
     - name: Install package with PyTorch ${{ matrix.torch-version }}
       if: matrix.torch-version != 'torch-latest'
       shell: bash
       run: |
-        uv run pip install torch==${{ matrix.torch-version }} -e .[dev,extras]
+        python -m pip install torch==${{ matrix.torch-version }} -e .[dev]
 
     - name: Additional install soundfile (Ubuntu)
       if: matrix.os == 'ubuntu-latest'
@@ -192,10 +188,10 @@ jobs:
       run: |
         uv run ruff check
 
-    - name: Test with pytest
+    - name: Test with coverage + pytest
       run: |
-        uv run coverage run -m pytest -v '--ignore-glob=tests/test_extras*.py'
+        coverage run -m pytest -v '--ignore-glob=tests/test_extras*.py'
 
     - name: Show coverage results
       run: |
-        uv run coverage report -m
+        coverage report -m
