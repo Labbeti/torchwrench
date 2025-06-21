@@ -79,11 +79,11 @@ jobs:
     # --- TESTS ---
     - name: Print install info
       run: |
-        uv run torchwrench-info
+        torchwrench-info
 
     - name: Check format with Ruff
       run: |
-        uv run ruff check
+        ruff check
 
     - name: Test with pytest
       run: |
@@ -181,11 +181,11 @@ jobs:
     # --- TESTS ---
     - name: Print install info
       run: |
-        uv run torchwrench-info
+        torchwrench-info
 
     - name: Check format with Ruff
       run: |
-        uv run ruff check
+        ruff check
 
     - name: Test with coverage + pytest
       run: |
