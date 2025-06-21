@@ -6,7 +6,6 @@ from unittest import TestCase
 
 import torch
 
-import torchwrench as tw
 from torchwrench.core.packaging import _NUMPY_AVAILABLE
 from torchwrench.extras.numpy import (
     ndarray_to_tensor,
