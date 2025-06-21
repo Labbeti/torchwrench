@@ -85,6 +85,7 @@ dev = [
     "sphinx-press-theme>=0.8.0",
     "twine>=6.1.0",
     "typing-extensions>=4.10.0",
+    "ipykernel>=6.29.5",
 ]
 extras = [
     "colorlog>=6.9.0",
