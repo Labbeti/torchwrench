@@ -16,7 +16,7 @@ from torchvision.datasets import CIFAR10
 
 from torchwrench.extras.hdf import HDFDataset, pack_to_hdf
 from torchwrench.hub.paths import get_tmp_dir
-from torchwrench.nn import ESequential, IndexToOnehot, ToList, ToNumpy
+from torchwrench.nn import ESequential, IndexToOnehot, ToList, ToNDArray
 from torchwrench.nn.functional import as_tensor
 
 
@@ -34,7 +34,7 @@ class TestHDF(TestCase):
         dataset = CIFAR10(
             str(tmpdir),
             train=False,
-            transform=ToNumpy(),
+            transform=ToNDArray(),
             target_transform=ESequential(IndexToOnehot(10), ToList()),
             download=True,
         )
