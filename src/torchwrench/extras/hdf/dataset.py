@@ -45,10 +45,10 @@ from torchwrench.extras.hdf.common import (
 )
 from torchwrench.extras.numpy.scan_info import numpy_dtype_to_torch_dtype
 from torchwrench.nn.functional.indices import get_inverse_perm
+from torchwrench.serialization.common import as_builtin
 from torchwrench.types._typing import ScalarLike
 from torchwrench.types.guards import is_scalar_like
 from torchwrench.utils.data import DatasetSlicer
-from torchwrench.utils.saving import as_builtin
 
 T = TypeVar("T", covariant=True)
 U = TypeVar("U", covariant=False)

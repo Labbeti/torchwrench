@@ -40,7 +40,7 @@ except ImportError:
 
 import pythonwrench as pw
 from pythonwrench.collections import all_eq
-from pythonwrench.datetime import now_iso
+from pythonwrench.datetime import get_now
 from pythonwrench.functools import Compose
 from pythonwrench.typing import is_dataclass_instance, isinstance_generic
 
@@ -203,7 +203,7 @@ def pack_to_hdf(
         json.dump(data, file)
         scan_results_fpath = Path(file.name)
 
-    creation_date = now_iso()
+    creation_date = get_now()
 
     with h5py.File(hdf_fpath, "w", **file_kwds) as hdf_file:
         # Step 2: Build hdf datasets in file
