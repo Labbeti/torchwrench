@@ -6,20 +6,22 @@ from unittest import TestCase
 
 import torch
 
+import torchwrench as tw
 from torchwrench.core.packaging import _NUMPY_AVAILABLE
 from torchwrench.extras.numpy import (
+    ndarray_to_tensor,
     np,
     numpy_is_complex,
     numpy_is_complex_dtype,
     numpy_item,
-    ndarray_to_tensor,
+    numpy_topk,
     numpy_view_as_complex,
     numpy_view_as_real,
     tensor_to_ndarray,
 )
 
 
-class TestNumpyConversions(TestCase):
+class TestNumpy(TestCase):
     def test_example_1(self) -> None:
         if not _NUMPY_AVAILABLE:
             return None
@@ -66,6 +68,10 @@ class TestNumpyConversions(TestCase):
         x = 10.99
         result = numpy_item(x)
         assert isinstance(result, np.generic)
+
+    def test_numpy_topk(self) -> None:
+        x = np.array([0, 2, 0, 1, 2])
+        assert np.all(numpy_topk(x, k=3) == np.array([2, 1, 2]))
 
 
 if __name__ == "__main__":

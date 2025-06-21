@@ -21,7 +21,7 @@ from torchwrench.core.make import DeviceLike, DTypeLike, as_device, as_dtype
 from torchwrench.extras.numpy.definitions import NumpyNumberLike, NumpyScalarLike, np
 
 
-def to_numpy(
+def to_ndarray(
     x: Union[Tensor, np.ndarray, Iterable, BuiltinScalar],
     *,
     dtype: Union[str, np.dtype, None] = None,
@@ -29,12 +29,12 @@ def to_numpy(
 ) -> np.ndarray:
     """Convert input to numpy array. Works with any arbitrary object."""
     if isinstance(x, Tensor):
-        return tensor_to_numpy(x, dtype=dtype, force=force)
+        return tensor_to_ndarray(x, dtype=dtype, force=force)
     else:
         return np.array(x, dtype=dtype)  # type: ignore
 
 
-def tensor_to_numpy(
+def tensor_to_ndarray(
     x: Tensor,
     *,
     dtype: Union[str, np.dtype, None] = None,
@@ -55,7 +55,7 @@ def tensor_to_numpy(
     return x_arr
 
 
-def numpy_to_tensor(
+def ndarray_to_tensor(
     x: Union[np.ndarray, np.number],
     *,
     device: DeviceLike = None,
@@ -140,10 +140,10 @@ def numpy_topk(
     largest: bool = True,
     sorted: bool = True,
 ) -> Tuple[np.ndarray, np.ndarray]:
-    x_pt = numpy_to_tensor(x)
+    x_pt = ndarray_to_tensor(x)
     values, indices = x_pt.topk(k=k, dim=dim, largest=largest, sorted=sorted)
-    values = tensor_to_numpy(values)
-    indices = tensor_to_numpy(indices)
+    values = tensor_to_ndarray(values)
+    indices = tensor_to_ndarray(indices)
     return values, indices
 
 
@@ -207,13 +207,13 @@ def logical_and_lst(*args, **kwargs): ...
 def logical_or_lst(*args, **kwargs): ...
 
 
-@function_alias(to_numpy)
-def to_ndarray(*args, **kwargs): ...
+@function_alias(to_ndarray)
+def to_numpy(*args, **kwargs): ...
 
 
-@function_alias(tensor_to_numpy)
-def tensor_to_ndarray(*args, **kwargs): ...
+@function_alias(tensor_to_ndarray)
+def tensor_to_numpy(*args, **kwargs): ...
 
 
-@function_alias(numpy_to_tensor)
-def ndarray_to_tensor(*args, **kwargs): ...
+@function_alias(ndarray_to_tensor)
+def numpy_to_tensor(*args, **kwargs): ...

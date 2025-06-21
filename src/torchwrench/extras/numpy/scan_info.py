@@ -152,7 +152,7 @@ def numpy_dtype_to_torch_dtype(
 ) -> Union[torch.dtype, T_Invalid]:
     if dtype in ACCEPTED_NUMPY_DTYPES:
         x = np.empty((0,), dtype=dtype)
-        x = tw.numpy_to_tensor(x)
+        x = tw.ndarray_to_tensor(x)
         return x.dtype
     else:
         return invalid

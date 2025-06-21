@@ -497,7 +497,7 @@ def _scan_dataset(
         return x
 
     def encode_dict_array(x: Dict[str, np.ndarray]) -> Dict[str, Any]:
-        return {k: encode_array(tw.to_numpy(v)) for k, v in x.items()}  # type: ignore
+        return {k: encode_array(tw.to_ndarray(v)) for k, v in x.items()}  # type: ignore
 
     to_dict_fn: Callable[[T], Dict[str, Any]]
 
@@ -553,7 +553,7 @@ def _scan_dataset(
                 else:
                     src_np_dtypes[attr_name] = {np_dtype}  # type: ignore
 
-                value = tw.to_numpy(value)
+                value = tw.to_ndarray(value)
                 if kind == "U" and not store_str_as_vlen:
                     value = encode_array(value)  # type: ignore
                     # update shape and np_dtype after encoding

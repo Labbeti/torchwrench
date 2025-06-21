@@ -18,7 +18,7 @@ from torchwrench.nn.modules.module import Module
 
 class ToNDArray(Module):
     """
-    For more information, see :func:`~torchwrench.nn.functional.numpy.to_numpy`.
+    For more information, see :func:`~torchwrench.nn.functional.numpy.to_ndarray`.
     """
 
     def __init__(
@@ -41,7 +41,7 @@ class ToNDArray(Module):
 
 class TensorToNDArray(Module):
     """
-    For more information, see :func:`~torchwrench.nn.functional.numpy.tensor_to_numpy`.
+    For more information, see :func:`~torchwrench.nn.functional.numpy.tensor_to_ndarray`.
     """
 
     def __init__(
@@ -64,7 +64,7 @@ class TensorToNDArray(Module):
 
 class NDArrayToTensor(Module):
     """
-    For more information, see :func:`~torchwrench.nn.functional.numpy.numpy_to_tensor`.
+    For more information, see :func:`~torchwrench.nn.functional.numpy.ndarray_to_tensor`.
     """
 
     def __init__(
