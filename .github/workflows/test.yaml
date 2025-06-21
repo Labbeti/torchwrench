@@ -66,7 +66,7 @@ jobs:
       if: matrix.torch-version != 'torch-latest'
       shell: bash
       run: |
-        # uv pip install torch==${{ matrix.torch-version }} .[dev,extras]
+        # uv pip install 'torch==${{ matrix.torch-version }}' .[dev,extras]
         uv sync --upgrade --dev --all-extras
 
     - name: Additional install soundfile (Ubuntu)
@@ -172,7 +172,7 @@ jobs:
       if: matrix.torch-version != 'torch-latest'
       shell: bash
       run: |
-        # uv pip install torch==${{ matrix.torch-version }} .[dev]
+        # uv pip install 'torch==${{ matrix.torch-version }}' .[dev]
         uv sync --upgrade --dev
 
     - name: Additional install soundfile (Ubuntu)
