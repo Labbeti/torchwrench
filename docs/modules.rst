@@ -1,7 +1,7 @@
-torchoutil
-==========
+torchwrench
+===========
 
 .. toctree::
    :maxdepth: 4
 
-   torchoutil
+   torchwrench

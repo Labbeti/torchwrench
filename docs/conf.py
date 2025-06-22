@@ -91,7 +91,7 @@ add_module_names = False
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/", None),
-    "torch": ("https://pytorch.org/docs/master/", None),
+    "torch": ("https://pytorch.org/docs/main/", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
     "h5py": ("https://docs.h5py.org/en/latest/", None),
 }
