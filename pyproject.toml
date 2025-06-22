@@ -90,7 +90,7 @@ dev = [
 extras = [
     "colorlog>=6.9.0",
     "h5py>=3.14.0",
-    "numpy!=2.0.2",
+    "numpy!=2.0.0,!=2.0.1,!=2.0.2",
     "omegaconf>=2.3.0",
     "pandas>=2.3.0",
     "pyyaml>=6.0.2",
