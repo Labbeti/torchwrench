@@ -62,8 +62,8 @@ class TestSaving(TestCase):
 
     def test_csv(self) -> None:
         data = {
-            "a": [pw.randstr(2, 10) for _ in range(100)],
-            "b": [pw.randstr(9, 10) for _ in range(100)],
+            "a": [pw.randstr(10) for _ in range(100)],
+            "b": [pw.randstr(10) for _ in range(100)],
         }
 
         fpath = get_tmp_dir().joinpath("tmp.csv")
