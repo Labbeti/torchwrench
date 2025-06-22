@@ -6,13 +6,13 @@
 from typing import Hashable, Iterable, List, Mapping, Optional, Sequence, TypeVar, Union
 
 import torch
+from pythonwrench.typing import isinstance_generic
 from torch import Tensor
 
 from torchwrench.core.make import DeviceLike, DTypeLike, as_device, as_dtype
 from torchwrench.nn.functional.padding import pad_and_stack_rec
 from torchwrench.nn.functional.predicate import is_stackable
 from torchwrench.nn.functional.transform import as_tensor, to_item
-from pythonwrench.typing import isinstance_generic
 from torchwrench.types import LongTensor, is_number_like, is_tensor_or_array
 from torchwrench.types._typing import TensorOrArray
 

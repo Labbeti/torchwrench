@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import torch
-
 from pythonwrench.os import get_num_cpus_available
 
 

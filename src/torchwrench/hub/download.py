@@ -8,12 +8,11 @@ from typing import Optional, Union
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
 
-from torch.hub import download_url_to_file
-
 # for backward compatibility
 from pythonwrench.hashlib import hash_file  # noqa: F401
 from pythonwrench.os import safe_rmdir  # noqa: F401
 from pythonwrench.warnings import warn_once
+from torch.hub import download_url_to_file
 
 pylog = logging.getLogger(__name__)
 

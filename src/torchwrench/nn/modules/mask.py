@@ -3,10 +3,10 @@
 
 from typing import Iterable, Union
 
+from pythonwrench.collections import dump_dict
 from torch import Tensor
 
 from torchwrench.nn.functional.mask import masked_mean, masked_sum
-from pythonwrench.collections import dump_dict
 
 from .module import Module
 

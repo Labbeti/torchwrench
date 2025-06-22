@@ -4,7 +4,6 @@
 from typing import Callable, Final, Iterable, Union
 
 import torch
-
 from pythonwrench.functools import identity
 from pythonwrench.importlib import is_available_package
 from pythonwrench.semver import Version

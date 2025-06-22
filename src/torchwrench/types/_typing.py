@@ -4,6 +4,7 @@
 from typing import TypeVar, Union
 
 import torch
+from pythonwrench.typing.classes import BuiltinNumber, BuiltinScalar
 from typing_extensions import TypeAlias
 
 from torchwrench.extras.numpy.definitions import (  # noqa: F401
@@ -11,7 +12,6 @@ from torchwrench.extras.numpy.definitions import (  # noqa: F401
     NumpyScalarLike,
     np,
 )
-from pythonwrench.typing.classes import BuiltinNumber, BuiltinScalar
 
 from .tensor_subclasses import (  # noqa: F401
     BoolTensor,

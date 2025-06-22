@@ -4,14 +4,14 @@
 from abc import abstractmethod
 from typing import Callable, Generic, Iterable, Iterator, Optional, TypeVar, Union
 
+from pythonwrench.collections import is_sorted
+from pythonwrench.typing.classes import (
+    SupportsGetitemIterLen,
+    SupportsGetitemLen,
+)
 from torch.utils.data.dataset import Dataset, IterableDataset
 from torch.utils.data.dataset import Subset as TorchSubset
 
-from pythonwrench.collections import is_sorted
-from pythonwrench.typing.classes import (
-    SupportsGetitemLen,
-    SupportsGetitemIterLen,
-)
 from torchwrench.types.tensor_subclasses import LongTensor1D
 
 T = TypeVar("T", covariant=True)

@@ -5,13 +5,13 @@ from abc import ABC, abstractmethod
 from typing import Any, Generic, Iterable, List, Tuple, TypeVar, Union, final, overload
 
 import torch
+from pythonwrench.typing import isinstance_generic
+from pythonwrench.typing.classes import SupportsGetitemLen
 from torch.utils.data.dataset import Dataset
 from typing_extensions import TypeAlias
 
 from torchwrench.extras.numpy.functional import is_numpy_bool_array
 from torchwrench.nn.functional.transform import as_tensor
-from pythonwrench.typing import isinstance_generic
-from pythonwrench.typing.classes import SupportsGetitemLen
 from torchwrench.types._typing import BoolTensor1D, Tensor1D, TensorOrArray
 from torchwrench.types.guards import is_number_like, is_tensor_or_array
 from torchwrench.utils.data.dataset import Wrapper

@@ -5,11 +5,11 @@ import re
 from typing import Any, Dict, List, Optional, TypeVar
 
 import torch
+from pythonwrench.collections.collections import KeyMode, list_dict_to_dict_list
+from pythonwrench.re import PatternListLike, match_patterns
 
 from torchwrench.nn.functional.padding import pad_and_stack_rec
 from torchwrench.nn.functional.predicate import is_convertible_to_tensor, is_stackable
-from pythonwrench.collections.collections import KeyMode, list_dict_to_dict_list
-from pythonwrench.re import PatternListLike, match_patterns
 
 K = TypeVar("K")
 V = TypeVar("V")

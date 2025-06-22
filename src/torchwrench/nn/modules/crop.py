@@ -3,11 +3,11 @@
 
 from typing import Iterable, Union
 
+from pythonwrench.collections import dump_dict
 from torch import Tensor
 
 from torchwrench.core.make import GeneratorLike
 from torchwrench.nn.functional.cropping import CropAlign, crop_dim, crop_dims
-from pythonwrench.collections import dump_dict
 
 from .module import Module
 

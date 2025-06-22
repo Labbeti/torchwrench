@@ -7,11 +7,11 @@ from typing import Any, List, Tuple, Type
 from unittest import TestCase
 
 import torch
+from pythonwrench.inspect import get_fullname
 from torch import nn
 
 from torchwrench.nn.functional import deep_equal
 from torchwrench.nn.modules import tensor as tensor_module
-from pythonwrench.inspect import get_fullname
 
 
 def module_name_to_fn_name(x: str) -> str:

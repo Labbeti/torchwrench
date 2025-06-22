@@ -4,6 +4,7 @@
 from typing import Generic, List, Mapping, Optional, Union
 
 import torch
+from pythonwrench.collections import dump_dict
 from torch import Tensor, nn
 
 from torchwrench.core.make import DeviceLike, DTypeLike
@@ -19,7 +20,6 @@ from torchwrench.nn.functional.multilabel import (
     probs_to_multihot,
     probs_to_multinames,
 )
-from pythonwrench.collections import dump_dict
 from torchwrench.types import LongTensor
 
 from .module import Module

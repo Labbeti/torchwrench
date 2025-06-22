@@ -8,6 +8,7 @@ from .functional import (
     is_numpy_scalar_like,
     logical_and_lst,
     logical_or_lst,
+    ndarray_to_tensor,
     numpy_all_eq,
     numpy_all_ne,
     numpy_complex_dtype_to_float_dtype,
@@ -23,7 +24,6 @@ from .functional import (
     tensor_to_numpy,
     to_ndarray,
     to_numpy,
-    ndarray_to_tensor,
 )
 from .scan_info import (
     InvalidTorchDType,

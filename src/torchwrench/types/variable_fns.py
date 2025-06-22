@@ -6,10 +6,10 @@ from torchwrench.nn.functional.new import (  # noqa: F401
     arange,
     empty,
     full,
+    ones,
     rand,
     randint,
     randperm,
-    ones,
     zeros,
 )
 from torchwrench.nn.functional.transform import (  # noqa: F401

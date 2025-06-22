@@ -6,9 +6,7 @@ from enum import auto
 from typing import Any, Dict, Final
 
 import torch
-
 from pythonwrench.enum import StrEnum
-
 
 # Local aliases to avoid overlap with torch.int and torch.bool
 _bool = builtins.bool

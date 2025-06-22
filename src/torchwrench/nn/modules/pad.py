@@ -3,6 +3,7 @@
 
 from typing import Iterable, Union
 
+from pythonwrench.collections import dump_dict
 from torch import Tensor
 from torch.types import Number
 
@@ -15,7 +16,6 @@ from torchwrench.nn.functional.padding import (
     pad_dim,
     pad_dims,
 )
-from pythonwrench.collections import dump_dict
 
 from .module import Module
 

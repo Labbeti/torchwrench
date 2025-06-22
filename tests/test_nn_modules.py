@@ -12,6 +12,7 @@ from torchwrench.nn.modules import (
     AsTensor,
     CropDim,
     CropDims,
+    ESequential,
     Identity,
     LogSoftmaxMultidim,
     Mean,
@@ -26,7 +27,6 @@ from torchwrench.nn.modules import (
     Transpose,
     Unsqueeze,
 )
-from torchwrench.nn.modules import ESequential
 
 
 class TestSequential(TestCase):

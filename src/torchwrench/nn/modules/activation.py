@@ -3,10 +3,10 @@
 
 from typing import Iterable, Union
 
+from pythonwrench.collections import dump_dict
 from torch import Tensor
 
 from torchwrench.nn.functional.activation import log_softmax_multidim, softmax_multidim
-from pythonwrench.collections import dump_dict
 
 from .module import Module
 
