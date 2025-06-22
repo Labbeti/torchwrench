@@ -1,5 +1,5 @@
 
-torchoutil's documentation
+torchwrench's documentation
 ========================================
 
 Collection of functions and modules to help development in PyTorch.
