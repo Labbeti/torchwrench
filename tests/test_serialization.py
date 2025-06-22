@@ -125,9 +125,9 @@ class TestSaving(TestCase):
             ]
 
         for i, (backend, data, to_builtins, load_kwds, dump_kwds) in enumerate(tests):
-            assert tw.isinstance_generic(backend, SavingBackend), (
+            assert tw.isinstance_generic(backend, SavingBackend), (  # type: ignore
                 f"{backend=}; {get_args(SavingBackend)=}"
-            )  # type: ignore
+            )
 
             if to_builtins:
                 data = tw.as_builtin(data)

@@ -5,7 +5,6 @@ import unittest
 from typing import Iterator
 from unittest import TestCase
 
-import torchwrench as tw
 from torchwrench.utils.data.dataset import IterableSubset, IterableTransformWrapper
 
 
