@@ -6,6 +6,7 @@ from unittest import TestCase
 
 import torch
 
+import torchwrench as tw
 from torchwrench.core.packaging import _NUMPY_AVAILABLE
 from torchwrench.extras.numpy import (
     ndarray_to_tensor,
@@ -70,7 +71,9 @@ class TestNumpy(TestCase):
 
     def test_numpy_topk(self) -> None:
         x = np.array([0, 2, 0, 1, 2])
-        assert np.all(numpy_topk(x, k=3) == np.array([2, 1, 2]))
+        result = numpy_topk(x, k=3)
+        expected = np.array([2, 2, 1]), np.array([1, 4, 3])
+        assert tw.deep_equal(result, expected)
 
 
 if __name__ == "__main__":
