@@ -86,6 +86,7 @@ dev = [
     "twine>=6.1.0",
     "typing-extensions>=4.10.0",
     "ipykernel>=6.29.5",
+    "numpy!=2.0.0,!=2.0.1,!=2.0.2",
 ]
 extras = [
     "colorlog>=6.9.0",
