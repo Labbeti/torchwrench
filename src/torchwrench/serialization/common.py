@@ -151,7 +151,8 @@ def _fpath_to_saving_backend(
         raise ValueError(msg)
 
     if verbose >= 2:
-        pylog.debug(f"Loading file '{str(fpath)}' using {saving_backend=}.")
+        msg = f"Loading file '{str(fpath)}' using {saving_backend=}."
+        pylog.debug(msg)
     return saving_backend
 
 

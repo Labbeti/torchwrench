@@ -675,7 +675,7 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
 
 
 def _decode_bytes(
-    encoded: Union[bytes, np.ndarray, Iterable],
+    encoded: Union[bytes, bytearray, np.ndarray, list],
     encoding: str,
 ) -> Union[str, np.ndarray, list]:
     """Decode bytes to str with the specified encoding. Works recursively on list of bytes, list of list of bytes, etc."""
@@ -693,7 +693,7 @@ def _decode_bytes(
             return _decode_bytes(encoded.item(), encoding=encoding)
 
     elif is_iterable_bytes_or_list(encoded):
-        return [_decode_bytes(elt, encoding) for elt in encoded]
+        return [_decode_bytes(elt, encoding) for elt in encoded]  # type: ignore
 
     else:
         msg = f"Invalid argument type {type(encoded)} for {get_current_fn_name()}. (expected bytes, bytes ndarray or Iterable)"

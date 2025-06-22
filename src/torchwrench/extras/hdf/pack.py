@@ -330,7 +330,7 @@ def pack_to_hdf(
                         hdf_shapes_dset = hdf_dsets[shape_name]
                         hdf_shapes_dset[i] = shape
 
-                    global_hash_value += tw.checksum(value)
+                    global_hash_value += tw.checksum_any(value)
 
                 i += 1
 

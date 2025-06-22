@@ -5,12 +5,12 @@ import io
 import os
 from io import BufferedWriter
 from pathlib import Path
-from typing import Any, BinaryIO, Optional, Union
+from typing import BinaryIO, Optional, Union
 
-import torch
 from pythonwrench.functools import function_alias
 from pythonwrench.importlib import Placeholder
 from pythonwrench.io import _setup_path
+from torch import Tensor
 
 from torchwrench.core.packaging import _TORCHAUDIO_AVAILABLE
 
@@ -28,7 +28,7 @@ except (ImportError, AttributeError):
 
 
 def dump_with_torchaudio(
-    src: torch.Tensor,
+    src: Tensor,
     uri: Union[BinaryIO, str, Path, os.PathLike, None],
     sample_rate: int,
     channels_first: bool = True,
@@ -83,7 +83,7 @@ def load_with_torchaudio(
     format: Optional[str] = None,
     buffer_size: int = 4096,
     backend: Optional[str] = None,
-) -> Any:
+) -> tuple[Tensor, int]:
     return torchaudio.load(  # type: ignore
         uri,
         frame_offset,

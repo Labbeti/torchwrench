@@ -50,8 +50,10 @@ def load_tfevents(
         ignore_underscore_tags: Ignore event when tag starts with an underscore. defaults to True.
         verbose: Verbose level. Higher value means more log messages. defaults to 0.
     """
-    if not osp.isfile(fpath):
-        raise FileNotFoundError(f"Invalid argument {fpath=}. (not a file)")
+    fpath = Path(fpath)
+    if not fpath.is_file():
+        msg = f"Invalid argument {fpath=}. (not a file)"
+        raise FileNotFoundError(msg)
 
     event_file_loader = EventFileLoader(fpath)
     raw_data = []
@@ -84,9 +86,8 @@ def load_tfevents(
 
         if ignore_underscore_tags and tag.startswith("_"):
             if verbose >= 2:
-                pylog.debug(
-                    f'Skip value with tag "{tag}" which begins by an underscore.'
-                )
+                msg = f"Skip value with tag '{tag}' which begins by an underscore."
+                pylog.debug(msg)
             continue
 
         if dtype == _DT_FLOAT:
@@ -114,7 +115,8 @@ def load_tfevents(
                 value = string_val
 
         else:
-            raise RuntimeError(f"Unknown value {dtype=}. (expected one of {_DTYPES})")
+            msg = f"Unknown value {dtype=}. (expected one of {_DTYPES})"
+            raise RuntimeError(msg)
 
         data_i["tag"] = tag
         data_i["dtype"] = dtype
