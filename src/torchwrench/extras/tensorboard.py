@@ -3,7 +3,6 @@
 
 import glob
 import logging
-import os.path as osp
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, TypedDict, Union
 
