@@ -18,6 +18,7 @@ from torchwrench.nn.functional.transform import (
     resample_nearest_rates,
     shuffled,
     top_p,
+    view_as_complex,
 )
 from torchwrench.utils import return_types
 
@@ -147,6 +148,14 @@ class TestFlatten(TestCase):
         for (xi, start, end), expected_i in zip(x, expected):
             result_i = flatten(xi, start, end)
             assert np.equal(result_i, expected_i).all()
+
+
+class TestView(TestCase):
+    def test_view_example_1(self) -> None:
+        assert view_as_complex((1, 1)) == 1 + 1j
+
+        x = tw.as_tensor(1 + 1j)
+        assert (view_as_complex(tw.view_as_real(x)) == x).all()
 
 
 if __name__ == "__main__":

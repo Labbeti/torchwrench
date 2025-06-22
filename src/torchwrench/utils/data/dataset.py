@@ -2,14 +2,25 @@
 # -*- coding: utf-8 -*-
 
 from abc import abstractmethod
-from typing import Callable, Generic, Iterable, Iterator, Optional, TypeVar, Union
+from typing import (
+    Callable,
+    Generic,
+    Iterable,
+    Iterator,
+    Optional,
+    Sized,
+    TypeVar,
+    Union,
+)
 
 from pythonwrench.collections import is_sorted
 from pythonwrench.typing.classes import (
     SupportsGetitemIterLen,
     SupportsGetitemLen,
+    SupportsIterLen,
 )
 from torch.utils.data.dataset import Dataset, IterableDataset
+from torch.utils.data.dataset import IterableDataset as TorchIterableDataset
 from torch.utils.data.dataset import Subset as TorchSubset
 
 from torchwrench.types.tensor_subclasses import LongTensor1D
@@ -18,7 +29,6 @@ T = TypeVar("T", covariant=True)
 U = TypeVar("U", covariant=True)
 
 SizedDatasetLike = SupportsGetitemLen
-SupportsIterLenDatasetLike = SupportsGetitemIterLen
 
 T_Dataset = TypeVar("T_Dataset", bound=Dataset)
 T_SizedDatasetLike = TypeVar("T_SizedDatasetLike", bound=SupportsGetitemLen)
@@ -38,14 +48,10 @@ class EmptyDataset(Dataset[None]):
         return 0
 
 
-class Wrapper(Generic[T], Dataset[T]):
-    def __init__(self, dataset: SupportsGetitemLen[T]) -> None:
+class _WrapperBase(Generic[T], Dataset[T]):
+    def __init__(self, dataset: Sized) -> None:
         Dataset.__init__(self)
         self.dataset = dataset
-
-    @abstractmethod
-    def __getitem__(self, idx, /) -> T:  # type: ignore
-        raise NotImplementedError
 
     @abstractmethod
     def __len__(self) -> int:
@@ -53,20 +59,31 @@ class Wrapper(Generic[T], Dataset[T]):
 
     def unwrap(self, recursive: bool = True) -> Union[SupportsGetitemLen, Dataset]:
         dataset = self.dataset
-        continue_ = recursive and isinstance(dataset, (Wrapper, TorchSubset))
+        continue_ = recursive and isinstance(
+            dataset, (_WrapperBase, TorchSubset, TorchIterableDataset)
+        )
         while continue_:
             dataset = dataset.dataset  # type: ignore
-            continue_ = isinstance(dataset, Wrapper)
+            continue_ = isinstance(dataset, _WrapperBase)
         return dataset  # type: ignore
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({repr(self.dataset)})"
 
 
-class IterableWrapper(Generic[T], IterableDataset[T], Wrapper[T]):
-    def __init__(self, dataset: SupportsGetitemLen[T]) -> None:
+class Wrapper(Generic[T], _WrapperBase[T]):
+    @abstractmethod
+    def __getitem__(self, idx, /) -> T:  # type: ignore
+        raise NotImplementedError
+
+
+class IterableWrapper(Generic[T], IterableDataset[T], _WrapperBase[T]):
+    def __init__(
+        self, dataset: Union[SupportsGetitemLen[T], SupportsIterLen[T]]
+    ) -> None:
         IterableDataset.__init__(self)
-        Wrapper.__init__(self, dataset)
+        _WrapperBase.__init__(self, dataset)
+        self.dataset: Union[SupportsGetitemLen[T], SupportsIterLen[T]]
 
     @abstractmethod
     def __iter__(self) -> Iterator[T]:
@@ -76,7 +93,7 @@ class IterableWrapper(Generic[T], IterableDataset[T], Wrapper[T]):
         if hasattr(self.dataset, "__iter__"):
             it = iter(self.dataset)
         else:
-            it = (self.dataset[i] for i in range(len(self.dataset)))
+            it = (self.dataset[i] for i in range(len(self.dataset)))  # type: ignore
         return it
 
 
@@ -90,6 +107,7 @@ class TransformWrapper(Generic[T, U], Wrapper[T]):
         super().__init__(dataset)
         self._transform = transform
         self._condition = condition
+        self.dataset: SupportsGetitemLen[T]
 
     def __getitem__(self, idx) -> Union[T, U]:  # type: ignore
         assert isinstance(idx, int)
@@ -115,7 +133,7 @@ class TransformWrapper(Generic[T, U], Wrapper[T]):
 class IterableTransformWrapper(IterableWrapper[T], Generic[T, U]):
     def __init__(
         self,
-        dataset: SupportsGetitemLen[T],
+        dataset: Union[SupportsGetitemLen[T], SupportsIterLen[T]],
         transform: Optional[Callable[[T], U]],
         condition: Optional[Callable[[T, int], bool]] = None,
     ) -> None:
@@ -148,7 +166,7 @@ class IterableTransformWrapper(IterableWrapper[T], Generic[T, U]):
 class IterableSubset(IterableWrapper[T], Generic[T]):
     def __init__(
         self,
-        dataset: SupportsGetitemLen[T],
+        dataset: Union[SupportsGetitemLen[T], SupportsIterLen[T]],
         indices: Union[Iterable[int], LongTensor1D],
     ) -> None:
         if isinstance(indices, LongTensor1D):

@@ -22,6 +22,7 @@ from typing import (
     Tuple,
     TypeVar,
     Union,
+    get_args,
     overload,
 )
 
@@ -63,14 +64,6 @@ CastMode = Literal[
     "to_torch_src",
     "none",
 ]
-CAST_MODES = (
-    "to_torch_or_builtin",
-    "to_torch_or_numpy",
-    "as_builtin",
-    "to_numpy_src",
-    "to_torch_src",
-    "none",
-)
 
 pylog = logging.getLogger(__name__)
 
@@ -615,7 +608,7 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
         hdf_dtype: np.dtype,
     ) -> Any:
         if self._cast == "none":
-            return hdf_values
+            result = hdf_values
 
         elif self._cast == "to_torch_or_builtin":
             valid = tw.get_shape(hdf_values, return_valid=True).valid
@@ -634,10 +627,7 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
                 result = np.array(hdf_values)
 
         elif self._cast == "as_builtin":
-            if isinstance(hdf_values, np.ndarray):
-                result = hdf_values.tolist()
-            else:
-                result = as_builtin(hdf_values)
+            result = as_builtin(hdf_values)
 
         elif self._cast == "to_numpy_src":
             assert isinstance(hdf_values, np.ndarray), f"{type(hdf_values)=}"
@@ -668,7 +658,7 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
                 result = hdf_values
 
         else:
-            msg = f"Invalid argument {self._cast=}. (expected one of {CAST_MODES})"
+            msg = f"Invalid argument {self._cast=}. (expected one of {get_args(CastMode)})"
             raise ValueError(msg)
 
         return result

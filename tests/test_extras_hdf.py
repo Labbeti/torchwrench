@@ -11,13 +11,14 @@ import numpy as np
 import torch
 from pythonwrench import dict_list_to_list_dict
 from torch import Tensor
-from torch.utils.data.dataset import Subset
 from torchvision.datasets import CIFAR10
 
+import torchwrench as tw
 from torchwrench.extras.hdf import HDFDataset, pack_to_hdf
+from torchwrench.extras.hdf.pack import hdf_dtype_to_numpy_dtype
 from torchwrench.hub.paths import get_tmp_dir
 from torchwrench.nn import ESequential, IndexToOnehot, ToList, ToNDArray
-from torchwrench.nn.functional import as_tensor
+from torchwrench.utils.data.dataset import Subset
 
 
 class TestHDF(TestCase):
@@ -124,8 +125,8 @@ class TestHDF(TestCase):
             hdf_dataset[indices, "data"],
             hdf_dataset[mask.tolist(), "data"],
             hdf_dataset[indices.tolist(), "data"],
-            hdf_dataset[as_tensor(mask), "data"],
-            hdf_dataset[as_tensor(indices), "data"],
+            hdf_dataset[tw.as_tensor(mask), "data"],
+            hdf_dataset[tw.as_tensor(indices), "data"],
             data[mask],
             data[indices],
         ):
@@ -329,6 +330,12 @@ class TestHDF(TestCase):
 
         ds_vlen.close(remove_file=True)
         ds_bytes.close(remove_file=True)
+
+    def test_conversion(self) -> None:
+        assert hdf_dtype_to_numpy_dtype("i") == np.dtype("int32")
+
+        with self.assertRaises(ValueError):
+            assert hdf_dtype_to_numpy_dtype("invalid") == np.dtype("V")  # type: ignore
 
 
 if __name__ == "__main__":

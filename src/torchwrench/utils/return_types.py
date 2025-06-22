@@ -35,7 +35,10 @@ class _namedtuple_values_indices(Generic[T_Values, T_Indices], tuple):
         return self[1]
 
 
-if Version(str(__version__)) < Version("2.0.0"):
+if Version(str(__version__)) >= Version("2.0.0"):
+    from torch.return_types import max, min, sort, topk  # type: ignore # noqa: F401
+
+else:
 
     class max(_namedtuple_values_indices[Tensor, Tensor]): ...
 
@@ -44,9 +47,6 @@ if Version(str(__version__)) < Version("2.0.0"):
     class sort(_namedtuple_values_indices[Tensor, Tensor]): ...
 
     class topk(_namedtuple_values_indices[Tensor, Tensor]): ...
-
-else:
-    from torch.return_types import max, min, sort, topk  # type: ignore # noqa: F401
 
 
 if Version.python() < (3, 11, 0):

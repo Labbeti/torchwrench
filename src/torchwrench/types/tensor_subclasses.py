@@ -23,6 +23,7 @@ CHalfTensor CFloatTensor CDoubleTensor    HalfTensor FloatTensor DoubleTensor   
 
 """
 
+import builtins
 from typing import (
     Any,
     ClassVar,
@@ -43,13 +44,17 @@ from typing import (
 )
 
 import torch
-from pythonwrench import BuiltinNumber, T_BuiltinNumber
+from pythonwrench import BuiltinNumber
 from torch._C import _TensorMeta
-from torch.types import Device, _bool, _float, _int
+from torch.types import Device
 from typing_extensions import TypeVar
 
 from torchwrench.core.dtype_enum import DTypeEnum
 from torchwrench.core.make import DeviceLike, DTypeLike, as_device, as_dtype
+
+_bool = builtins.bool
+_float = builtins.float
+_int = builtins.int
 
 _DEFAULT_T_DTYPE = Literal[None]
 _DEFAULT_T_NDIM = _int
@@ -57,13 +62,14 @@ _DEFAULT_T_FLOATING = _bool
 _DEFAULT_T_COMPLEX = _bool
 _DEFAULT_T_SIGNED = _bool
 
-T_Tensor = TypeVar("T_Tensor", bound="_TensorNDBase")
+T_BuiltinNumber = TypeVar("T_BuiltinNumber", bound=BuiltinNumber, covariant=True)
+T_Tensor = TypeVar("T_Tensor", bound="_TensorNDBase", contravariant=True)
 
-T_DType = TypeVar("T_DType", "DTypeEnum", None, default=None)
-T_NDim = TypeVar("T_NDim", bound=_int, default=_int)
-T_Floating = TypeVar("T_Floating", bound=_bool, default=_bool)
-T_Complex = TypeVar("T_Complex", bound=_bool, default=_bool)
-T_Signed = TypeVar("T_Signed", bound=_bool, default=_bool)
+T_DType = TypeVar("T_DType", bound=Union["DTypeEnum", None])
+T_NDim = TypeVar("T_NDim", bound=_int)
+T_Floating = TypeVar("T_Floating", bound=_bool)
+T_Complex = TypeVar("T_Complex", bound=_bool)
+T_Signed = TypeVar("T_Signed", bound=_bool)
 
 _TORCH_BASE_CLASSES: Final[Dict[str, Type]] = {
     "float32": torch.FloatTensor,
@@ -600,7 +606,7 @@ class _TensorNDBase(
     ) -> T_Tensor: ...
 
     @overload
-    def to(
+    def to(  # type: ignore
         self,
         other: T_Tensor,
         non_blocking: _bool = False,

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import math
+from numbers import Real
 from typing import (
     Any,
     Callable,
@@ -567,8 +568,8 @@ def view_as_complex(
     elif (
         isinstance(x, Sequence)
         and len(x) == 2
-        and isinstance(x[0], float)
-        and isinstance(x[1], float)
+        and isinstance(x[0], Real)
+        and isinstance(x[1], Real)
     ):
         return x[0] + x[1] * 1j
     else:

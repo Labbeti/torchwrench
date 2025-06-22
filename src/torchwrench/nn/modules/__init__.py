@@ -66,6 +66,7 @@ from .tensor import (
     Repeat,
     RepeatInterleave,
     Reshape,
+    Sort,
     TensorTo,
     ToList,
     Transpose,

@@ -5,14 +5,19 @@ import copy
 import unittest
 from collections import Counter
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, get_args
 from unittest import TestCase
 
 import pythonwrench as pw
 import torch
 
 import torchwrench as tw
-from torchwrench.extras import _NUMPY_AVAILABLE, _SAFETENSORS_AVAILABLE, _YAML_AVAILABLE
+from torchwrench.extras import (
+    _NUMPY_AVAILABLE,
+    _PANDAS_AVAILABLE,
+    _SAFETENSORS_AVAILABLE,
+    _YAML_AVAILABLE,
+)
 from torchwrench.hub.paths import get_tmp_dir
 from torchwrench.nn.functional import deep_equal
 from torchwrench.serialization.common import (
@@ -37,20 +42,50 @@ class TestSaving(TestCase):
         result = as_builtin(x)
         assert result == expected, f"{result=}; {expected=}"
 
-    def test_backend(self) -> None:
+    def test_detect_backend(self) -> None:
         tests: List[Tuple[str, SavingBackend]] = [
             ("test.json", "json"),
             ("test.json.yaml", "yaml"),
             ("test.yaml.json", "json"),
+            ("test.yml", "yaml"),
         ]
 
         for fpath, expected_backend in tests:
             backend = _fpath_to_saving_backend(fpath)
             assert backend == expected_backend
 
+    def test_as_builtin(self) -> None:
+        assert as_builtin(tw.arange(10)) == list(range(10))
+
+        with self.assertRaises(TypeError):
+            as_builtin(self)
+
+    def test_csv(self) -> None:
+        data = {
+            "a": [pw.randstr(2, 10) for _ in range(100)],
+            "b": [pw.randstr(9, 10) for _ in range(100)],
+        }
+
+        fpath = get_tmp_dir().joinpath("tmp.csv")
+        tw.dump_csv(data, fpath)
+        result = tw.load_csv(fpath, orient="dict")
+
+        assert result == data
+
+        if _NUMPY_AVAILABLE and _PANDAS_AVAILABLE:
+            import numpy as np
+
+            n = 10
+            data_matrix = dict(zip(pw.randstr(n), tw.rand(n, 100).numpy()))
+
+            tw.dump_csv(data_matrix, fpath, backend="pandas")
+            result = tw.load_csv(fpath, orient="dict", backend="pandas")
+
+            assert all(np.allclose(v, result[k]) for k, v in data_matrix.items())
+
     def test_save_load(self) -> None:
         n = 1
-        data1 = {
+        data_tensors = {
             "arange": tw.arange(n),
             "full": tw.full((n, 5), 9),
             "ones": tw.ones(n, 5),
@@ -60,45 +95,48 @@ class TestSaving(TestCase):
             "zeros": tw.zeros(n, 1),
             "empty": tw.empty(n, 2),
         }
-        data2: Dict[str, Any] = copy.copy(data1)
-        data2.update({"randstr": [pw.randstr(2) for _ in range(n)]})
+        data_objs: Dict[str, Any] = copy.copy(data_tensors)
+        data_objs.update({"randstr": [pw.randstr(2) for _ in range(n)]})
 
-        assert pw.is_full(map(len, data2.values()))
+        assert pw.is_full(map(len, data_objs.values()))
 
-        tests: List[Tuple[SavingBackend, Any, bool, dict]] = [
-            ("json", data2, True, dict()),
-            ("pickle", data2, False, dict()),
+        tests: List[Tuple[str, Any, bool, dict, dict]] = [
+            ("json", data_objs, True, dict(), dict()),
+            ("pickle", data_objs, False, dict(), dict()),
         ]
 
         if _NUMPY_AVAILABLE:
             from torchwrench.extras.numpy import to_ndarray
 
-            added_tests: List[Tuple[SavingBackend, Any, bool, dict]] = [
-                ("numpy", to_ndarray(v), False, dict()) for k, v in data2.items()
+            tests += [
+                ("numpy", to_ndarray(v), False, dict(), dict())
+                for k, v in data_objs.items()
             ]
-            tests += added_tests
 
         if _SAFETENSORS_AVAILABLE:
-            added_tests: List[Tuple[SavingBackend, Any, bool, dict]] = [
-                ("safetensors", data1, False, dict()),
+            tests += [
+                ("safetensors", data_tensors, False, dict(), dict()),
             ]
-            tests += added_tests
 
         if _YAML_AVAILABLE:
-            added_tests: List[Tuple[SavingBackend, Any, bool, dict]] = [
-                ("yaml", data1, True, dict()),
-                ("yaml", data2, True, dict()),
+            tests += [
+                ("yaml", data_tensors, True, dict(), dict()),
+                ("yaml", data_objs, True, dict(), dict()),
             ]
-            tests += added_tests
 
-        for i, (backend, data, to_builtins, load_kwds) in enumerate(tests):
+        for i, (backend, data, to_builtins, load_kwds, dump_kwds) in enumerate(tests):
+            assert tw.isinstance_generic(backend, SavingBackend), (
+                f"{backend=}; {get_args(SavingBackend)=}"
+            )  # type: ignore
+
             if to_builtins:
                 data = tw.as_builtin(data)
             if backend == "safetensors":
+                # note: safetensors automatically sort dicts
                 data = pw.sorted_dict(data)
 
             fpath = get_tmp_dir().joinpath(f"tmp.{backend}")
-            tw.dump(data, fpath, saving_backend=backend)
+            tw.dump(data, fpath, saving_backend=backend, **dump_kwds)
             result = tw.load(fpath, saving_backend=backend, **load_kwds)
 
             assert deep_equal(data, result), f"{backend=}, {i=}/{len(tests)}"

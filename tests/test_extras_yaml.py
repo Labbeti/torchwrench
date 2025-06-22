@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import io
 import unittest
 from unittest import TestCase
 
@@ -8,7 +9,14 @@ import yaml
 from yaml.constructor import ConstructorError
 
 from torchwrench.core.packaging import _YAML_AVAILABLE
-from torchwrench.extras.yaml import FullLoader, IgnoreTagLoader, SafeLoader
+from torchwrench.extras.yaml import (
+    FullLoader,
+    IgnoreTagLoader,
+    SafeLoader,
+    SplitTagLoader,
+    dump_yaml,
+    load_yaml,
+)
 
 
 class TestYaml(TestCase):
@@ -28,6 +36,14 @@ class TestYaml(TestCase):
 
         with self.assertRaises(ConstructorError):
             yaml.load(dumped, Loader=SafeLoader)
+
+        result = yaml.load(dumped, Loader=SplitTagLoader)
+        expected = {"a": {"_target_": "yaml.org,2002:python/tuple", "_args_": [1, 2]}}
+        assert result == expected
+
+        data = load_yaml(io.StringIO(dumped), Loader=FullLoader)
+        assert dump_yaml(data) == f"{dumped}\n"
+        assert dump_yaml(data, to_builtins=True) == "a:\n- 1\n- 2\n"
 
 
 if __name__ == "__main__":

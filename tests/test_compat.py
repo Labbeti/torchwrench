@@ -19,7 +19,6 @@ class TestFunctionsCompat(TestCase):
         src_modules = [
             torch,
             torch.Tensor,
-            # torch.nn.functional,  # type: ignore
             torch.fft,
         ]
         all_base_fn_names = {

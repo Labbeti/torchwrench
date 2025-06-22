@@ -93,7 +93,7 @@ def load_csv(
     fpath: Union[str, Path],
     /,
     *,
-    orient: Literal["dict"],
+    orient: Literal["dict"] = "dict",
     header: bool = True,
     comment_start: Optional[str] = None,
     strip_content: bool = False,
@@ -109,7 +109,7 @@ def load_csv(
     fpath: Union[str, Path],
     /,
     *,
-    orient: Literal["list"] = "list",
+    orient: Literal["list"],
     header: bool = True,
     comment_start: Optional[str] = None,
     strip_content: bool = False,
@@ -124,7 +124,7 @@ def load_csv(
     fpath: Union[str, Path],
     /,
     *,
-    orient: Orient = "list",
+    orient: Orient = "dict",
     header: bool = True,
     comment_start: Optional[str] = None,
     strip_content: bool = False,
@@ -181,6 +181,9 @@ def _dump_csv_with_pandas(
 
     fpath = _setup_path(fpath, overwrite, make_parents)
     df = pd.DataFrame(data)  # type: ignore
+
+    # set index to False by default
+    kwargs.setdefault("index", False)
 
     file = io.StringIO()
     df.to_csv(file, **kwargs)

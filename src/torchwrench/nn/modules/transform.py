@@ -323,8 +323,8 @@ class Squeeze(Module):
 class Shuffled(Module):
     def __init__(
         self,
-        dims: Union[int, Iterable[int]],
-        generator: GeneratorLike,
+        dims: Union[int, Iterable[int]] = -1,
+        generator: GeneratorLike = None,
     ) -> None:
         """
         For more information, see :func:`~torchwrench.nn.functional.transform.shuffled`.

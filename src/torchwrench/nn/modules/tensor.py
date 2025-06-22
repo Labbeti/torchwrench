@@ -454,6 +454,44 @@ class Reshape(Module):
         )
 
 
+class Sort(Module):
+    """
+    Module version of :func:`~torch.Tensor.sort`.
+    """
+
+    def __init__(
+        self,
+        dim: int = -1,
+        descending: bool = False,
+        *,
+        return_values: bool = True,
+        return_indices: bool = True,
+    ) -> None:
+        if not return_values and not return_indices:
+            msg = f"Invalid combinaison of arguments {return_values=} and {return_indices=}. (at least one of them must be True)"
+            raise ValueError(msg)
+
+        super().__init__()
+        self.dim = dim
+        self.descending = descending
+        self.return_values = return_values
+        self.return_indices = return_indices
+
+    def forward(self, x: Tensor) -> Union[return_types.sort, Tensor]:
+        result = x.sort(dim=self.dim, descending=self.descending)
+        result = return_types.sort(result)
+
+        if self.return_values and self.return_indices:
+            return result
+        elif self.return_values:
+            return result.values
+        elif self.return_indices:
+            return result.indices
+        else:
+            msg = f"Invalid combinaison of arguments {self.return_values=} and {self.return_indices=}. (at least one of them must be True)"
+            raise ValueError(msg)
+
+
 class TensorTo(Module):
     """
     Module version of :func:`~torch.Tensor.to`.

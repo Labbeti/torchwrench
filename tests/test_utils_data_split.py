@@ -5,6 +5,7 @@ import unittest
 from unittest import TestCase
 
 import torchwrench as tw
+from torchwrench.utils.data.dataset import IterableSubset
 from torchwrench.utils.data.split import balanced_monolabel_split, random_split
 
 
