@@ -9,7 +9,7 @@ from typing import Dict, Union
 import torch
 from pythonwrench.json import dump_json
 
-import torchwrench
+import torchwrench as tw
 from torchwrench.core.packaging import _EXTRA_VERSION
 from torchwrench.hub.paths import get_cache_dir, get_dir, get_tmp_dir
 from torchwrench.utils.data.dataloader import get_auto_num_cpus, get_auto_num_gpus
@@ -22,7 +22,7 @@ def get_package_repository_path() -> str:
 
 def get_install_info() -> Dict[str, Union[str, int]]:
     install_info = {
-        "torchwrench": torchwrench.__version__,
+        "torchwrench": tw.__version__,
         "python": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
         "os": platform.system(),
         "architecture": platform.architecture()[0],
