@@ -5,17 +5,14 @@
 <a href="https://www.python.org/">
     <img alt="Python" src="https://img.shields.io/badge/-Python 3.9+-blue?style=for-the-badge&logo=python&logoColor=white">
 </a>
-<a href="https://pytorch.org/get-started/locally/">
-    <img alt="PyTorch" src="https://img.shields.io/badge/-PyTorch 1.10+-ee4c2c?style=for-the-badge&logo=pytorch&logoColor=white">
-</a>
-<a href="https://black.readthedocs.io/en/stable/">
-    <img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-black.svg?style=for-the-badge&labelColor=gray">
-</a>
 <a href="https://github.com/Labbeti/torchwrench/actions">
     <img alt="Build" src="https://img.shields.io/github/actions/workflow/status/Labbeti/torchwrench/test.yaml?branch=main&style=for-the-badge&logo=github">
 </a>
-<a href='https://torchwrench.readthedocs.io/en/stable/?badge=stable'>
+<a href='https://torchwrench.readthedocs.io/'>
     <img src='https://readthedocs.org/projects/torchwrench/badge/?version=stable&style=for-the-badge' alt='Documentation Status' />
+</a>
+<a href="https://pytorch.org/get-started/locally/">
+    <img alt="PyTorch" src="https://img.shields.io/badge/-PyTorch 1.10+-ee4c2c?style=for-the-badge&logo=pytorch&logoColor=white">
 </a>
 
 Collection of functions and modules to help development in PyTorch.
@@ -24,8 +21,15 @@ Collection of functions and modules to help development in PyTorch.
 
 
 ## Installation
+
+With pip:
 ```bash
 pip install torchwrench
+```
+
+With uv:
+```bash
+uv add torchwrench
 ```
 
 The main requirement is **[PyTorch](https://pytorch.org/)**.
@@ -39,7 +43,7 @@ This library works on all Python versions **>=3.9**, all PyTorch versions **>= 1
 
 ## Examples
 
-`torchwrench` functions and modules can be used like `torch` ones. The default acronym for `torchwrench` is `to`.
+`torchwrench` functions and modules can be used like `torch` ones. The default acronym for `torchwrench` is `tw`.
 
 ### Label conversions
 Supports **multiclass** labels conversions between probabilities, classes indices, classes names and onehot encoding.

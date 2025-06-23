@@ -9,7 +9,7 @@ __author_email__ = "labbeti.pub@gmail.com"
 __license__ = "MIT"
 __maintainer__ = "Étienne Labbé (Labbeti)"
 __status__ = "Development"
-__version__ = "0.6.0"
+__version__ = "0.7.0"
 
 # Import global functions and classes from torch
 # Imports from pythonwrench
@@ -48,6 +48,8 @@ from . import optim as optim
 from . import serialization as serialization
 from . import types as types
 from . import utils as utils
+
+# Global imports
 from .core.dtype_enum import DTypeEnum
 from .core.dtype_enum import DTypeEnum as dtype_enum
 from .core.make import (
@@ -56,8 +58,6 @@ from .core.make import (
     DTypeLike,
     GeneratorLike,
 )
-
-# Global imports
 from .extras.numpy import ndarray_to_tensor, tensor_to_ndarray, to_ndarray
 from .hub.download import download_file
 from .hub.paths import get_cache_dir, get_tmp_dir
