@@ -54,8 +54,10 @@ from .core.dtype_enum import DTypeEnum
 from .core.dtype_enum import DTypeEnum as dtype_enum
 from .core.make import (
     CUDA_IF_AVAILABLE,
+    Device,
     DeviceLike,
     DTypeLike,
+    Generator,
     GeneratorLike,
 )
 from .extras.numpy import ndarray_to_tensor, tensor_to_ndarray, to_ndarray
