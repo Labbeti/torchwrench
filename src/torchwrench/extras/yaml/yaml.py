@@ -12,7 +12,6 @@ from typing_extensions import TypeAlias
 from torchwrench.core.packaging import _OMEGACONF_AVAILABLE, _YAML_AVAILABLE
 from torchwrench.serialization.common import as_builtin
 
-
 if _YAML_AVAILABLE:
     import yaml
     from yaml import (
@@ -36,7 +35,6 @@ if _YAML_AVAILABLE:
 
 else:
     from torchwrench.extras.yaml import _yaml_fallback as yaml
-
     from torchwrench.extras.yaml._yaml_fallback import (
         BaseLoader,
         CBaseLoader,
@@ -48,12 +46,12 @@ else:
         Loader,
         MappingNode,
         Node,
+        ParserError,
         SafeLoader,
         ScalarNode,
+        ScannerError,
         SequenceNode,
         UnsafeLoader,
-        ParserError,
-        ScannerError,
     )
 
 

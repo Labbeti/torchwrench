@@ -16,11 +16,11 @@ from typing import (
     overload,
 )
 
-from pythonwrench.io import _setup_output_fpath
 from pythonwrench.csv import Orient
 from pythonwrench.csv import dump_csv as _dump_csv_base
 from pythonwrench.csv import load_csv as _load_csv_base
 from pythonwrench.importlib import Placeholder
+from pythonwrench.io import _setup_output_fpath
 from pythonwrench.warnings import warn_once
 
 from torchwrench.core.packaging import _PANDAS_AVAILABLE
