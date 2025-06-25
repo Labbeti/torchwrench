@@ -4,7 +4,7 @@
 from typing import Literal, Optional, Union, overload
 
 import torch
-from torch.types import Device
+from torch.types import Device  # noqa: F401
 from typing_extensions import TypeAlias
 
 from torchwrench.core.dtype_enum import (
