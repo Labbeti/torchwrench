@@ -61,6 +61,7 @@ from .core.make import (
     GeneratorLike,
 )
 from .extras.numpy import ndarray_to_tensor, tensor_to_ndarray, to_ndarray
+from .extras.yaml import dump_yaml, load_yaml
 from .hub.download import download_file
 from .hub.paths import get_cache_dir, get_tmp_dir
 from .nn.functional import *
