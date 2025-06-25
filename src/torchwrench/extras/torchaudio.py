@@ -9,7 +9,7 @@ from typing import BinaryIO, Optional, Union
 
 from pythonwrench.functools import function_alias
 from pythonwrench.importlib import Placeholder
-from pythonwrench.io import _setup_path
+from pythonwrench.io import _setup_output_fpath
 from torch import Tensor
 
 from torchwrench.core.packaging import _TORCHAUDIO_AVAILABLE
@@ -48,7 +48,7 @@ def dump_with_torchaudio(
         raise ValueError(msg)
 
     if isinstance(uri, (str, Path, os.PathLike)) or uri is None:
-        uri = _setup_path(uri, overwrite, make_parents)
+        uri = _setup_output_fpath(uri, overwrite, make_parents)
 
     buffer = io.BytesIO()
     torchaudio.save(  # type: ignore

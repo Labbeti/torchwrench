@@ -93,6 +93,7 @@ if _H5PY_AVAILABLE:
         {
             r"^.+\.h5$": "h5py",
             r"^.+\.hdf$": "h5py",
+            r"^.+\.hdf5$": "h5py",
         }
     )
 
