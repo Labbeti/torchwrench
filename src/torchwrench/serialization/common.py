@@ -132,6 +132,7 @@ BACKEND_TO_PATTERN: Dict[SavingBackend, str] = {
 
 @register_as_builtin_fn(Counter)
 def _counter_to_builtin(x: Counter[T]) -> Dict[T, int]:
+    # TODO: remove this fn when using newer pythonwrench version >0.2.0
     return dict(x)
 
 
