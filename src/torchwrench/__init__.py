@@ -9,7 +9,7 @@ __author_email__ = "labbeti.pub@gmail.com"
 __license__ = "MIT"
 __maintainer__ = "Étienne Labbé (Labbeti)"
 __status__ = "Development"
-__version__ = "0.7.0"
+__version__ = "0.7.1"
 
 # Import global functions and classes from torch
 # Imports from pythonwrench
@@ -54,11 +54,14 @@ from .core.dtype_enum import DTypeEnum
 from .core.dtype_enum import DTypeEnum as dtype_enum
 from .core.make import (
     CUDA_IF_AVAILABLE,
+    Device,
     DeviceLike,
     DTypeLike,
+    Generator,
     GeneratorLike,
 )
 from .extras.numpy import ndarray_to_tensor, tensor_to_ndarray, to_ndarray
+from .extras.yaml import dump_yaml, load_yaml
 from .hub.download import download_file
 from .hub.paths import get_cache_dir, get_tmp_dir
 from .nn.functional import *

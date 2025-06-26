@@ -16,10 +16,11 @@ from typing import (
     overload,
 )
 
-from pythonwrench.csv import Orient, _setup_path
+from pythonwrench.csv import Orient
 from pythonwrench.csv import dump_csv as _dump_csv_base
 from pythonwrench.csv import load_csv as _load_csv_base
 from pythonwrench.importlib import Placeholder
+from pythonwrench.io import _setup_output_fpath
 from pythonwrench.warnings import warn_once
 
 from torchwrench.core.packaging import _PANDAS_AVAILABLE
@@ -56,23 +57,24 @@ def dump_csv(
         else:
             backend = "csv"
 
-    if to_builtins:
-        if isinstance(data, DataFrame) and backend == "pandas":
-            msg = f"Inconsistent combinaison of arguments: {to_builtins=}, {backend=} and {type(data)=}."
-            warn_once(msg)
-        data = as_builtin(data)
-
     if backend == "csv":
         return _dump_csv_base(
             data,
             fpath,
             overwrite=overwrite,
             make_parents=make_parents,
+            to_builtins=to_builtins,
             header=header,
             **backend_kwds,
         )
 
     elif backend == "pandas":
+        if to_builtins:
+            if isinstance(data, DataFrame):
+                msg = f"Inconsistent combinaison of arguments: {to_builtins=}, {backend=} and {type(data)=}."
+                warn_once(msg)
+            data = as_builtin(data)
+
         header = header if header != "auto" else True
         return _dump_csv_with_pandas(
             data,
@@ -93,7 +95,7 @@ def load_csv(
     fpath: Union[str, Path],
     /,
     *,
-    orient: Literal["dict"] = "dict",
+    orient: Literal["dict"],
     header: bool = True,
     comment_start: Optional[str] = None,
     strip_content: bool = False,
@@ -109,7 +111,7 @@ def load_csv(
     fpath: Union[str, Path],
     /,
     *,
-    orient: Literal["list"],
+    orient: Literal["list"] = "list",
     header: bool = True,
     comment_start: Optional[str] = None,
     strip_content: bool = False,
@@ -124,7 +126,7 @@ def load_csv(
     fpath: Union[str, Path],
     /,
     *,
-    orient: Orient = "dict",
+    orient: Orient = "list",
     header: bool = True,
     comment_start: Optional[str] = None,
     strip_content: bool = False,
@@ -179,7 +181,6 @@ def _dump_csv_with_pandas(
         msg = f"Invalid argument {backend=} without pandas installed."
         raise ValueError(msg)
 
-    fpath = _setup_path(fpath, overwrite, make_parents)
     df = pd.DataFrame(data)  # type: ignore
 
     # set index to False by default
@@ -190,6 +191,7 @@ def _dump_csv_with_pandas(
     content = file.getvalue()
     file.close()
 
+    fpath = _setup_output_fpath(fpath, overwrite, make_parents)
     if fpath is not None:
         fpath.write_text(content)
 

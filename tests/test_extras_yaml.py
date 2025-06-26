@@ -6,13 +6,12 @@ import unittest
 from unittest import TestCase
 
 import yaml
+from yaml import FullLoader, SafeLoader
 from yaml.constructor import ConstructorError
 
 from torchwrench.core.packaging import _YAML_AVAILABLE
 from torchwrench.extras.yaml import (
-    FullLoader,
     IgnoreTagLoader,
-    SafeLoader,
     SplitTagLoader,
     dump_yaml,
     load_yaml,

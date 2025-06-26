@@ -4,6 +4,7 @@
 from typing import Literal, Optional, Union, overload
 
 import torch
+from torch.types import Device  # noqa: F401
 from typing_extensions import TypeAlias
 
 from torchwrench.core.dtype_enum import (
@@ -17,6 +18,11 @@ DeviceLike: TypeAlias = Union[
 ]
 DTypeLike: TypeAlias = Union[torch.dtype, None, Literal["default"], str, DTypeEnum]
 GeneratorLike: TypeAlias = Union[torch.Generator, None, Literal["default"], int]
+
+# Expose torch types
+Generator = torch.Generator
+device = torch.device
+
 
 CUDA_IF_AVAILABLE = "cuda_if_available"
 

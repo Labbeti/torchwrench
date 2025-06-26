@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, Literal, Optional, Tuple, Union, overload
 
 from pythonwrench.inspect import get_fullname
-from pythonwrench.io import _setup_path
+from pythonwrench.io import _setup_output_fpath
 from pythonwrench.typing.checks import isinstance_generic
 from safetensors import safe_open
 from safetensors.torch import save
@@ -92,7 +92,7 @@ def dump_safetensors(
         msg = f"Invalid argument type {type(tensors)}. (expected dict[str, Tensor] but found {get_fullname(type(tensors))})"
         raise TypeError(msg)
 
-    fpath = _setup_path(fpath, overwrite, make_parents)
+    fpath = _setup_output_fpath(fpath, overwrite, make_parents)
     content = save(tensors, metadata)
     if fpath is not None:
         fpath.write_bytes(content)

@@ -6,7 +6,7 @@ from io import BytesIO
 from pathlib import Path
 from typing import Literal, Optional, Union, get_args
 
-from pythonwrench.io import _setup_path
+from pythonwrench.io import _setup_output_fpath
 
 from .definitions import np
 
@@ -22,7 +22,7 @@ def dump_numpy(
     make_parents: bool = True,
     **kwargs,
 ) -> bytes:
-    fpath = _setup_path(fpath, overwrite, make_parents)
+    fpath = _setup_output_fpath(fpath, overwrite, make_parents)
 
     if np_format is not None:
         pass

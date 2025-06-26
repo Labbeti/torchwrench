@@ -6,48 +6,57 @@ from io import TextIOBase
 from pathlib import Path
 from typing import Any, Iterable, Literal, Mapping, Optional, Type, Union
 
+from pythonwrench.typing import DataclassInstance, NamedTupleInstance
 from typing_extensions import TypeAlias
 
 from torchwrench.core.packaging import _OMEGACONF_AVAILABLE, _YAML_AVAILABLE
-
-if not _YAML_AVAILABLE:
-    msg = f"Cannot use python module {__file__} since pyyaml package is not installed. Please install it with `pip install torchwrench[extras]`."
-    raise ImportError(msg)
-
-import yaml
-from pythonwrench.typing import DataclassInstance, NamedTupleInstance
-from yaml import (
-    BaseLoader,
-    CBaseLoader,
-    CFullLoader,
-    CLoader,
-    CSafeLoader,
-    CUnsafeLoader,
-    FullLoader,
-    Loader,
-    MappingNode,
-    Node,
-    SafeLoader,
-    ScalarNode,
-    SequenceNode,
-    UnsafeLoader,
-)
-from yaml.parser import ParserError
-from yaml.scanner import ScannerError
-
 from torchwrench.serialization.common import as_builtin
+
+if _YAML_AVAILABLE:
+    import yaml
+    from yaml import (
+        BaseLoader,
+        CBaseLoader,
+        CFullLoader,
+        CLoader,
+        CSafeLoader,
+        CUnsafeLoader,
+        FullLoader,
+        Loader,
+        MappingNode,
+        Node,
+        SafeLoader,
+        ScalarNode,
+        SequenceNode,
+        UnsafeLoader,
+    )
+    from yaml.parser import ParserError
+    from yaml.scanner import ScannerError
+
+else:
+    from torchwrench.extras.yaml import _yaml_fallback as yaml
+    from torchwrench.extras.yaml._yaml_fallback import (
+        BaseLoader,
+        CBaseLoader,
+        CFullLoader,
+        CLoader,
+        CSafeLoader,
+        CUnsafeLoader,
+        FullLoader,
+        Loader,
+        MappingNode,
+        Node,
+        ParserError,
+        SafeLoader,
+        ScalarNode,
+        ScannerError,
+        SequenceNode,
+        UnsafeLoader,
+    )
+
 
 if _OMEGACONF_AVAILABLE:
     from omegaconf import OmegaConf  # type: ignore
-
-
-__all__ = [
-    "YamlLoaders",
-    "load_yaml",
-    "dump_yaml",
-    "IgnoreTagLoader",
-    "SplitTagLoader",
-]
 
 
 YamlLoaders: TypeAlias = Union[
@@ -87,6 +96,10 @@ def dump_yaml(
     **yaml_dump_kwds,
 ) -> str:
     """Dump content to yaml format."""
+    if not _YAML_AVAILABLE:
+        msg = f"Cannot use python module {__file__} since pyyaml package is not installed. Please install it with `pip install torchwrench[extras]`."
+        raise ImportError(msg)
+
     if not _OMEGACONF_AVAILABLE and resolve:
         msg = (
             "Cannot resolve yaml config without omegaconf package."
@@ -128,12 +141,16 @@ def load_yaml(
     on_error: Literal["raise", "ignore"] = "raise",
 ) -> Any:
     """Load content from yaml filepath."""
+    if not _YAML_AVAILABLE:
+        msg = f"Cannot use python module {__file__} since pyyaml package is not installed. Please install it with `pip install torchwrench[extras]`."
+        raise ImportError(msg)
+
     if isinstance(fpath, (str, Path)):
         with open(fpath, "r") as file:
             return load_yaml(file, Loader=Loader, on_error=on_error)
 
     try:
-        data = yaml.load(fpath, Loader=Loader)
+        data = yaml.load(fpath, Loader=Loader)  # type: ignore
     except (ScannerError, ParserError) as err:
         if on_error == "ignore":
             return None
@@ -166,9 +183,8 @@ class IgnoreTagLoader(SafeLoader):
         elif isinstance(node, SequenceNode):
             return self.construct_sequence(node)
         else:
-            raise NotImplementedError(
-                f"Unsupported node type {type(node)} with {tag=}."
-            )
+            msg = f"Unsupported node type {type(node)} with {tag=}."
+            raise NotImplementedError(msg)
 
 
 IgnoreTagLoader.add_multi_constructor("!", IgnoreTagLoader.construct_with_tag)

@@ -3,7 +3,7 @@
 <center>
 
 <a href="https://www.python.org/">
-    <img alt="Python" src="https://img.shields.io/badge/-Python 3.9+-blue?style=for-the-badge&logo=python&logoColor=white">
+    <img alt="Python" src="https://img.shields.io/badge/-Python 3.8+-blue?style=for-the-badge&logo=python&logoColor=white">
 </a>
 <a href="https://github.com/Labbeti/torchwrench/actions">
     <img alt="Build" src="https://img.shields.io/github/actions/workflow/status/Labbeti/torchwrench/test.yaml?branch=main&style=for-the-badge&logo=github">
@@ -39,7 +39,7 @@ To check if the package is installed and show the package version, you can use t
 torchwrench-info
 ```
 
-This library works on all Python versions **>=3.9**, all PyTorch versions **>= 1.10**, and on **Linux, Mac and Windows** systems.
+This library has been tested on all Python versions **3.8 - 3.13**, all PyTorch versions **1.10 - 2.6**, and on **Linux, Mac and Windows** systems.
 
 ## Examples
 

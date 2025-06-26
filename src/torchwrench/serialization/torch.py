@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import IO, Any, BinaryIO, Callable, Dict, Optional, Union
 
 import torch
-from pythonwrench.io import _setup_path
+from pythonwrench.io import _setup_output_fpath
 from pythonwrench.semver import Version
 from torch.serialization import DEFAULT_PROTOCOL
 from torch.types import Storage
@@ -33,9 +33,6 @@ def dump_torch(
     overwrite: bool = True,
     make_parents: bool = True,
 ) -> bytes:
-    if isinstance(f, (str, Path, os.PathLike)) or f is None:
-        f = _setup_path(f, overwrite, make_parents)
-
     if "_disable_byteorder_record" in inspect.getargs(torch.save.__code__).args:
         kwds = dict(_disable_byteorder_record=_disable_byteorder_record)
     else:
@@ -52,6 +49,9 @@ def dump_torch(
     )
     content = buffer.getvalue()
     buffer.close()
+
+    if isinstance(f, (str, Path, os.PathLike)) or f is None:
+        f = _setup_output_fpath(f, overwrite, make_parents)
 
     if isinstance(f, Path):
         f.write_bytes(content)
