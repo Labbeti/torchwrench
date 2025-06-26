@@ -5,7 +5,7 @@ import io
 import os
 from io import BufferedWriter
 from pathlib import Path
-from typing import BinaryIO, Optional, Union
+from typing import BinaryIO, Optional, Tuple, Union
 
 from pythonwrench.functools import function_alias
 from pythonwrench.importlib import Placeholder
@@ -83,7 +83,7 @@ def load_with_torchaudio(
     format: Optional[str] = None,
     buffer_size: int = 4096,
     backend: Optional[str] = None,
-) -> tuple[Tensor, int]:
+) -> Tuple[Tensor, int]:
     return torchaudio.load(  # type: ignore
         uri,
         frame_offset,
