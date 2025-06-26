@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 ## [0.7.1] 2025-06-26
 ### Added
 - Support for Python 3.8.
+- `dump_yaml` and `load_yaml` are now in global context.
 
 ## [0.7.0] 2025-06-23
 Rename project `torchwrench` and split python utilities into `pythonwrench` repository.
