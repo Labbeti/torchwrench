@@ -14,6 +14,7 @@ Subpackages
 
    torchwrench.extras.hdf
    torchwrench.extras.numpy
+   torchwrench.extras.yaml
 
 Submodules
 ----------
@@ -25,4 +26,3 @@ Submodules
    torchwrench.extras.safetensors
    torchwrench.extras.tensorboard
    torchwrench.extras.torchaudio
-   torchwrench.extras.yaml
