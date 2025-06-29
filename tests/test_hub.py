@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import time
 import unittest
+import warnings
 from unittest import TestCase
+from urllib.error import HTTPError
 
 from torch import Tensor
 
@@ -53,7 +56,21 @@ class TestRegistryHub(TestCase):
         )
 
         model_name = "cnext_bl_70"
-        register.download_file(model_name, force=False)
+        num_tries = 5
+        for i in range(num_tries):
+            try:
+                register.download_file(model_name, force=False)
+                break
+            except HTTPError as err:
+                if i + 1 < num_tries:
+                    msg = f"Failed to download {i + 1} times."
+                    warnings.warn(msg)
+                    raise err
+                else:
+                    msg = f"Found error {err} at try number {i + 1}/{num_tries}, retrying..."
+                    warnings.warn(msg)
+                    time.sleep(i + 1)
+
         state_dict = register.load_state_dict(
             model_name,
             offline=True,
