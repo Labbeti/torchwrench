@@ -130,12 +130,6 @@ BACKEND_TO_PATTERN: Dict[SavingBackend, str] = {
 }
 
 
-@register_as_builtin_fn(Counter)
-def _counter_to_builtin(x: Counter) -> Dict[Any, int]:
-    # TODO: remove this fn when using newer pythonwrench version >0.2.0
-    return dict(x)
-
-
 @register_as_builtin_fn(Tensor)
 def _tensor_to_builtin(x: Tensor) -> Any:
     return x.tolist()
