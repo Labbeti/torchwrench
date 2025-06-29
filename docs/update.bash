@@ -1,10 +1,12 @@
-#!/usr/bin/bash
+#!/bin/bash
 # -*- coding: utf-8 -*-
+
+pkg_name="torchwrench"
 
 docs_dpath=`dirname $0`
 cd "$docs_dpath"
 
-rm torchwrench.*rst
-uv run sphinx-apidoc -e -M -o . ../src/torchwrench && uv run make clean && uv run make html
+rm ${pkg_name}.*rst
+sphinx-apidoc -e -M -o . ../src/${pkg_name} && make clean && make html
 
 exit 0
