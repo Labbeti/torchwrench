@@ -15,8 +15,13 @@ __version__ = "0.7.2"
 # Imports from pythonwrench
 from pythonwrench.semver import Version
 from pythonwrench.typing.checks import (
+    is_builtin_collection,
+    is_builtin_number,
+    is_builtin_obj,
+    is_builtin_scalar,
     is_dataclass_instance,
     is_namedtuple_instance,
+    is_typed_dict,
     isinstance_generic,
 )
 from torch import *  # type: ignore
@@ -73,8 +78,6 @@ from .serialization.load_fn import load
 from .serialization.pickle import dump_pickle, load_pickle
 from .serialization.torch import dump_torch, load_torch
 from .types.guards import (
-    is_builtin_number,
-    is_builtin_scalar,
     is_number_like,
     is_scalar_like,
     is_tensor_or_array,
