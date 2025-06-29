@@ -39,26 +39,44 @@ class TestSaving(TestCase):
             ],
         ]
         expected = [[[list(range(3))], "a", "path", {"a": 3, "b": 1, "c": 1}, []]]
+
+        if _PANDAS_AVAILABLE:
+            import pandas as pd
+
+            df = pd.DataFrame({"a": [1, 2]})
+
+            x += [
+                df,
+                df["a"],
+            ]
+            expected += [
+                {"a": [1, 2]},
+                [1, 2],
+            ]
+
         result = as_builtin(x)
         assert result == expected, f"{result=}; {expected=}"
-
-    def test_detect_backend(self) -> None:
-        tests: List[Tuple[str, SavingBackend]] = [
-            ("test.json", "json"),
-            ("test.json.yaml", "yaml"),
-            ("test.yaml.json", "json"),
-            ("test.yml", "yaml"),
-        ]
-
-        for fpath, expected_backend in tests:
-            backend = _fpath_to_saving_backend(fpath)
-            assert backend == expected_backend
 
     def test_as_builtin(self) -> None:
         assert as_builtin(tw.arange(10)) == list(range(10))
 
         with self.assertRaises(TypeError):
             as_builtin(self)
+
+    def test_detect_backend(self) -> None:
+        tests: List[Tuple[str, str]] = [
+            ("test.json", "json"),
+            ("test.yaml.json", "json"),
+        ]
+        if _YAML_AVAILABLE:
+            tests += [
+                ("test.json.yaml", "yaml"),
+                ("test.yml", "yaml"),
+            ]
+
+        for fpath, expected_backend in tests:
+            backend = _fpath_to_saving_backend(fpath)
+            assert backend == expected_backend
 
     def test_csv(self) -> None:
         data = {

@@ -3,36 +3,18 @@
 
 import logging
 import re
-from argparse import Namespace
-from dataclasses import asdict
-from enum import Enum
 from pathlib import Path
-from re import Pattern
 from typing import (
     Any,
     Dict,
-    Iterable,
-    List,
     Literal,
-    Mapping,
     Optional,
     TypeVar,
     Union,
-    get_args,
-    overload,
 )
 
 import torch
-from pythonwrench.importlib import Placeholder
-from pythonwrench.typing import (
-    BuiltinNumber,
-    DataclassInstance,
-    NamedTupleInstance,
-    T_BuiltinScalar,
-    is_builtin_scalar,
-    is_dataclass_instance,
-    is_namedtuple_instance,
-)
+from pythonwrench.cast import as_builtin, register_as_builtin_fn
 from torch import Tensor
 
 from torchwrench.core.packaging import (
@@ -45,25 +27,10 @@ from torchwrench.core.packaging import (
     _YAML_AVAILABLE,
 )
 
-if _OMEGACONF_AVAILABLE:
-    from omegaconf import DictConfig, ListConfig, OmegaConf  # type: ignore
-
-if _PANDAS_AVAILABLE:
-    import pandas as pd  # type: ignore
-
-    DataFrame = pd.DataFrame  # type: ignore
-else:
-
-    class DataFrame(Placeholder): ...
-
+T = TypeVar("T")
 
 pylog = logging.getLogger(__name__)
 
-T = TypeVar("T")
-K = TypeVar("K")
-V = TypeVar("V")
-
-UnkMode = Literal["identity", "error"]
 SavingBackend = Literal[
     "csv",
     "json",
@@ -162,142 +129,43 @@ BACKEND_TO_PATTERN: Dict[SavingBackend, str] = {
 }
 
 
-@overload
-def as_builtin(
-    x: Enum,
-    *,
-    unk_mode: UnkMode = "error",
-) -> str: ...
+@register_as_builtin_fn(Tensor)
+def _tensor_to_builtin(x: Tensor) -> Any:
+    return x.tolist()
 
 
-@overload
-def as_builtin(
-    x: Path,
-    *,
-    unk_mode: UnkMode = "error",
-) -> str: ...
+@register_as_builtin_fn(torch.dtype)
+def _torch_dtype_to_builtin(x: torch.dtype) -> Any:
+    return str(x)
 
 
-@overload
-def as_builtin(
-    x: Pattern,
-    *,
-    unk_mode: UnkMode = "error",
-) -> str: ...
+if _NUMPY_AVAILABLE:
+    import numpy as np
 
-
-@overload
-def as_builtin(
-    x: Namespace,
-    *,
-    unk_mode: UnkMode = "error",
-) -> Dict[str, Any]: ...
-
-
-@overload
-def as_builtin(
-    x: Tensor,
-    *,
-    unk_mode: UnkMode = "error",
-) -> Union[List, BuiltinNumber]: ...
-
-
-@overload
-def as_builtin(
-    x: Mapping[K, V],
-    *,
-    unk_mode: UnkMode = "error",
-) -> Dict[K, V]: ...
-
-
-@overload
-def as_builtin(
-    x: DataclassInstance,
-    *,
-    unk_mode: UnkMode = "error",
-) -> Dict[str, Any]: ...
-
-
-@overload
-def as_builtin(
-    x: NamedTupleInstance,
-    *,
-    unk_mode: UnkMode = "error",
-) -> Dict[str, Any]: ...
-
-
-@overload
-def as_builtin(
-    x: T_BuiltinScalar,
-    *,
-    unk_mode: UnkMode = "error",
-) -> T_BuiltinScalar: ...
-
-
-@overload
-def as_builtin(
-    x: Any,
-    *,
-    unk_mode: UnkMode = "error",
-) -> Any: ...
-
-
-def as_builtin(
-    x: Any,
-    *,
-    unk_mode: UnkMode = "error",
-) -> Any:
-    """Convert an object to a python builtin equivalent.
-
-    This function can be used to sanitize data before saving to YAML or CSV file.
-
-    Args:
-        x: Object to convert to built-in equivalent.
-        unk_mode: When an object type is not recognized, unk_mode defines the behaviour.
-            If unk_mode == "identity", the object is returned unchanged.
-            If unk_mode == "error", a TypeError is raised.
-    """
-    # Terminal cases
-    if is_builtin_scalar(x, strict=True):
-        return x
-    if isinstance(x, Enum):
-        return x.name
-    if isinstance(x, Path):
-        return str(x)
-    if isinstance(x, Pattern):
-        return x.pattern
-    if isinstance(x, Tensor):
+    @register_as_builtin_fn(np.ndarray)
+    def _np_ndarray_to_builtin(x: np.ndarray) -> Any:
         return x.tolist()
-    if isinstance(x, torch.dtype):
-        return str(x)
-    if _NUMPY_AVAILABLE and isinstance(x, np.ndarray):  # type: ignore
-        return x.tolist()
-    if _NUMPY_AVAILABLE and isinstance(x, np.generic):  # type: ignore
+
+    @register_as_builtin_fn(np.generic)
+    def _np_generic_to_builtin(x: np.generic) -> Any:
         return x.item()
-    if _NUMPY_AVAILABLE and isinstance(x, np.dtype):  # type: ignore
+
+    @register_as_builtin_fn(np.dtype)
+    def _np_dtype_to_builtin(x: np.dtype) -> Any:
         return str(x)
 
-    # Non-terminal cases (iterables and mappings)
-    if _OMEGACONF_AVAILABLE and isinstance(x, (DictConfig, ListConfig)):  # type: ignore
-        return as_builtin(OmegaConf.to_container(x, resolve=False, enum_to_str=True))  # type: ignore
-    if _PANDAS_AVAILABLE and isinstance(x, DataFrame):  # type: ignore
-        return as_builtin(x.to_dict("list"))
-    if isinstance(x, Namespace):
-        return as_builtin(x.__dict__)
-    if is_dataclass_instance(x):
-        return as_builtin(asdict(x))
-    if is_namedtuple_instance(x):
-        return as_builtin(x._asdict())
-    if isinstance(x, Mapping):
-        return {as_builtin(k): as_builtin(v) for k, v in x.items()}
-    if isinstance(x, Iterable):
-        return [as_builtin(xi) for xi in x]
 
-    if unk_mode == "identity":
-        return x
-    elif unk_mode == "error":
-        msg = f"Unsupported argument type {type(x)}."
-        raise TypeError(msg)
-    else:
-        msg = f"Invalid argument {unk_mode=}. (expected one of {get_args(UnkMode)})"
-        raise ValueError(msg)
+if _OMEGACONF_AVAILABLE:
+    from omegaconf import DictConfig, ListConfig, OmegaConf  # type: ignore
+
+    @register_as_builtin_fn((DictConfig, ListConfig))
+    def _omegaconf_to_builtin(x: Union[DictConfig, ListConfig]) -> Any:
+        return as_builtin(OmegaConf.to_container(x, resolve=False, enum_to_str=True))  # type: ignore
+
+
+if _PANDAS_AVAILABLE:
+    import pandas as pd
+
+    @register_as_builtin_fn(pd.DataFrame)
+    def _dataframe_to_builtin(x: pd.DataFrame) -> Any:
+        return as_builtin(x.to_dict("list"))

@@ -41,8 +41,8 @@ class TestYaml(TestCase):
         assert result == expected
 
         data = load_yaml(io.StringIO(dumped), Loader=FullLoader)
-        assert dump_yaml(data) == f"{dumped}\n"
-        assert dump_yaml(data, to_builtins=True) == "a:\n- 1\n- 2\n"
+        assert dump_yaml(data) == f"{dumped}\n", f"{data=}"
+        assert dump_yaml(data, to_builtins=True) == "a:\n- 1\n- 2\n", f"{data=}"
 
 
 if __name__ == "__main__":

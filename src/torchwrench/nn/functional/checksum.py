@@ -14,6 +14,7 @@ from pythonwrench.checksum import (
     checksum_bytes,
     checksum_dict,
     checksum_float,
+    checksum_list_tuple,
     checksum_str,
     register_checksum_fn,
 )
@@ -29,9 +30,12 @@ if _PANDAS_AVAILABLE:
     import pandas as pd
 
     DataFrame = pd.DataFrame  # type: ignore
+    Series = pd.Series
 else:
 
     class DataFrame(Placeholder): ...
+
+    class Series(Placeholder): ...
 
 
 @register_checksum_fn(DataFrame)
@@ -40,13 +44,24 @@ def checksum_dataframe(x: DataFrame, **kwargs) -> int:
         msg = "Cannot call function 'checksum_dataframe' because optional dependency 'pandas' is not installed. Please install it using 'pip install torchwrench[extras]'"
         raise NotImplementedError(msg)
 
-    # hash_value = hashlib.sha1(pd.util.hash_pandas_object(x).values).hexdigest()
-    # csum = checksum_str(hash_value, **kwargs)
     kwargs["accumulator"] = kwargs.get("accumulator", 0) + _cached_checksum_str(
         get_fullname(x)
     )
     xdict = x.to_dict()
     return checksum_dict(xdict, **kwargs)  # type: ignore
+
+
+@register_checksum_fn(Series)
+def checksum_series(x: Series, **kwargs) -> int:
+    if not _PANDAS_AVAILABLE:
+        msg = "Cannot call function 'checksum_series' because optional dependency 'pandas' is not installed. Please install it using 'pip install torchwrench[extras]'"
+        raise NotImplementedError(msg)
+
+    kwargs["accumulator"] = kwargs.get("accumulator", 0) + _cached_checksum_str(
+        get_fullname(x)
+    )
+    xlist = x.tolist()
+    return checksum_list_tuple(xlist, **kwargs)  # type: ignore
 
 
 @register_checksum_fn((torch.dtype, np.dtype))

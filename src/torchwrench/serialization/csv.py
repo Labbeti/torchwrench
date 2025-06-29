@@ -169,7 +169,7 @@ def load_csv(
 
 
 def _dump_csv_with_pandas(
-    data: Union[Iterable[Mapping[str, Any]], Mapping[str, Iterable[Any]]],
+    data: Union[Iterable[Mapping[str, Any]], Mapping[str, Iterable[Any]], DataFrame],
     fpath: Union[str, Path, None] = None,
     *,
     overwrite: bool = True,

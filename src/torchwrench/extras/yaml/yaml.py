@@ -187,10 +187,6 @@ class IgnoreTagLoader(SafeLoader):
             raise NotImplementedError(msg)
 
 
-IgnoreTagLoader.add_multi_constructor("!", IgnoreTagLoader.construct_with_tag)
-IgnoreTagLoader.add_multi_constructor("tag:", IgnoreTagLoader.construct_with_tag)
-
-
 class SplitTagLoader(SafeLoader):
     """SafeLoader that store tags inside value.
 
@@ -233,5 +229,9 @@ class SplitTagLoader(SafeLoader):
         return result
 
 
-SplitTagLoader.add_multi_constructor("!", SplitTagLoader.construct_with_tag)
-SplitTagLoader.add_multi_constructor("tag:", SplitTagLoader.construct_with_tag)
+if _YAML_AVAILABLE:
+    IgnoreTagLoader.add_multi_constructor("!", IgnoreTagLoader.construct_with_tag)
+    IgnoreTagLoader.add_multi_constructor("tag:", IgnoreTagLoader.construct_with_tag)
+
+    SplitTagLoader.add_multi_constructor("!", SplitTagLoader.construct_with_tag)
+    SplitTagLoader.add_multi_constructor("tag:", SplitTagLoader.construct_with_tag)
