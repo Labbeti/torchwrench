@@ -28,10 +28,8 @@ from typing import (
 
 import h5py
 import numpy as np
+import pythonwrench as pw
 from h5py import Dataset as HDFRawDataset
-from pythonwrench.collections import all_eq
-from pythonwrench.difflib import find_closest_in_list
-from pythonwrench.inspect import get_current_fn_name
 from pythonwrench.typing import is_iterable_bytes_or_list, is_iterable_str
 from torch import Tensor
 from typing_extensions import TypeAlias, override
@@ -72,7 +70,8 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
     def __init__(
         self,
         hdf_fpath: Union[str, Path],
-        transform: Optional[Callable[[T], U]] = None,
+        *,
+        transform: Optional[Callable[[T], U]] = pw.identity,
         keep_padding: Iterable[str] = (),
         return_added_columns: bool = False,
         open_hdf: bool = True,
@@ -237,7 +236,7 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
         self,
         index: int,
         column: None = None,
-    ) -> T: ...
+    ) -> U: ...
 
     @overload
     def get_item(
@@ -276,7 +275,11 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
             index = slice(None)
         elif is_scalar_like(index):
             index = tw.to_item(index)  # type: ignore
-        elif isinstance(index, Iterable):
+        elif (
+            pw.isinstance_generic(index, Iterable[int])
+            or pw.isinstance_generic(index, Iterable[bool])
+            or tw.is_tensor_or_array(index)
+        ):
             index = tw.to_ndarray(index)
         elif isinstance(index, (int, slice)):
             pass
@@ -305,7 +308,7 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
 
         assert isinstance(column, str)
         if column not in self.all_columns:
-            closest = find_closest_in_list(column, self.all_columns)  # type: ignore
+            closest = pw.find_closest_in_list(column, self.all_columns)
             msg = f"Invalid argument {column=}. (did you mean '{closest}'? Expected one of {tuple(self.all_columns)})"
             raise ValueError(msg)
 
@@ -502,7 +505,7 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
         elif len(self._hdf_file) > 0:
             hdf_dsets: List[HDFRawDataset] = list(self._hdf_file.values())
             hdf_dsets_lens = [len(ds) for ds in hdf_dsets]
-            if not all_eq(hdf_dsets_lens):
+            if not pw.all_eq(hdf_dsets_lens):
                 msg = f"Found an different number of lengths in hdf sub-datasets. (found {set(hdf_dsets_lens)})"
                 raise ValueError(msg)
             length = hdf_dsets_lens[0]
@@ -578,7 +581,7 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
 
     def _sanity_check(self) -> None:
         lens = [dset.shape[0] for dset in self._hdf_file.values()]
-        if not all_eq(lens) or lens[0] != len(self):
+        if not pw.all_eq(lens) or lens[0] != len(self):
             msg = (
                 f"Incorrect length stored in HDF file. (found {lens=} and {len(self)=})"
             )
@@ -686,5 +689,5 @@ def _decode_bytes(
         return [_decode_bytes(elt, encoding) for elt in encoded]  # type: ignore
 
     else:
-        msg = f"Invalid argument type {type(encoded)} for {get_current_fn_name()}. (expected bytes, bytes ndarray or Iterable)"
+        msg = f"Invalid argument type {type(encoded)} for {pw.get_current_fn_name()}. (expected bytes, bytes ndarray or Iterable)"
         raise TypeError(msg)
