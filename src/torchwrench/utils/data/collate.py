@@ -16,7 +16,10 @@ V = TypeVar("V")
 
 
 class CollateDict:
-    """Collate class to handle a batch dict."""
+    """Collate object for :class:`~torch.utils.data.dataloader.DataLoader`.
+
+    Merge lists in dicts into a single dict of lists. No padding is applied.
+    """
 
     def __init__(self, key_mode: KeyMode = "same") -> None:
         super().__init__()
@@ -31,7 +34,20 @@ class CollateDict:
 
 
 class AdvancedCollateDict:
-    """Collate class to automatically convert to tensor, pad sequences and filter keys in a batch dict."""
+    """Advanced collate object for :class:`~torch.utils.data.dataloader.DataLoader`.
+
+    Merge lists in dicts into a single dict of lists.
+    Audio will be padded if a fill pad_values is given in `__init__`.
+
+    .. code-block:: python
+        :caption:  Example
+
+        >>> collate = AdvancedCollate({"audio": 0.0})
+        >>> loader = DataLoader(..., collate_fn=collate)
+        >>> next(iter(loader))
+        ... {"audio": tensor([[...]]), ...}
+
+    """
 
     def __init__(
         self,
