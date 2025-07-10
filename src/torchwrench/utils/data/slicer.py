@@ -88,14 +88,6 @@ class DatasetSlicer(Generic[T], ABC, Dataset[T]):
         else:
             raise TypeError(f"Invalid argument type {type(idx)=} with {args=}.")
 
-    @final
-    def __getitems__(
-        self,
-        indices: Indices,
-        *args,
-    ) -> List[T]:
-        return self.__getitem__(indices, *args)
-
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}()"
 
