@@ -3,21 +3,23 @@
 
 import pickle
 import random
+import string
 import time
 import unittest
 from unittest import TestCase
 
 import numpy as np
+import pythonwrench as pw
 import torch
 from pythonwrench import dict_list_to_list_dict
 from torch import Tensor
 from torchvision.datasets import CIFAR10
 
 import torchwrench as tw
+from torchwrench import nn
 from torchwrench.extras.hdf import HDFDataset, pack_to_hdf
 from torchwrench.extras.hdf.pack import hdf_dtype_to_numpy_dtype
 from torchwrench.hub.paths import get_tmp_dir
-from torchwrench.nn import ESequential, IndexToOnehot, ToList, ToNDArray
 from torchwrench.utils.data.dataset import Subset
 
 
@@ -35,14 +37,14 @@ class TestHDF(TestCase):
         dataset = CIFAR10(
             str(tmpdir),
             train=False,
-            transform=ToNDArray(),
-            target_transform=ESequential(IndexToOnehot(10), ToList()),
+            transform=nn.ToNDArray(),
+            target_transform=nn.Sequential(nn.IndexToOnehot(10), nn.ToList()),
             download=True,
         )
         indices = torch.randint(0, len(dataset), (max(len(dataset) // 10, 1),)).tolist()
         dataset = Subset(dataset, indices)
 
-        path = tmpdir.joinpath("test_cifar10.hdf")
+        path = tmpdir.joinpath("test_cifar10_pack_to_hdf.hdf")
         hdf_dataset = pack_to_hdf(dataset, path, exists="overwrite")
 
         idx = 0
@@ -336,6 +338,18 @@ class TestHDF(TestCase):
 
         with self.assertRaises(ValueError):
             assert hdf_dtype_to_numpy_dtype("invalid") == np.dtype("V")  # type: ignore
+
+    def test_pack_dict(self) -> None:
+        num_rows = tw.randint(100, 200, ()).item()
+        data = {
+            "x": tw.rand(num_rows, 10),
+            "y": tw.randint(0, 1000, (num_rows, 10)),
+            "z": [pw.randstr(10, letters=string.printable) for _ in range(num_rows)],
+        }
+        hdf_fpath = self.__class__.tmpdir.joinpath("test_pack_dict.hdf")
+        ds = pack_to_hdf(data, hdf_fpath)
+
+        assert tw.deep_equal(ds.to_dict(), data)
 
 
 if __name__ == "__main__":
