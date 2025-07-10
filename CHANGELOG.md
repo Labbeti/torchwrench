@@ -3,6 +3,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.3] UNRELEASED
+### Added
+- `pack_to_hdf` now supports mapping of sequences.
+
 ## [0.7.2] 2025-06-29
 ### Fixed
 - Global import when `pyyaml` is not installed.
