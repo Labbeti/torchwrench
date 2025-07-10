@@ -227,6 +227,7 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
         return self.attrs["load_as_complex"]
 
     # Public methods
+    @pw.deprecated_function()
     def at(self, *args, **kwargs) -> Any:
         """Deprecated: Use get_item method instead."""
         return self.get_item(*args, **kwargs)
