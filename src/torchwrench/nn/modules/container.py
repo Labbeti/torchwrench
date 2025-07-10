@@ -121,7 +121,7 @@ class EModuleDict(
         nn.ModuleDict.__init__(self, modules)
 
     def forward(self, *args: InType, **kwargs: InType) -> Dict[str, OutType3]:
-        return {name: module(*args, **kwargs) for name, module in self.items()}
+        return {name: module(*args, **kwargs) for name, module in self.items()}  # type: ignore
 
 
 class EModulePartial(

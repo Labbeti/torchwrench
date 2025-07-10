@@ -16,8 +16,8 @@ from torchwrench.types._typing import BoolTensor1D, Tensor1D, TensorOrArray
 from torchwrench.types.guards import is_number_like, is_tensor_or_array
 from torchwrench.utils.data.dataset import Wrapper
 
-T = TypeVar("T", covariant=False)
-U = TypeVar("U", covariant=False)
+T = TypeVar("T", covariant=True)
+U = TypeVar("U", covariant=True)
 
 Indices: TypeAlias = Union[Iterable[bool], Iterable[int], None, slice, Tensor1D]
 
@@ -155,6 +155,7 @@ class DatasetSlicerWrapper(Generic[T], DatasetSlicer[T], Wrapper[T]):
         add_slice_support: bool = True,
         add_indices_support: bool = True,
         add_mask_support: bool = True,
+        add_none_support: bool = True,
     ) -> None:
         """Wrap a sequence to support slice, indices and mask arguments types."""
         DatasetSlicer.__init__(
@@ -162,6 +163,7 @@ class DatasetSlicerWrapper(Generic[T], DatasetSlicer[T], Wrapper[T]):
             add_slice_support=add_slice_support,
             add_indices_support=add_indices_support,
             add_mask_support=add_mask_support,
+            add_none_support=add_none_support,
         )
         Wrapper.__init__(self, dataset)
 

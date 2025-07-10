@@ -154,7 +154,7 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
         return attrs  # type: ignore
 
     @property
-    def column_names(self) -> List[str]:
+    def column_names(self) -> Tuple[str, ...]:
         """The name of each column of the dataset."""
         column_names = self.all_columns
         column_names = [
@@ -162,7 +162,7 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
             for name in column_names
             if self._return_added_columns or name not in self.added_columns
         ]
-        return column_names
+        return tuple(column_names)
 
     @property
     def info(self) -> Dict[str, Any]:
@@ -230,6 +230,51 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
     def at(self, *args, **kwargs) -> Any:
         """Deprecated: Use get_item method instead."""
         return self.get_item(*args, **kwargs)
+
+    def close(self, ignore_if_closed: bool = False, remove_file: bool = False) -> None:
+        if self.is_closed() and not ignore_if_closed:
+            raise RuntimeError("Cannot close the HDF file twice.")
+
+        if not ignore_if_closed:
+            self._hdf_file.close()
+        if remove_file:
+            os.remove(self._hdf_fpath)
+
+        self._hdf_file = None
+        self._clear_caches()
+
+    def get_attrs(self) -> HDFDatasetAttributes:
+        return self.attrs
+
+    def get_hdf_fpath(self) -> Path:
+        return self._hdf_fpath
+
+    def get_hdf_keys(self) -> Tuple[str, ...]:
+        if self.is_closed():
+            raise RuntimeError("Cannot get keys from a closed HDF file.")
+        return tuple(self._hdf_file.keys())
+
+    def get_column_shape(self, column_name: str) -> Tuple[int, ...]:
+        if self.is_closed():
+            msg = f"Cannot get_column_shape with a closed HDF file. ({self._hdf_file is None=} or {not bool(self._hdf_file)=})"
+            raise RuntimeError(msg)
+        return tuple(self._hdf_file[column_name].shape)
+
+    def get_columns_shapes(self) -> Dict[str, Tuple[int, ...]]:
+        if self.is_closed():
+            msg = f"Cannot get_columns_shapes with a closed HDF file. ({self._hdf_file is None=} or {not bool(self._hdf_file)=})"
+            raise RuntimeError(msg)
+
+        return {
+            column_name: tuple(self._hdf_file[column_name].shape)
+            for column_name in self.column_names
+        }
+
+    def get_column_dtype(self, column_name: str) -> np.dtype:
+        if self.is_closed():
+            msg = f"Cannot get dtype with a closed HDF file. ({self._hdf_file is None=} or {not bool(self._hdf_file)=})"
+            raise RuntimeError(msg)
+        return self._hdf_file[column_name].dtype
 
     @overload
     def get_item(
@@ -379,56 +424,14 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
             outputs = outputs[0]
         return outputs
 
-    def close(self, ignore_if_closed: bool = False, remove_file: bool = False) -> None:
-        if self.is_closed() and not ignore_if_closed:
-            raise RuntimeError("Cannot close the HDF file twice.")
-
-        if not ignore_if_closed:
-            self._hdf_file.close()
-        if remove_file:
-            os.remove(self._hdf_fpath)
-
-        self._hdf_file = None
-        self._clear_caches()
-
-    def get_attrs(self) -> HDFDatasetAttributes:
-        return self.attrs
-
-    def get_hdf_fpath(self) -> Path:
-        return self._hdf_fpath
-
-    def get_hdf_keys(self) -> Tuple[str, ...]:
-        if self.is_closed():
-            raise RuntimeError("Cannot get keys from a closed HDF file.")
-        return tuple(self._hdf_file.keys())
-
-    def get_column_shape(self, column_name: str) -> Tuple[int, ...]:
-        if self.is_closed():
-            msg = f"Cannot get_column_shape with a closed HDF file. ({self._hdf_file is None=} or {not bool(self._hdf_file)=})"
-            raise RuntimeError(msg)
-        return tuple(self._hdf_file[column_name].shape)
-
-    def get_columns_shapes(self) -> Dict[str, Tuple[int, ...]]:
-        if self.is_closed():
-            msg = f"Cannot get_columns_shapes with a closed HDF file. ({self._hdf_file is None=} or {not bool(self._hdf_file)=})"
-            raise RuntimeError(msg)
-
-        return {
-            column_name: tuple(self._hdf_file[column_name].shape)
-            for column_name in self.column_names
-        }
-
-    def get_column_dtype(self, column_name: str) -> np.dtype:
-        if self.is_closed():
-            msg = f"Cannot get dtype with a closed HDF file. ({self._hdf_file is None=} or {not bool(self._hdf_file)=})"
-            raise RuntimeError(msg)
-        return self._hdf_file[column_name].dtype
-
     def is_closed(self) -> bool:
         return not self.is_open()
 
     def is_open(self) -> bool:
         return self._hdf_file is not None and bool(self._hdf_file)
+
+    def keys(self) -> Tuple[str, ...]:
+        return self.column_names
 
     def open(self, ignore_if_opened: bool = False) -> None:
         if self.is_open():
