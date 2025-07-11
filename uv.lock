@@ -3060,15 +3060,13 @@ wheels = [
 
 [[package]]
 name = "pythonwrench"
-version = "0.2.0"
+version = "0.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "coverage", version = "7.6.1", source = { registry = "https://pypi.org/simple" }, extra = ["toml"], marker = "python_full_version < '3.9'" },
-    { name = "coverage", version = "7.9.1", source = { registry = "https://pypi.org/simple" }, extra = ["toml"], marker = "python_full_version >= '3.9'" },
     { name = "typing-extensions", version = "4.13.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
     { name = "typing-extensions", version = "4.14.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/df/33/1903773d5c9aa9db2dad6c71fccfd68ea4457b4b59c4ba4e7a3ea190c73f/pythonwrench-0.2.0.tar.gz", hash = "sha256:b73be5f5f4e3fae7fa98851e6ad0fbfd36662ea2ec525e2ba8b0ef3499f3d724", size = 47502 }
+sdist = { url = "https://files.pythonhosted.org/packages/c3/96/26880ea96d593e7d592f6304ca76dc77c5cf4a9bb1afd52af76b5b42ce0b/pythonwrench-0.3.0.tar.gz", hash = "sha256:01eadb725a3b158091b22a9e74005681984293c6e2f55edadc42b4421dee1617", size = 49269 }
 
 [[package]]
 name = "pytz"
@@ -4435,7 +4433,7 @@ requires-dist = [
     { name = "pandas", marker = "extra == 'extras'" },
     { name = "pre-commit", marker = "extra == 'dev'" },
     { name = "pytest", marker = "extra == 'dev'" },
-    { name = "pythonwrench", specifier = ">=0.2.0,<0.3.0" },
+    { name = "pythonwrench", specifier = ">=0.3.0,<0.4.0" },
     { name = "pyyaml", marker = "extra == 'extras'" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.12.0" },
     { name = "safetensors", marker = "extra == 'extras'" },
