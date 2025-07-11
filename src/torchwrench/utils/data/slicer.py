@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from abc import ABC, abstractmethod
-from typing import Any, Generic, Iterable, List, Tuple, TypeVar, Union, final, overload
+from typing import Any, Generic, Iterable, List, Tuple, TypeVar, Union, overload
 
 import pythonwrench as pw
 import torch
