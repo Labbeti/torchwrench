@@ -152,6 +152,8 @@ if _REPLACE_MODULE_CLASSES:
     ModuleList = EModuleList
     ModuleDict = EModuleDict
     Sequential = ESequential
+else:
+    from torch.nn import ModuleDict, ModuleList, Sequential  # noqa: F401
 
 ModulePartial = EModulePartial
 
