@@ -475,8 +475,10 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
 
     def __getitem__(  # type: ignore
         self,
-        index: Union[IndexLike, Tuple[IndexLike, ColumnLike]],
+        index: Union[IndexLike, ColumnLike, Tuple[IndexLike, ColumnLike]],
     ) -> Any:
+        if isinstance(index, str) or pw.isinstance_generic(index, Iterable[str]):
+            index = slice(None), index
         return super().__getitem__(index)  # type: ignore
 
     def __getstate__(self) -> Dict[str, Any]:
