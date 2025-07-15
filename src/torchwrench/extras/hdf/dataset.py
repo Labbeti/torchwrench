@@ -32,7 +32,7 @@ import pythonwrench as pw
 from h5py import Dataset as HDFRawDataset
 from pythonwrench.typing import is_iterable_bytes_or_list, is_iterable_str
 from torch import Tensor
-from typing_extensions import TypeAlias, override
+from typing_extensions import Self, TypeAlias, override
 
 import torchwrench as tw
 from torchwrench.extras.hdf.common import (
@@ -454,7 +454,7 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
     def __eq__(self, __o: object) -> bool:
         return isinstance(__o, HDFDataset) and pickle.dumps(self) == pickle.dumps(__o)
 
-    def __enter__(self) -> "HDFDataset":
+    def __enter__(self) -> Self:
         return self
 
     def __exit__(self) -> None:
@@ -462,20 +462,24 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
             self.close()
 
     @overload
-    def __getitem__(self, index: int) -> U: ...
+    def __getitem__(self, index: int, /) -> U: ...
+
+    @overload
+    def __getitem__(self, index: str, /) -> list: ...
 
     @overload
     def __getitem__(
         self,
-        index: Union[Iterable[int], slice, None],
-    ) -> Dict[str, list]: ...
+        index: Union[Iterable[int], List[str], Tuple[str, ...], slice, None],
+    ) -> Dict[str, Any]: ...
 
     @overload
-    def __getitem__(self, index: Any) -> Any: ...
+    def __getitem__(self, index: Any, /) -> Any: ...
 
     def __getitem__(  # type: ignore
         self,
         index: Union[IndexLike, ColumnLike, Tuple[IndexLike, ColumnLike]],
+        /,
     ) -> Any:
         if isinstance(index, str) or pw.isinstance_generic(index, Iterable[str]):
             index = slice(None), index

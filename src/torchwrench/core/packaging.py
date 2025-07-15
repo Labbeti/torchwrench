@@ -5,7 +5,6 @@ from functools import wraps
 from typing import Callable, Final, Iterable, TypeVar, Union
 
 import torch
-from pythonwrench.functools import identity
 from pythonwrench.importlib import is_available_package
 from pythonwrench.semver import Version
 from typing_extensions import ParamSpec
