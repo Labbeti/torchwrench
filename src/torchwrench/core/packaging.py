@@ -55,7 +55,9 @@ _YAML_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["yaml"]
 
 
 def requires_packages(
-    arg0: Union[Callable[P, T], Iterable[str], str] = ..., /, *args: str
+    arg0: Union[Callable[P, T], Iterable[str], str] = ...,
+    /,
+    *args: str,
 ) -> Callable:
     """Decorator to wrap a function and raises an error if the function is called.
 
@@ -67,14 +69,11 @@ def requires_packages(
     ```
     """
     if arg0 is ...:
-        return _wrap
-
+        packages = []
     elif callable(arg0):
         packages = args
-
     elif isinstance(arg0, str):
         packages = [arg0] + list(args)
-
     elif isinstance(arg0, Iterable):
         packages = list(arg0) + list(args)
 
