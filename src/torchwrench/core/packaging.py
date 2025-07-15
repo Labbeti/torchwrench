@@ -1,12 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from typing import Callable, Final, Iterable, Union
+from functools import wraps
+from typing import Callable, Final, Iterable, TypeVar, Union
 
 import torch
 from pythonwrench.functools import identity
 from pythonwrench.importlib import is_available_package
 from pythonwrench.semver import Version
+from typing_extensions import ParamSpec
+
+P = ParamSpec("P")
+T = TypeVar("T")
 
 
 def _get_extra_version(name: str) -> str:
@@ -49,24 +54,52 @@ _TQDM_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["tqdm"]
 _YAML_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["yaml"]
 
 
-def requires_packages(packages: Union[str, Iterable[str]]) -> Callable:
-    if isinstance(packages, str):
-        packages = [packages]
+def requires_packages(
+    arg0: Union[Callable[P, T], Iterable[str], str] = ..., /, *args: str
+) -> Callable:
+    """Decorator to wrap a function and raises an error if the function is called.
+
+    ```
+    >>> @requires_packages("pandas")
+    >>> def f(x):
+    >>>     return x
+    >>> f(1)  # raises ImportError if pandas is not installed
+    ```
+    """
+    if arg0 is ...:
+        return _wrap
+
+    elif callable(arg0):
+        packages = args
+
+    elif isinstance(arg0, str):
+        packages = [arg0] + list(args)
+
+    elif isinstance(arg0, Iterable):
+        packages = list(arg0) + list(args)
+
     else:
-        packages = list(packages)
+        raise TypeError
 
-    missing = [pkg for pkg in packages if not is_available_package(pkg)]
-    if len(missing) == 0:
-        return identity
+    def _wrap(fn: Callable[P, T]) -> Callable[P, T]:
+        @wraps(fn)
+        def _impl(*args: P.args, **kwargs: P.kwargs) -> T:
+            missing = [pkg for pkg in packages if not is_available_package(pkg)]
+            if len(missing) == 0:
+                return fn(*args, **kwargs)
+            else:
+                prefix = "\n - "
+                missing_str = prefix.join(missing)
+                msg = (
+                    f"Cannot use/import objects because the following optionals dependencies are missing:"
+                    f"{prefix}{missing_str}\n"
+                    f"Please install them using `pip install torchwrench[extras]`."
+                )
+                raise ImportError(msg)
 
-    prefix = "\n - "
-    missing_str = prefix.join(missing)
-    msg = (
-        f"Cannot use/import objects because the following optionals dependencies are missing:"
-        f"{prefix}{missing_str}\n"
-        f"Please install them using `pip install torchwrench[extras]`."
-    )
-    raise ImportError(msg)
+        return _impl
+
+    return _wrap
 
 
 def torch_version_ge_1_13() -> bool:
