@@ -16,7 +16,6 @@ from typing import (
     overload,
 )
 
-from pythonwrench.csv import Orient
 from pythonwrench.csv import dump_csv as _dump_csv_base
 from pythonwrench.csv import load_csv as _load_csv_base
 from pythonwrench.importlib import Placeholder
@@ -24,8 +23,7 @@ from pythonwrench.io import _setup_output_fpath
 from pythonwrench.warnings import warn_once
 
 from torchwrench.core.packaging import _PANDAS_AVAILABLE
-
-from .common import as_builtin
+from torchwrench.serialization.common import as_builtin
 
 if _PANDAS_AVAILABLE:
     import pandas as pd  # type: ignore
@@ -36,6 +34,7 @@ else:
     class DataFrame(Placeholder): ...
 
 
+OrientExtended = Literal["list", "dict", "dataframe", "auto"]
 CSVBackend = Literal["csv", "pandas", "auto"]
 
 
@@ -95,11 +94,27 @@ def load_csv(
     fpath: Union[str, Path],
     /,
     *,
+    orient: Literal["list"] = "list",
+    header: bool = True,
+    comment_start: Optional[str] = None,
+    strip_content: bool = False,
+    backend: CSVBackend = "auto",
+    # CSV reader kwargs
+    delimiter: Optional[str] = None,
+    **backend_kwds,
+) -> List[Dict[str, Any]]: ...
+
+
+@overload
+def load_csv(
+    fpath: Union[str, Path],
+    /,
+    *,
     orient: Literal["dict"],
     header: bool = True,
     comment_start: Optional[str] = None,
     strip_content: bool = False,
-    backend: CSVBackend = "csv",
+    backend: CSVBackend = "auto",
     # CSV reader kwargs
     delimiter: Optional[str] = None,
     **backend_kwds,
@@ -111,40 +126,55 @@ def load_csv(
     fpath: Union[str, Path],
     /,
     *,
-    orient: Literal["list"] = "list",
+    orient: Literal["dataframe"],
     header: bool = True,
     comment_start: Optional[str] = None,
     strip_content: bool = False,
-    backend: CSVBackend = "csv",
+    backend: CSVBackend = "auto",
     # CSV reader kwargs
     delimiter: Optional[str] = None,
     **backend_kwds,
-) -> List[Dict[str, Any]]: ...
+) -> DataFrame: ...
 
 
 def load_csv(
     fpath: Union[str, Path],
     /,
     *,
-    orient: Orient = "list",
+    orient: OrientExtended = "list",
     header: bool = True,
     comment_start: Optional[str] = None,
     strip_content: bool = False,
-    backend: CSVBackend = "csv",
+    backend: CSVBackend = "auto",
     # CSV reader kwargs
     delimiter: Optional[str] = None,
     **backend_kwds,
-) -> Union[List[Dict[str, Any]], Dict[str, List[Any]]]:
+) -> Union[List[Dict[str, Any]], Dict[str, List[Any]], DataFrame]:
+    """Load CSV file using CSV or pandas backend."""
     if backend == "auto":
         if _PANDAS_AVAILABLE:
             backend = "pandas"
         else:
             backend = "csv"
 
+    if orient == "auto":
+        if _PANDAS_AVAILABLE:
+            orient = "dataframe"
+        else:
+            orient = "list"
+
     if backend == "csv":
-        return _load_csv_base(
+        if orient == "dataframe":
+            if not _PANDAS_AVAILABLE:
+                msg = f"Invalid argument {backend=} without pandas installed."
+                raise ValueError(msg)
+            backend_orient = "dict"
+        else:
+            backend_orient = orient
+
+        result = _load_csv_base(
             fpath,
-            orient=orient,
+            orient=backend_orient,
             header=header,
             comment_start=comment_start,
             strip_content=strip_content,
@@ -152,8 +182,11 @@ def load_csv(
             **backend_kwds,
         )
 
+        if orient == "dataframe":
+            result = DataFrame(result)
+
     elif backend == "pandas":
-        return _load_csv_with_pandas(
+        result = _load_csv_with_pandas(
             fpath,
             orient=orient,
             header=header,
@@ -166,6 +199,8 @@ def load_csv(
     else:
         msg = f"Invalid argument {backend=}. (expected one of {get_args(CSVBackend)})"
         raise ValueError(msg)
+
+    return result
 
 
 def _dump_csv_with_pandas(
@@ -202,14 +237,14 @@ def _load_csv_with_pandas(
     fpath: Union[str, Path],
     /,
     *,
-    orient: Orient = "list",
+    orient: OrientExtended = "list",
     header: bool = True,
     comment_start: Optional[str] = None,
     strip_content: bool = False,
-    # CSV reader kwargs
+    # Backend kwargs
     delimiter: Optional[str] = None,
     **backend_kwds,
-) -> Union[List[Dict[str, Any]], Dict[str, List[Any]]]:
+) -> Union[List[Dict[str, Any]], Dict[str, List[Any]], DataFrame]:
     backend = "pandas"
 
     if not _PANDAS_AVAILABLE:
@@ -234,6 +269,10 @@ def _load_csv_with_pandas(
         return df.to_dict("records")  # type: ignore
     elif orient == "dict":
         return df.to_dict("list")  # type: ignore
+    elif orient in ("pandas", "auto"):
+        return df  # type: ignore
     else:
-        msg = f"Invalid argument {orient=}. (expected one of {get_args(Orient)})"
+        msg = (
+            f"Invalid argument {orient=}. (expected one of {get_args(OrientExtended)})"
+        )
         raise ValueError(msg)
