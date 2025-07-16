@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 ## [0.7.3] UNRELEASED
 ### Added
 - `pack_to_hdf` now supports mapping of sequences.
+- Argument `orient` in `load_csv` now supports `dataframe` and `auto` to returns a dataframe by default when `pandas` is installed.
 
 ## [0.7.2] 2025-06-29
 ### Fixed
