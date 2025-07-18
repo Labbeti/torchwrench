@@ -11,6 +11,8 @@ from typing import (
     Any,
     Callable,
     Dict,
+    Generic,
+    Hashable,
     List,
     Literal,
     Mapping,
@@ -39,10 +41,13 @@ except ImportError:
 
 
 import pythonwrench as pw
-from pythonwrench.collections import all_eq
-from pythonwrench.datetime import get_now
 from pythonwrench.functools import Compose
-from pythonwrench.typing import is_dataclass_instance, isinstance_generic
+from pythonwrench.typing import (
+    SupportsGetitemLen,
+    SupportsIterLen,
+    is_dataclass_instance,
+    isinstance_generic,
+)
 
 import torchwrench as tw
 from torchwrench import nn
@@ -62,13 +67,13 @@ from torchwrench.extras.numpy import (
     numpy_is_complex_dtype,
     scan_shape_dtypes,
 )
-from torchwrench.serialization.common import as_builtin
 from torchwrench.types import BuiltinScalar
-from torchwrench.utils.data.dataloader import get_auto_num_cpus
-from torchwrench.utils.data.dataset import IterableDataset, SizedDatasetLike
 
+K = TypeVar("K", covariant=True, bound=Hashable)
+V = TypeVar("V", covariant=True)
 T = TypeVar("T", covariant=True)
 T_DictOrTuple = TypeVar("T_DictOrTuple", tuple, dict, covariant=True)
+T_DictOrTuple2 = TypeVar("T_DictOrTuple2", tuple, dict, covariant=True)
 
 HDFDType: TypeAlias = Union[np.dtype, Literal["b", "i", "u", "f", "c"], type]
 
@@ -78,20 +83,28 @@ pylog = logging.getLogger(__name__)
 
 @torch.inference_mode()
 def pack_to_hdf(
-    dataset: SizedDatasetLike[T],
+    dataset: Union[
+        SupportsGetitemLen[T_DictOrTuple],
+        SupportsIterLen[T_DictOrTuple],
+        Mapping[str, SupportsGetitemLen],
+    ],
     hdf_fpath: Union[str, Path],
-    pre_transform: Optional[Callable[[T], T_DictOrTuple]] = None,
+    pre_transform: Optional[Callable[[T_DictOrTuple], T_DictOrTuple]] = pw.identity,
     *,
-    exists: ExistsMode = "error",
-    verbose: int = 0,
+    # Loader args
     batch_size: int = 32,
     num_workers: Union[int, Literal["auto"]] = "auto",
+    skip_scan: bool = False,
+    # Packing args
+    encoding: str = HDF_ENCODING,
+    file_kwds: Optional[Dict[str, Any]] = None,
     shape_suffix: str = SHAPE_SUFFIX,
     store_str_as_vlen: bool = False,
-    file_kwds: Optional[Dict[str, Any]] = None,
-    ds_kwds: Optional[Dict[str, Any]] = None,
     user_attrs: Any = None,
-    skip_scan: bool = False,
+    # Others args
+    exists: ExistsMode = "error",
+    ds_kwds: Optional[Dict[str, Any]] = None,
+    verbose: int = 0,
 ) -> HDFDataset[T_DictOrTuple, T_DictOrTuple]:
     """Pack a dataset to HDF file.
 
@@ -102,34 +115,39 @@ def pack_to_hdf(
         hdf_fpath: The path to the HDF file.
         pre_transform: The optional transform to apply to audio returned by the dataset BEFORE storing it in HDF file.
             Can be used for deterministic transforms like Resample, LogMelSpectrogram, etc. defaults to None.
-        exists: Determine which action should be performed if the target HDF file already exists.
-            "overwrite": Replace the target file then pack dataset.
-            "skip": Skip this function and returns the packed dataset.
-            "error": Raises a ValueError.
-        verbose: Verbose level. defaults to 0.
+
         batch_size: The batch size of the dataloader. defaults to 32.
         num_workers: The number of workers of the dataloader.
             If "auto", it will be set to `len(os.sched_getaffinity(0))`. defaults to "auto".
-        shape_suffix: Shape column suffix in HDF file. defaults to "_shape".
-        store_str_as_vlen: If True, store strings as variable length string dtype. defaults to False.
-        file_kwds: Options given to h5py file object. defaults to None.
-        ds_kwds: Keywords arguments passed to the returned HDFDataset instance if the target file already exists and if exists == "skip".
-        user_attrs: Additional metadata to add to the hdf file. It must be convertible to JSON with `json.dumps`. defaults to None.
+
         skip_scan: If True, the input dataset will be considered as fully homogeneous, which means that all columns values contains the same shape and dtype, which will be inferred from the first batch.
             It is meant to skip the first step which scans each dataset item once and speed up packing to HDF file.
             defaults to False.
 
+        encoding: String encoding used in file. defaults to "utf-8".
+        file_kwds: Options given to h5py file object. defaults to None.
+        shape_suffix: Shape column suffix in HDF file. defaults to "_shape".
+        store_str_as_vlen: If True, store strings as variable length string dtype. defaults to False.
+        user_attrs: Additional metadata to add to the hdf file. It must be convertible to JSON with `json.dumps`. defaults to None.
+
+        exists: Determine which action should be performed if the target HDF file already exists.
+            "overwrite": Replace the target file then pack dataset.
+            "skip": Skip this function and returns the packed dataset.
+            "error": Raises a ValueError.
+        ds_kwds: Keywords arguments passed to the returned HDFDataset instance if the target file already exists and if exists == "skip".
+        verbose: Verbose level. defaults to 0.
+
     Returns:
         hdf_dataset: The target HDF dataset object.
     """
-    if not isinstance(dataset, SizedDatasetLike):
-        msg = f"Cannot pack to hdf a non-sized-dataset '{dataset.__class__.__name__}'."
+    if not isinstance(dataset, SupportsGetitemLen):
+        msg = f"Cannot pack to hdf a non-sized-dataset '{pw.get_fullname(dataset)}'."
         raise TypeError(msg)
     if len(dataset) == 0:
         msg = f"Cannot pack to hdf an empty dataset. (found {len(dataset)=})"
         raise ValueError(msg)
 
-    hdf_fpath = Path(hdf_fpath).resolve()
+    hdf_fpath = Path(hdf_fpath).resolve().expanduser()
     if hdf_fpath.exists() and not hdf_fpath.is_file():
         msg = f"Item {hdf_fpath=} exists but it is not a file."
         raise RuntimeError(msg)
@@ -152,16 +170,15 @@ def pack_to_hdf(
         file_kwds = {}
 
     if num_workers == "auto":
-        num_workers = get_auto_num_cpus()
-        if verbose >= 2:
-            pylog.debug(f"Found num_workers=='auto', set to {num_workers}.")
+        num_workers = pw.get_num_cpus_available()
 
     if verbose >= 2:
         pylog.debug(f"Start packing data into HDF file '{hdf_fpath}'...")
 
     # Step 1: First pass to the dataset to build static HDF dataset shapes (much faster for read the resulting file)
-    encoding = HDF_ENCODING
+    pre_transform_name = pw.get_fullname(pre_transform)
     (
+        dataset,
         dict_pre_transform,
         item_type,
         max_shapes,
@@ -192,7 +209,7 @@ def pack_to_hdf(
         "all_eq_shapes": all_eq_shapes,
         "src_np_dtypes": src_np_dtypes,
     }
-    data = as_builtin(data)
+    data = pw.as_builtin(data)
 
     with NamedTemporaryFile(
         "w",
@@ -203,7 +220,7 @@ def pack_to_hdf(
         json.dump(data, file)
         scan_results_fpath = Path(file.name)
 
-    creation_date = get_now()
+    creation_date = pw.get_now()
 
     with h5py.File(hdf_fpath, "w", **file_kwds) as hdf_file:
         # Step 2: Build hdf datasets in file
@@ -358,17 +375,17 @@ def pack_to_hdf(
             "encoding": encoding,
             "file_kwds": file_kwds,
             "global_hash_value": global_hash_value,
-            "info": as_builtin(info),
+            "info": pw.as_builtin(info),
             "item_type": item_type,
             "length": len(dataset),
             "load_as_complex": {},  # for backward compatibility only
-            "pre_transform": pre_transform.__class__.__name__,
+            "pre_transform": pre_transform_name,
             "shape_suffix": shape_suffix,
             "source_dataset": dataset.__class__.__name__,
             "src_np_dtypes": src_np_dtypes_dumped,
             "store_complex_as_real": False,  # for backward compatibility only
             "store_str_as_vlen": store_str_as_vlen,
-            "user_attrs": as_builtin(user_attrs),
+            "user_attrs": pw.as_builtin(user_attrs),
             "torchwrench_version": str(tw.__version__),
         }
         for name in _DUMPED_JSON_KEYS:
@@ -465,7 +482,11 @@ def hdf_dtype_to_numpy_dtype(hdf_dtype: HDFDType) -> np.dtype:
 
 
 def _scan_dataset(
-    dataset: SizedDatasetLike[T],
+    dataset: Union[
+        SupportsGetitemLen[T_DictOrTuple],
+        SupportsIterLen[T_DictOrTuple],
+        Mapping[str, SupportsGetitemLen],
+    ],
     pre_transform: Optional[Callable[[T], T_DictOrTuple]],
     batch_size: int,
     num_workers: int,
@@ -474,6 +495,7 @@ def _scan_dataset(
     encoding: str,
     skip_scan: bool,
 ) -> Tuple[
+    Union[SupportsGetitemLen[T], SupportsIterLen[T_DictOrTuple]],
     Callable[[T], Dict[str, Any]],
     HDFItemType,
     Dict[str, Tuple[int, ...]],
@@ -484,10 +506,14 @@ def _scan_dataset(
     if pre_transform is None:
         pre_transform = nn.Identity()
 
-    if isinstance(dataset, IterableDataset):
+    if isinstance(dataset, Mapping):
+        item_0 = {k: next(iter(v)) for k, v in dataset.items()}
+    elif isinstance(dataset, SupportsGetitemLen):
+        item_0 = dataset[0]
+    elif isinstance(dataset, SupportsIterLen):
         item_0 = next(iter(dataset))
     else:
-        item_0 = dataset[0]
+        raise TypeError(f"Invalid argument type {type(dataset)}.")
 
     def encode_array(x: np.ndarray) -> Any:
         if x.dtype.kind == "U":
@@ -508,7 +534,7 @@ def _scan_dataset(
         item_type = "tuple"
         to_dict_fn = _tuple_to_dict  # type: ignore
     else:
-        msg = f"Invalid item type for {dataset.__class__.__name__}. (expected Dict[str, Any] or tuple but found {type(item_0)})"
+        msg = f"Invalid item type for {pw.get_fullname(dataset)}. (expected Dict[str, Any] or tuple but found {type(item_0)})"
         raise ValueError(msg)
     del item_0
 
@@ -520,8 +546,18 @@ def _scan_dataset(
         encode_dict_fn,
     )
 
+    if isinstance(dataset, Mapping):
+        wrapped_dataset = _DictWrapper(dataset)  # type: ignore
+    elif isinstance(dataset, SupportsGetitemLen):
+        wrapped_dataset = dataset
+    elif isinstance(dataset, SupportsIterLen):
+        wrapped_dataset = iter(dataset)  # type: ignore
+    else:
+        raise TypeError(f"Invalid argument type {type(dataset)}.")
+    del dataset
+
     loader = DataLoader(
-        dataset,  # type: ignore
+        wrapped_dataset,  # type: ignore
         batch_size=batch_size,
         shuffle=False,
         num_workers=num_workers,
@@ -576,7 +612,7 @@ def _scan_dataset(
     for attr_name, info in infos_dict.items():
         shapes = [shape for shape, _ in info]
         ndims = list(map(len, shapes))
-        if not all_eq(ndims):
+        if not pw.all_eq(ndims):
             ndims_set = tuple(set(ndims))
             indices = [ndims.index(ndim) for ndim in ndims_set]
             msg = f"Invalid ndim for attribute {attr_name}. (found multiple ndims: {ndims_set} at {indices=})"
@@ -586,7 +622,7 @@ def _scan_dataset(
         np_dtype = merge_numpy_dtypes(np_dtypes, empty=HDF_VOID_DTYPE)
         hdf_dtype = numpy_dtype_to_hdf_dtype(np_dtype, encoding=encoding)
 
-        all_eq_shapes[attr_name] = all_eq(shapes)
+        all_eq_shapes[attr_name] = pw.all_eq(shapes)
         max_shapes[attr_name] = tuple(map(max, zip(*shapes)))
         hdf_dtypes[attr_name] = hdf_dtype
 
@@ -599,6 +635,7 @@ def _scan_dataset(
         pylog.debug(f"Found src_np_dtypes:\n{src_np_dtypes}")
 
     return (
+        wrapped_dataset,  # type: ignore
         dict_pre_transform,
         item_type,
         max_shapes,
@@ -608,14 +645,13 @@ def _scan_dataset(
     )
 
 
-def bytearray_to_bytes(x: Any) -> Any:
-    if isinstance(x, (str, bytes)):
-        return x
-    if isinstance(x, bytearray):
-        return bytes(x)
-    elif isinstance(x, Mapping):
-        return {bytearray_to_bytes(k): bytearray_to_bytes(v) for k, v in x.items()}
-    elif isinstance(x, (list, tuple, set, frozenset)):
-        return type(x)(bytearray_to_bytes(xi) for xi in x)
-    else:
-        return x
+class _DictWrapper(Generic[K, V]):
+    def __init__(self, mapping: Mapping[K, SupportsGetitemLen[V]]) -> None:
+        super().__init__()
+        self.mapping = mapping
+
+    def __getitem__(self, index: int) -> Dict[K, V]:
+        return {k: v[index] for k, v in self.mapping.items()}
+
+    def __len__(self) -> int:
+        return len(next(iter(self.mapping.values())))

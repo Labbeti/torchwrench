@@ -4,6 +4,7 @@
 import unittest
 from unittest import TestCase
 
+import pythonwrench as pw
 import torch
 
 import torchwrench as tw
@@ -73,6 +74,22 @@ class TestNumpy(TestCase):
         x = np.array([0, 2, 0, 1, 2])
         result = numpy_topk(x, k=3)
         expected = np.array([2, 2, 1]), np.array([1, 4, 3])
+        assert tw.deep_equal(result, expected)
+
+
+class TestReduceCompat(TestCase):
+    def test_example_1(self) -> None:
+        x1 = np.random.rand(10) > 0.5
+        x2 = np.random.rand(10) > 0.5
+        expected = x1 | x2
+
+        result = pw.reduce_or(x1, x2)
+        assert tw.deep_equal(result, expected)
+
+        result = pw.reduce_or([x1, x2], start=False)
+        assert tw.deep_equal(result, expected)
+
+        result = pw.reduce_or(np.array([x1, x2]), start=False)
         assert tw.deep_equal(result, expected)
 
 

@@ -452,6 +452,14 @@ class _TensorNDBase(
         ...
 
     @overload
+    def cpu(self: T_Tensor) -> T_Tensor:  # type: ignore
+        ...
+
+    @overload
+    def cuda(self: T_Tensor) -> T_Tensor:  # type: ignore
+        ...
+
+    @overload
     def double(self) -> "DoubleTensor":  # type: ignore
         ...
 
@@ -681,6 +689,8 @@ class _TensorNDBase(
     any = torch.Tensor.any  # noqa: F811  # type: ignore
     bool = torch.Tensor.bool  # noqa: F811  # type: ignore
     contiguous = torch.Tensor.contiguous  # noqa: F811  # type: ignore
+    cpu = torch.Tensor.cpu  # noqa: F811  # type: ignore
+    cuda = torch.Tensor.cuda  # noqa: F811  # type: ignore
     double = torch.Tensor.double  # noqa: F811  # type: ignore
     eq = torch.Tensor.eq  # noqa: F811  # type: ignore
     equal = torch.Tensor.equal  # noqa: F811  # type: ignore

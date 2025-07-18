@@ -21,7 +21,7 @@ Submodules
    torchwrench.nn.modules.multiclass
    torchwrench.nn.modules.multilabel
    torchwrench.nn.modules.numpy
-   torchwrench.nn.modules.pad
+   torchwrench.nn.modules.padding
    torchwrench.nn.modules.powerset
    torchwrench.nn.modules.tensor
    torchwrench.nn.modules.transform

@@ -6,6 +6,8 @@ from typing import Callable, Dict, Generic, Iterable, List, Mapping, Optional, o
 from torch import nn
 from typing_extensions import Concatenate, ParamSpec
 
+from torchwrench.core.config import _REPLACE_MODULE_CLASSES
+
 from ._mixins import (
     _DEFAULT_DEVICE_DETECT_MODE,
     ConfigModule,
@@ -121,7 +123,7 @@ class EModuleDict(
         nn.ModuleDict.__init__(self, modules)
 
     def forward(self, *args: InType, **kwargs: InType) -> Dict[str, OutType3]:
-        return {name: module(*args, **kwargs) for name, module in self.items()}
+        return {name: module(*args, **kwargs) for name, module in self.items()}  # type: ignore
 
 
 class EModulePartial(
@@ -146,10 +148,14 @@ class EModulePartial(
         return f"{self.fn.__name__}, {ConfigModule.extra_repr(self)}"
 
 
-ModuleList = EModuleList
-ModuleDict = EModuleDict
+if _REPLACE_MODULE_CLASSES:
+    ModuleList = EModuleList
+    ModuleDict = EModuleDict
+    Sequential = ESequential
+else:
+    from torch.nn import ModuleDict, ModuleList, Sequential  # noqa: F401
+
 ModulePartial = EModulePartial
-Sequential = ESequential
 
 
 def __test_typing_1() -> None:

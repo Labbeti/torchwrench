@@ -3,12 +3,12 @@
 
 from abc import abstractmethod
 from typing import (
+    Any,
     Callable,
     Generic,
     Iterable,
     Iterator,
     Optional,
-    Sized,
     TypeVar,
     Union,
 )
@@ -49,7 +49,7 @@ class EmptyDataset(Dataset[None]):
 
 
 class _WrapperBase(Generic[T], Dataset[T]):
-    def __init__(self, dataset: Sized) -> None:
+    def __init__(self, dataset: Any) -> None:
         Dataset.__init__(self)
         self.dataset = dataset
 

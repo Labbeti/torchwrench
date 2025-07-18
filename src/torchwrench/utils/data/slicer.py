@@ -2,24 +2,27 @@
 # -*- coding: utf-8 -*-
 
 from abc import ABC, abstractmethod
-from typing import Any, Generic, Iterable, List, Tuple, TypeVar, Union, final, overload
+from typing import Any, Generic, Iterable, List, Tuple, TypeVar, Union, overload
 
+import pythonwrench as pw
 import torch
-from pythonwrench.typing import isinstance_generic
 from pythonwrench.typing.classes import SupportsGetitemLen
 from torch.utils.data.dataset import Dataset
 from typing_extensions import TypeAlias
 
+from torchwrench.extras.numpy import np
 from torchwrench.extras.numpy.functional import is_numpy_bool_array
 from torchwrench.nn.functional.transform import as_tensor
 from torchwrench.types._typing import BoolTensor1D, Tensor1D, TensorOrArray
 from torchwrench.types.guards import is_number_like, is_tensor_or_array
 from torchwrench.utils.data.dataset import Wrapper
 
-T = TypeVar("T", covariant=False)
-U = TypeVar("U", covariant=False)
+T = TypeVar("T", covariant=True)
+U = TypeVar("U", covariant=True)
 
-Indices: TypeAlias = Union[Iterable[bool], Iterable[int], None, slice, Tensor1D]
+Indices: TypeAlias = Union[
+    Iterable[bool], Iterable[int], None, slice, Tensor1D, np.ndarray
+]
 
 
 class DatasetSlicer(Generic[T], ABC, Dataset[T]):
@@ -46,21 +49,17 @@ class DatasetSlicer(Generic[T], ABC, Dataset[T]):
         raise NotImplementedError
 
     @overload
-    @final
     def __getitem__(self, idx: int, /) -> T:  # type: ignore
         ...
 
     @overload
-    @final
     def __getitem__(self, idx: Indices, /) -> List[T]:  # type: ignore
         ...
 
     @overload
-    @final
     def __getitem__(self, idx: Tuple[Any, ...], /) -> Any:  # type: ignore
         ...
 
-    @final
     def __getitem__(self, idx) -> Any:
         if isinstance(idx, tuple) and len(idx) > 1:
             idx, *args = idx
@@ -74,13 +73,13 @@ class DatasetSlicer(Generic[T], ABC, Dataset[T]):
             return self.get_items_slice(idx, *args)
 
         elif (
-            isinstance_generic(idx, Iterable[bool])
+            pw.isinstance_generic(idx, Iterable[bool])
             or isinstance(idx, BoolTensor1D)
             or (is_numpy_bool_array(idx) and idx.ndim == 1)
         ):
             return self.get_items_mask(idx, *args)
 
-        elif isinstance_generic(idx, Iterable[int]) or is_tensor_or_array(idx):
+        elif pw.isinstance_generic(idx, Iterable[int]) or is_tensor_or_array(idx):
             return self.get_items_indices(idx, *args)
 
         elif idx is None:
@@ -88,14 +87,6 @@ class DatasetSlicer(Generic[T], ABC, Dataset[T]):
 
         else:
             raise TypeError(f"Invalid argument type {type(idx)=} with {args=}.")
-
-    @final
-    def __getitems__(
-        self,
-        indices: Indices,
-        *args,
-    ) -> List[T]:
-        return self.__getitem__(indices, *args)
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}()"
@@ -155,6 +146,7 @@ class DatasetSlicerWrapper(Generic[T], DatasetSlicer[T], Wrapper[T]):
         add_slice_support: bool = True,
         add_indices_support: bool = True,
         add_mask_support: bool = True,
+        add_none_support: bool = True,
     ) -> None:
         """Wrap a sequence to support slice, indices and mask arguments types."""
         DatasetSlicer.__init__(
@@ -162,6 +154,7 @@ class DatasetSlicerWrapper(Generic[T], DatasetSlicer[T], Wrapper[T]):
             add_slice_support=add_slice_support,
             add_indices_support=add_indices_support,
             add_mask_support=add_mask_support,
+            add_none_support=add_none_support,
         )
         Wrapper.__init__(self, dataset)
 

@@ -3,6 +3,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.3] 2025-07-18
+### Added
+- `pack_to_hdf` now supports mapping of sequences.
+- Argument `orient` in `load_csv` now supports `dataframe` and `auto` to returns a dataframe by default when `pandas` is installed.
+
+### Modified
+- `torchwrench.nn.Module` no longer uses `torchwrench.nn.EModule` by default to avoid isinstance errors like `isinstance(torch.nn.Module(), torchwrench.nn.Module) == False`.
+
 ## [0.7.2] 2025-06-29
 ### Fixed
 - Global import when `pyyaml` is not installed.

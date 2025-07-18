@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from typing import Callable, Final, Iterable, Union
+from typing import Final
 
 import torch
-from pythonwrench.functools import identity
 from pythonwrench.importlib import is_available_package
 from pythonwrench.semver import Version
 
@@ -47,26 +46,6 @@ _TENSORBOARD_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["tensorboard"]
 _TORCHAUDIO_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["torchaudio"]
 _TQDM_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["tqdm"]
 _YAML_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["yaml"]
-
-
-def requires_packages(packages: Union[str, Iterable[str]]) -> Callable:
-    if isinstance(packages, str):
-        packages = [packages]
-    else:
-        packages = list(packages)
-
-    missing = [pkg for pkg in packages if not is_available_package(pkg)]
-    if len(missing) == 0:
-        return identity
-
-    prefix = "\n - "
-    missing_str = prefix.join(missing)
-    msg = (
-        f"Cannot use/import objects because the following optionals dependencies are missing:"
-        f"{prefix}{missing_str}\n"
-        f"Please install them using `pip install torchwrench[extras]`."
-    )
-    raise ImportError(msg)
 
 
 def torch_version_ge_1_13() -> bool:
