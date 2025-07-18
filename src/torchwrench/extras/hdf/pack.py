@@ -147,7 +147,7 @@ def pack_to_hdf(
         msg = f"Cannot pack to hdf an empty dataset. (found {len(dataset)=})"
         raise ValueError(msg)
 
-    hdf_fpath = Path(hdf_fpath).resolve()
+    hdf_fpath = Path(hdf_fpath).resolve().expanduser()
     if hdf_fpath.exists() and not hdf_fpath.is_file():
         msg = f"Item {hdf_fpath=} exists but it is not a file."
         raise RuntimeError(msg)
