@@ -43,7 +43,7 @@ from .multilabel import (
     ProbsToMultinames,
 )
 from .numpy import NDArrayToTensor, TensorToNDArray, ToNDArray
-from .pad import PadAndStackRec, PadDim, PadDims
+from .padding import PadAndStackRec, PadDim, PadDims
 from .powerset import MultilabelToPowerset, PowersetToMultilabel
 from .tensor import (
     FFT,
