@@ -12,6 +12,7 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
+   torchwrench.core.config
    torchwrench.core.dtype_enum
    torchwrench.core.make
    torchwrench.core.packaging
