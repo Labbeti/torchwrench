@@ -3,7 +3,17 @@
 
 """Helper functions for conversion between classes indices, multihot, multi-names and probabilities for multilabel classification."""
 
-from typing import Hashable, Iterable, List, Mapping, Optional, Sequence, TypeVar, Union
+from typing import (
+    Hashable,
+    Iterable,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    TypeVar,
+    Union,
+    overload,
+)
 
 import torch
 from pythonwrench.typing import isinstance_generic
@@ -13,14 +23,51 @@ from torchwrench.core.make import DeviceLike, DTypeLike, as_device, as_dtype
 from torchwrench.nn.functional.padding import pad_and_stack_rec
 from torchwrench.nn.functional.predicate import is_stackable
 from torchwrench.nn.functional.transform import as_tensor, to_item
-from torchwrench.types import LongTensor, is_number_like, is_tensor_or_array
+from torchwrench.types import (
+    BoolTensor1D,
+    BoolTensor2D,
+    LongTensor,
+    is_number_like,
+    is_tensor_or_array,
+)
 from torchwrench.types._typing import TensorOrArray
 
 T_Name = TypeVar("T_Name", bound=Hashable)
 
 
+@overload
 def indices_to_multihot(
-    indices: Union[Sequence[Union[Sequence[int], TensorOrArray]], TensorOrArray],
+    indices: Iterable[int],
+    num_classes: int,
+    *,
+    padding_idx: Optional[int] = None,
+    device: DeviceLike = None,
+) -> BoolTensor1D: ...
+
+
+@overload
+def indices_to_multihot(
+    indices: Iterable[Iterable[int]],
+    num_classes: int,
+    *,
+    padding_idx: Optional[int] = None,
+    device: DeviceLike = None,
+) -> BoolTensor2D: ...
+
+
+@overload
+def indices_to_multihot(
+    indices: Iterable,
+    num_classes: int,
+    *,
+    padding_idx: Optional[int] = None,
+    device: DeviceLike = None,
+    dtype: DTypeLike = torch.bool,
+) -> Tensor: ...
+
+
+def indices_to_multihot(
+    indices: Iterable,
     num_classes: int,
     *,
     padding_idx: Optional[int] = None,
@@ -115,9 +162,7 @@ def indices_to_multinames(
 
 
 def multihot_to_indices(
-    multihot: Union[
-        TensorOrArray, Sequence[TensorOrArray], Sequence[Sequence[bool]], Sequence
-    ],
+    multihot: Iterable,
     *,
     keep_tensor: bool = False,
     padding_idx: Optional[int] = None,

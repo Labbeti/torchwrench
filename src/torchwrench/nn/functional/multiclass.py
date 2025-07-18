@@ -14,6 +14,7 @@ from typing import (
     Sequence,
     TypeVar,
     Union,
+    overload,
 )
 
 import torch
@@ -27,6 +28,8 @@ from torchwrench.core.make import DeviceLike, DTypeLike, as_device, as_dtype
 from torchwrench.nn.functional.others import get_ndim, get_shape
 from torchwrench.nn.functional.transform import to_item
 from torchwrench.types import (
+    BoolTensor2D,
+    BoolTensor3D,
     LongTensor,
     SupportsGetitemLen,
     SupportsIterLen,
@@ -37,8 +40,39 @@ from torchwrench.types._typing import TensorOrArray
 T_Name = TypeVar("T_Name", bound=Hashable)
 
 
+@overload
 def index_to_onehot(
-    index: Union[Sequence[int], TensorOrArray, Sequence],
+    index: Iterable[int],
+    num_classes: int,
+    *,
+    padding_idx: Optional[int] = None,
+    device: DeviceLike = None,
+) -> BoolTensor2D: ...
+
+
+@overload
+def index_to_onehot(
+    index: Iterable[Iterable[int]],
+    num_classes: int,
+    *,
+    padding_idx: Optional[int] = None,
+    device: DeviceLike = None,
+) -> BoolTensor3D: ...
+
+
+@overload
+def index_to_onehot(
+    index: Iterable,
+    num_classes: int,
+    *,
+    padding_idx: Optional[int] = None,
+    device: DeviceLike = None,
+    dtype: DTypeLike = torch.bool,
+) -> Tensor: ...
+
+
+def index_to_onehot(
+    index: Iterable,
     num_classes: int,
     *,
     padding_idx: Optional[int] = None,
