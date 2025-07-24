@@ -149,6 +149,9 @@ def pack_to_hdf(
         msg = f"Cannot pack to hdf an empty dataset. (found {len(dataset)=})"
         raise ValueError(msg)
 
+    if ds_kwds is None:
+        ds_kwds = {}
+
     hdf_fpath = Path(hdf_fpath).resolve().expanduser()
     if hdf_fpath.exists() and not hdf_fpath.is_file():
         msg = f"Item {hdf_fpath=} exists but it is not a file."
@@ -221,8 +224,6 @@ def pack_to_hdf(
 
     creation_date = pw.get_now()
 
-    if ds_kwds is None:
-        ds_kwds = {}
     if col_kwds is None:
         col_kwds = {}
 
