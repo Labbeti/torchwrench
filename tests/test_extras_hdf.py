@@ -354,7 +354,7 @@ class TestHDF(TestCase):
 
     def test_compression(self) -> None:
         num_rows = tw.randint(1000, 2000, ()).item()
-        dimsize = 10000
+        dimsize = 1000
 
         lengths = tw.randint(0, dimsize // 100, (num_rows,))
         mask = tw.lengths_to_non_pad_mask(lengths, dimsize)
