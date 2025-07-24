@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os.path as osp
 import pickle
 import random
 import string
@@ -26,7 +27,7 @@ from torchwrench.utils.data.dataset import Subset
 class TestHDF(TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        tmpdir = get_tmp_dir().joinpath("torchwrench_tests")
+        tmpdir = get_tmp_dir().joinpath("torchwrench_tests", "hdf")
         tmpdir.mkdir(parents=True, exist_ok=True)
         cls.tmpdir = tmpdir
 
@@ -347,9 +348,34 @@ class TestHDF(TestCase):
             "z": [pw.randstr(10, letters=string.printable) for _ in range(num_rows)],
         }
         hdf_fpath = self.__class__.tmpdir.joinpath("test_pack_dict.hdf")
-        ds = pack_to_hdf(data, hdf_fpath)
+        ds = pack_to_hdf(data, hdf_fpath, exists="overwrite")
 
         assert tw.deep_equal(ds.to_dict(), data)
+
+    def test_compression(self) -> None:
+        num_rows = tw.randint(1000, 2000, ()).item()
+        dimsize = 1000
+
+        lengths = tw.randint(0, dimsize // 100, (num_rows,))
+        mask = tw.lengths_to_non_pad_mask(lengths, dimsize)
+
+        data = {
+            "x": tw.where(mask, tw.rand(num_rows, dimsize), tw.as_tensor(0.0)),
+        }
+
+        hdf_fpath_uncompressed = self.__class__.tmpdir.joinpath("test_uncompressed.hdf")
+        hdf_uncompressed = pack_to_hdf(data, hdf_fpath_uncompressed, exists="overwrite")
+
+        hdf_fpath_compressed = self.__class__.tmpdir.joinpath("test_compressed.hdf")
+        hdf_compressed = pack_to_hdf(
+            data,
+            hdf_fpath_compressed,
+            col_kwds=dict(compression="lzf"),
+            exists="overwrite",
+        )
+
+        assert tw.deep_equal(hdf_uncompressed[:], hdf_compressed[:])
+        assert osp.getsize(hdf_fpath_uncompressed) > osp.getsize(hdf_fpath_compressed)
 
 
 if __name__ == "__main__":

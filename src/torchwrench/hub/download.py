@@ -87,9 +87,10 @@ def _get_filename_from_url(url: str) -> str:
         message["content-type"] = header
         filename = message.get_param("filename", None)
     except (URLError, ValueError):
-        pylog.warning(
+        msg = (
             f"Cannot get target filename from {url=}. Try to detect it from URL string."
         )
+        pylog.warning(msg)
         filename = None
 
     if filename is None:

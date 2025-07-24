@@ -85,7 +85,6 @@ extras = [
 [project.optional-dependencies]
 dev = [
     "coverage[toml]",
-    "flake8",
     "ipython",
     "pre-commit",
     "pytest",

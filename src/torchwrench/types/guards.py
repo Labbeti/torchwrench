@@ -11,6 +11,7 @@ from pythonwrench.typing import (
 from torch import Tensor
 from typing_extensions import TypeGuard, TypeIs
 
+from torchwrench.core.make import DTypeLike, as_dtype
 from torchwrench.extras.numpy import is_numpy_number_like, is_numpy_scalar_like, np
 
 from ._typing import (
@@ -50,5 +51,6 @@ def is_tensor_or_array(x: Any) -> TypeIs[TensorOrArray]:
     return isinstance(x, (Tensor, np.ndarray))
 
 
-def is_integral_dtype(dtype: torch.dtype) -> bool:
+def is_integral_dtype(dtype: DTypeLike) -> bool:
+    dtype = as_dtype(dtype)
     return isinstance(torch.empty((0,), dtype=dtype), IntegralTensor)

@@ -98,6 +98,7 @@ def pack_to_hdf(
     # Packing args
     encoding: str = HDF_ENCODING,
     file_kwds: Optional[Dict[str, Any]] = None,
+    col_kwds: Optional[Dict[str, Any]] = None,
     shape_suffix: str = SHAPE_SUFFIX,
     store_str_as_vlen: bool = False,
     user_attrs: Any = None,
@@ -125,7 +126,8 @@ def pack_to_hdf(
             defaults to False.
 
         encoding: String encoding used in file. defaults to "utf-8".
-        file_kwds: Options given to h5py file object. defaults to None.
+        file_kwds: Options given to h5py.File object. defaults to None.
+        col_kwds: Options given to all dataset columns, i.e. h5py.File().create_dataset(.) method. defaults to None.
         shape_suffix: Shape column suffix in HDF file. defaults to "_shape".
         store_str_as_vlen: If True, store strings as variable length string dtype. defaults to False.
         user_attrs: Additional metadata to add to the hdf file. It must be convertible to JSON with `json.dumps`. defaults to None.
@@ -147,13 +149,13 @@ def pack_to_hdf(
         msg = f"Cannot pack to hdf an empty dataset. (found {len(dataset)=})"
         raise ValueError(msg)
 
+    if ds_kwds is None:
+        ds_kwds = {}
+
     hdf_fpath = Path(hdf_fpath).resolve().expanduser()
     if hdf_fpath.exists() and not hdf_fpath.is_file():
         msg = f"Item {hdf_fpath=} exists but it is not a file."
         raise RuntimeError(msg)
-
-    if ds_kwds is None:
-        ds_kwds = {}
 
     if not hdf_fpath.is_file() or exists == "overwrite":
         pass
@@ -222,6 +224,9 @@ def pack_to_hdf(
 
     creation_date = pw.get_now()
 
+    if col_kwds is None:
+        col_kwds = {}
+
     with h5py.File(hdf_fpath, "w", **file_kwds) as hdf_file:
         # Step 2: Build hdf datasets in file
         hdf_dsets: Dict[str, HDFRawDataset] = {}
@@ -234,11 +239,15 @@ def pack_to_hdf(
             fill_value = hdf_dtype_to_fill_value(hdf_dtype)
             if fill_value is not None:
                 kwargs["fillvalue"] = fill_value
+            kwargs.update(col_kwds)
 
             hdf_ds_shape = (len(dataset),) + shape
             try:
                 hdf_dsets[attr_name] = hdf_file.create_dataset(
-                    attr_name, hdf_ds_shape, hdf_dtype, **kwargs
+                    name=attr_name,
+                    shape=hdf_ds_shape,
+                    dtype=hdf_dtype,
+                    **kwargs,
                 )
             except ValueError as err:
                 msg = f"Cannot create hdf dataset {attr_name=} of shape '{hdf_ds_shape}' with dtype '{hdf_dtype}' and {kwargs=}."
