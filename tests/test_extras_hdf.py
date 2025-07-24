@@ -360,7 +360,7 @@ class TestHDF(TestCase):
         mask = tw.lengths_to_non_pad_mask(lengths, dimsize)
 
         data = {
-            "x": tw.where(mask, tw.rand(num_rows, dimsize), 0.0),
+            "x": tw.where(mask, tw.rand(num_rows, dimsize), tw.as_tensor(0.0)),
         }
 
         hdf_fpath_uncompressed = self.__class__.tmpdir.joinpath("test_uncompressed.hdf")
