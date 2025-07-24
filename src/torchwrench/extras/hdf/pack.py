@@ -239,7 +239,7 @@ def pack_to_hdf(
             fill_value = hdf_dtype_to_fill_value(hdf_dtype)
             if fill_value is not None:
                 kwargs["fillvalue"] = fill_value
-            kwargs |= col_kwds
+            kwargs.update(col_kwds)
 
             hdf_ds_shape = (len(dataset),) + shape
             try:
