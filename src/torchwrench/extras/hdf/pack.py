@@ -73,7 +73,6 @@ K = TypeVar("K", covariant=True, bound=Hashable)
 V = TypeVar("V", covariant=True)
 T = TypeVar("T", covariant=True)
 T_DictOrTuple = TypeVar("T_DictOrTuple", tuple, dict, covariant=True)
-T_DictOrTuple2 = TypeVar("T_DictOrTuple2", tuple, dict, covariant=True)
 
 HDFDType: TypeAlias = Union[np.dtype, Literal["b", "i", "u", "f", "c"], type]
 
@@ -142,9 +141,7 @@ def pack_to_hdf(
     Returns:
         hdf_dataset: The target HDF dataset object.
     """
-    if not isinstance(dataset, SupportsGetitemLen):
-        msg = f"Cannot pack to hdf a non-sized-dataset '{pw.get_fullname(dataset)}'."
-        raise TypeError(msg)
+
     if len(dataset) == 0:
         msg = f"Cannot pack to hdf an empty dataset. (found {len(dataset)=})"
         raise ValueError(msg)
