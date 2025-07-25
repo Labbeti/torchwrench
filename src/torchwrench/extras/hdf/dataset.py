@@ -457,7 +457,7 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
     def __enter__(self) -> Self:
         return self
 
-    def __exit__(self) -> None:
+    def __exit__(self, *args, **kwargs) -> None:
         if self.is_open():
             self.close()
 
