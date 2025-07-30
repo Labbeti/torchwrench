@@ -211,3 +211,10 @@ def __test_typing_1() -> None:
 
     seq = ESequential(LayerF())
     y = seq(True)
+
+    class LayerG(EModule):
+        def forward(self, x: int) -> Tensor:
+            return torch.as_tensor(x)
+
+    seq = ESequential(LayerG())
+    y = seq(1)

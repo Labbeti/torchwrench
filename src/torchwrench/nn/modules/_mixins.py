@@ -59,7 +59,7 @@ class SupportsTypedForward(Protocol[InType, OutType]):
 
 TypedModuleLike: TypeAlias = Union[
     SupportsTypedForward[InType, OutType],
-    "EModule[InType, OutType]",
+    "TypedModule[InType, OutType]",
 ]
 
 

@@ -32,7 +32,6 @@ from torchwrench.types import (
     BoolTensor2D,
     BoolTensor3D,
     LongTensor,
-    SupportsGetitemLen,
     SupportsIterLen,
     is_number_like,
 )
@@ -181,7 +180,7 @@ def onehot_to_index(
     index = onehot.argmax(dim)
 
     if padding_idx is not None:
-        empty = (onehot == False).all(dim)
+        empty = (onehot == False).all(dim)  # noqa: E712
         if isinstance(empty, Tensor):
             index = torch.where(empty, padding_idx, index)
         elif isinstance(empty, np.ndarray):
