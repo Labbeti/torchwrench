@@ -130,7 +130,7 @@ def get_ndim(
     ) -> Tuple[bool, int]:
         if is_scalar_like(x):
             return True, 0
-        elif isinstance(x, (Tensor, np.ndarray, np.generic)):
+        elif isinstance(x, (Tensor, np.ndarray, np.generic, pd.DataFrame)):
             return True, x.ndim
         elif isinstance(x, (set, frozenset, dict)):
             return True, 0
@@ -208,7 +208,7 @@ def get_shape(
     ) -> Tuple[bool, Tuple[int, ...]]:
         if is_scalar_like(x):
             return True, ()
-        elif isinstance(x, (Tensor, np.ndarray, np.generic)):
+        elif isinstance(x, (Tensor, np.ndarray, np.generic, pd.DataFrame)):
             return True, tuple(x.shape)
         elif isinstance(x, (set, frozenset, dict)):
             return True, ()

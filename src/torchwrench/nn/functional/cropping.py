@@ -19,7 +19,19 @@ def crop_dim(
     align: CropAlign = "left",
     generator: GeneratorLike = None,
 ) -> Tensor:
-    """Generic function to crop a single dimension."""
+    """Generic function to crop a tensor along a single dimension.
+
+    Args:
+        x: Tensor to crop of with N dims of shape (..., D, ...), where D is the size of the dim-th dimension.
+        target_length: Target length for dim.
+        dims: Axis/dim to crop. defaults to -1.
+        align: Alignement for crop.
+        generator: Random generator when align is "random".
+
+    Returns:
+        Cropped tensor of N dims of (..., target_length, ...).
+    """
+
     return crop_dims(
         x,
         [target_length],
@@ -37,8 +49,18 @@ def crop_dims(
     aligns: Union[CropAlign, Iterable[CropAlign]] = "left",
     generator: GeneratorLike = None,
 ) -> Tensor:
-    """Generic function to crop multiple dimensions."""
+    """Generic function to crop a tensor along multiple dimensions.
 
+    Args:
+        x: Tensor to crop of with N dims.
+        target_lengths: List of target lengths for each dimension. The list has size M <= N.
+        dims: Dimensions for each length. Must be of size M. If "auto", creates a list of the M last dimensions.
+        aligns: Alignement or list of alignements for each dimension of size M.
+        generator: Random generator when aligns is "random".
+
+    Returns:
+        Cropped tensor of N dims.
+    """
     target_lengths = list(target_lengths)
 
     aligns_lst: List[CropAlign]

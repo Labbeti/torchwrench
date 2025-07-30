@@ -55,11 +55,16 @@ from .multiclass import (
 from .multilabel import (
     indices_to_multihot,
     indices_to_multinames,
+    multi_indices_to_multihot,
+    multi_indices_to_multinames,
     multihot_to_indices,
+    multihot_to_multi_indices,
     multihot_to_multinames,
     multinames_to_indices,
+    multinames_to_multi_indices,
     multinames_to_multihot,
     probs_to_indices,
+    probs_to_multi_indices,
     probs_to_multihot,
     probs_to_multinames,
 )

@@ -25,6 +25,7 @@ from torch import Tensor
 from torch.nn import functional as F
 
 from torchwrench.core.make import DeviceLike, DTypeLike, as_device, as_dtype
+from torchwrench.extras.numpy import np
 from torchwrench.nn.functional.others import get_ndim, get_shape
 from torchwrench.nn.functional.transform import to_item
 from torchwrench.types import (
@@ -35,9 +36,9 @@ from torchwrench.types import (
     SupportsIterLen,
     is_number_like,
 )
-from torchwrench.types._typing import TensorOrArray
+from torchwrench.types._typing import T_TensorOrArray, TensorOrArray
 
-T_Name = TypeVar("T_Name", bound=Hashable)
+T_Name = TypeVar("T_Name", bound=Hashable, covariant=True)
 
 
 @overload
@@ -124,7 +125,7 @@ def one_hot(
 
 def index_to_name(
     index: Union[Sequence[int], TensorOrArray, Sequence],
-    idx_to_name: Union[Mapping[int, T_Name], SupportsGetitemLen[T_Name]],
+    idx_to_name: Union[Mapping[int, T_Name], Iterable[T_Name]],
     *,
     is_number_fn: Callable[[Any], bool] = is_number_like,
 ) -> List[T_Name]:
@@ -140,6 +141,9 @@ def index_to_name(
         msg = f"Found 0 elements in {index=} but {index_ndim=} > 1, which means that we will lose information about shape when converting to names."
         warn_once(msg)
 
+    if not isinstance(idx_to_name, Mapping):
+        idx_to_name = list(idx_to_name)
+
     def _impl(x) -> Union[T_Name, list]:
         if is_number_fn(x):
             return idx_to_name[to_item(x)]  # type: ignore
@@ -154,11 +158,11 @@ def index_to_name(
 
 
 def onehot_to_index(
-    onehot: Tensor,
+    onehot: T_TensorOrArray,
     *,
     padding_idx: Optional[int] = None,
     dim: int = -1,
-) -> LongTensor:
+) -> T_TensorOrArray:
     """Convert onehot boolean encoding to indices of labels for **multiclass** classification.
 
     Args:
@@ -166,19 +170,32 @@ def onehot_to_index(
         padding_idx: Class index placeholder when input contains only zeroes. defaults to None.
         dim: Dimension of classes. defaults to -1.
     """
-    onehot = onehot.int()
-    index = onehot.argmax(dim=dim)
+    if isinstance(onehot, Tensor):
+        onehot = onehot.int()  # type: ignore
+    elif isinstance(onehot, np.ndarray):
+        onehot = onehot.astype(int)  # type: ignore
+    else:
+        msg = f"Invalid argument type {onehot}. (expected Tensor or ndarray)"
+        raise TypeError(msg)
+
+    index = onehot.argmax(dim)
 
     if padding_idx is not None:
-        empty = onehot.eq(False).all(dim=dim)
-        index = torch.where(empty, padding_idx, index)
+        empty = (onehot == False).all(dim)
+        if isinstance(empty, Tensor):
+            index = torch.where(empty, padding_idx, index)
+        elif isinstance(empty, np.ndarray):
+            index = np.where(empty, padding_idx, index)
+        else:
+            msg = f"Invalid argument type {onehot}. (expected Tensor or ndarray)"
+            raise TypeError(msg)
 
     return index  # type: ignore
 
 
 def onehot_to_name(
     onehot: Tensor,
-    idx_to_name: Union[Mapping[int, T_Name], SupportsGetitemLen[T_Name]],
+    idx_to_name: Union[Mapping[int, T_Name], Iterable[T_Name]],
     *,
     dim: int = -1,
 ) -> List[T_Name]:
@@ -283,7 +300,7 @@ def probs_to_onehot(
 
 def probs_to_name(
     probs: Tensor,
-    idx_to_name: Union[Mapping[int, T_Name], SupportsGetitemLen[T_Name]],
+    idx_to_name: Union[Mapping[int, T_Name], Iterable[T_Name]],
     *,
     dim: int = -1,
 ) -> List[T_Name]:

@@ -7,6 +7,7 @@ from typing import (
     Hashable,
     Iterable,
     List,
+    Literal,
     Mapping,
     Optional,
     Sequence,
@@ -16,7 +17,8 @@ from typing import (
 )
 
 import torch
-from pythonwrench.typing import isinstance_generic
+from pythonwrench.typing import SupportsGetitemLen, isinstance_generic
+from pythonwrench.warnings import deprecated_alias
 from torch import Tensor
 
 from torchwrench.core.make import DeviceLike, DTypeLike, as_device, as_dtype
@@ -27,6 +29,7 @@ from torchwrench.types import (
     BoolTensor1D,
     BoolTensor2D,
     LongTensor,
+    LongTensor1D,
     is_number_like,
     is_tensor_or_array,
 )
@@ -36,7 +39,7 @@ T_Name = TypeVar("T_Name", bound=Hashable)
 
 
 @overload
-def indices_to_multihot(
+def multi_indices_to_multihot(
     indices: Iterable[int],
     num_classes: int,
     *,
@@ -46,7 +49,7 @@ def indices_to_multihot(
 
 
 @overload
-def indices_to_multihot(
+def multi_indices_to_multihot(
     indices: Iterable[Iterable[int]],
     num_classes: int,
     *,
@@ -56,7 +59,7 @@ def indices_to_multihot(
 
 
 @overload
-def indices_to_multihot(
+def multi_indices_to_multihot(
     indices: Iterable,
     num_classes: int,
     *,
@@ -66,7 +69,7 @@ def indices_to_multihot(
 ) -> Tensor: ...
 
 
-def indices_to_multihot(
+def multi_indices_to_multihot(
     indices: Iterable,
     num_classes: int,
     *,
@@ -128,12 +131,50 @@ def indices_to_multihot(
     return multihot
 
 
-def indices_to_multinames(
-    indices: Union[Sequence[Union[Sequence[int], TensorOrArray]], TensorOrArray],
-    idx_to_name: Union[Mapping[int, T_Name], Sequence[T_Name]],
+@deprecated_alias(multi_indices_to_multihot)
+def indices_to_multihot(
+    indices: Iterable,
+    num_classes: int,
     *,
     padding_idx: Optional[int] = None,
-) -> List[List[T_Name]]:
+    device: DeviceLike = None,
+    dtype: DTypeLike = torch.bool,
+) -> Tensor: ...
+
+
+@overload
+def multi_indices_to_multinames(
+    indices: Iterable[int],
+    idx_to_name: Union[Mapping[int, T_Name], SupportsGetitemLen[T_Name]],
+    *,
+    padding_idx: Optional[int] = None,
+) -> List[T_Name]: ...
+
+
+@overload
+def multi_indices_to_multinames(
+    indices: Iterable[Iterable[int]],
+    idx_to_name: Union[Mapping[int, T_Name], SupportsGetitemLen[T_Name]],
+    *,
+    padding_idx: Optional[int] = None,
+) -> List[List[T_Name]]: ...
+
+
+@overload
+def multi_indices_to_multinames(
+    indices: Union[Iterable[Union[Iterable[int], TensorOrArray]], TensorOrArray],
+    idx_to_name: Union[Mapping[int, T_Name], SupportsGetitemLen[T_Name]],
+    *,
+    padding_idx: Optional[int] = None,
+) -> List: ...
+
+
+def multi_indices_to_multinames(
+    indices: Union[Iterable[Union[int, Iterable[int], TensorOrArray]], TensorOrArray],
+    idx_to_name: Union[Mapping[int, T_Name], SupportsGetitemLen[T_Name]],
+    *,
+    padding_idx: Optional[int] = None,
+) -> List:
     """Convert indices of labels to names using a mapping for **multilabel** classification.
 
     Args:
@@ -161,13 +202,67 @@ def indices_to_multinames(
     return names  # type: ignore
 
 
-def multihot_to_indices(
-    multihot: Iterable,
+@deprecated_alias(multi_indices_to_multinames)
+def indices_to_multinames(
+    indices: Union[Iterable[Union[int, Iterable[int], TensorOrArray]], TensorOrArray],
+    idx_to_name: Union[Mapping[int, T_Name], Sequence[T_Name]],
+    *,
+    padding_idx: Optional[int] = None,
+) -> List[List[T_Name]]: ...
+
+
+@overload
+def multihot_to_multi_indices(
+    multihot: Iterable[bool],
+    *,
+    keep_tensor: Literal[False] = False,
+    padding_idx: Optional[int] = None,
+    dim: int = -1,
+) -> List[int]: ...
+
+
+@overload
+def multihot_to_multi_indices(
+    multihot: Iterable[bool],
+    *,
+    keep_tensor: Literal[True],
+    padding_idx: Optional[int] = None,
+    dim: int = -1,
+) -> LongTensor1D: ...
+
+
+@overload
+def multihot_to_multi_indices(
+    multihot: Iterable[Iterable[bool]],
+    *,
+    keep_tensor: Literal[False] = False,
+    padding_idx: Optional[int] = None,
+    dim: int = -1,
+) -> List[List[int]]: ...
+
+
+@overload
+def multihot_to_multi_indices(
+    multihot: Union[TensorOrArray, Iterable[TensorOrArray]],
     *,
     keep_tensor: bool = False,
     padding_idx: Optional[int] = None,
     dim: int = -1,
-) -> Union[List, LongTensor]:
+) -> Union[List, LongTensor]: ...
+
+
+def multihot_to_multi_indices(
+    multihot: Union[
+        TensorOrArray,
+        Iterable[TensorOrArray],
+        Iterable[bool],
+        Iterable[Iterable[bool]],
+    ],
+    *,
+    keep_tensor: bool = False,
+    padding_idx: Optional[int] = None,
+    dim: int = -1,
+) -> Union[List, LongTensor, LongTensor1D]:
     """Convert multihot boolean encoding to indices of labels for **multilabel** classification.
 
     Args:
@@ -209,12 +304,27 @@ def multihot_to_indices(
     return result
 
 
+@deprecated_alias(multihot_to_multi_indices)
+def multihot_to_indices(
+    multihot: Iterable,
+    *,
+    keep_tensor: bool = False,
+    padding_idx: Optional[int] = None,
+    dim: int = -1,
+) -> Union[List, LongTensor]: ...
+
+
 def multihot_to_multinames(
-    multihot: Union[TensorOrArray, Sequence[TensorOrArray], Sequence[Sequence[bool]]],
+    multihot: Union[
+        TensorOrArray,
+        Iterable[TensorOrArray],
+        Iterable[bool],
+        Iterable[Iterable[bool]],
+    ],
     idx_to_name: Union[Mapping[int, T_Name], Sequence[T_Name]],
     *,
     dim: int = -1,
-) -> List[List[T_Name]]:
+) -> List:
     """Convert multihot boolean encoding to names using a mapping for **multilabel** classification.
 
     Args:
@@ -222,12 +332,12 @@ def multihot_to_multinames(
         idx_to_name: Mapping to convert a class index to its name.
         dim: Dimension of classes. defaults to -1.
     """
-    indices = multihot_to_indices(multihot, dim=dim)
-    names = indices_to_multinames(indices, idx_to_name)
+    indices = multihot_to_multi_indices(multihot, dim=dim)
+    names = multi_indices_to_multinames(indices, idx_to_name)
     return names
 
 
-def multinames_to_indices(
+def multinames_to_multi_indices(
     names: List[List[T_Name]],
     idx_to_name: Union[Mapping[int, T_Name], Sequence[T_Name]],
 ) -> List[List[int]]:
@@ -256,6 +366,13 @@ def multinames_to_indices(
     return indices  # type: ignore
 
 
+@deprecated_alias(multinames_to_multi_indices)
+def multinames_to_indices(
+    names: List[List[T_Name]],
+    idx_to_name: Union[Mapping[int, T_Name], Sequence[T_Name]],
+) -> List[List[int]]: ...
+
+
 def multinames_to_multihot(
     names: List[List[T_Name]],
     idx_to_name: Union[Mapping[int, T_Name], Sequence[T_Name]],
@@ -271,8 +388,8 @@ def multinames_to_multihot(
         device: PyTorch device of the output tensor.
         dtype: PyTorch DType of the output tensor.
     """
-    indices = multinames_to_indices(names, idx_to_name)
-    multihot = indices_to_multihot(
+    indices = multinames_to_multi_indices(names, idx_to_name)
+    multihot = multi_indices_to_multihot(
         indices,
         len(idx_to_name),
         device=device,
@@ -281,7 +398,7 @@ def multinames_to_multihot(
     return multihot
 
 
-def probs_to_indices(
+def probs_to_multi_indices(
     probs: TensorOrArray,
     threshold: Union[float, Sequence[float], TensorOrArray],
     *,
@@ -297,8 +414,18 @@ def probs_to_indices(
         dim: Dimension of classes. defaults to -1.
     """
     multihot = probs_to_multihot(probs, threshold, dim=dim)
-    indices = multihot_to_indices(multihot, padding_idx=padding_idx, dim=dim)
+    indices = multihot_to_multi_indices(multihot, padding_idx=padding_idx, dim=dim)
     return indices
+
+
+@deprecated_alias(probs_to_multi_indices)
+def probs_to_indices(
+    probs: TensorOrArray,
+    threshold: Union[float, Sequence[float], TensorOrArray],
+    *,
+    padding_idx: Optional[int] = None,
+    dim: int = -1,
+) -> Union[List, LongTensor]: ...
 
 
 def probs_to_multihot(
@@ -366,8 +493,8 @@ def probs_to_multinames(
         threshold: Threshold(s) to binarize probabilities. Can be a scalar or a sequence of (num_classes,) thresholds.
         idx_to_name: Mapping to convert a class index to its name.
     """
-    indices = probs_to_indices(probs, threshold)
-    names = indices_to_multinames(indices, idx_to_name)
+    indices = probs_to_multi_indices(probs, threshold)
+    names = multi_indices_to_multinames(indices, idx_to_name)
     return names
 
 

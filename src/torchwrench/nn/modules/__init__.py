@@ -35,11 +35,16 @@ from .multilabel import (
     IndicesToMultihot,
     IndicesToMultinames,
     MultihotToIndices,
+    MultihotToMultiIndices,
     MultihotToMultinames,
+    MultiIndicesToMultihot,
+    MultiIndicesToMultinames,
     MultinamesToIndices,
     MultinamesToMultihot,
+    MultinamesToMultiIndices,
     ProbsToIndices,
     ProbsToMultihot,
+    ProbsToMultiIndices,
     ProbsToMultinames,
 )
 from .numpy import NDArrayToTensor, TensorToNDArray, ToNDArray

@@ -8,13 +8,13 @@ import torch
 
 from torchwrench.core.make import as_device
 from torchwrench.nn.functional.multilabel import (
-    indices_to_multihot,
-    indices_to_multinames,
-    multihot_to_indices,
+    multi_indices_to_multihot,
+    multi_indices_to_multinames,
+    multihot_to_multi_indices,
     multihot_to_multinames,
-    multinames_to_indices,
+    multinames_to_multi_indices,
     multinames_to_multihot,
-    probs_to_indices,
+    probs_to_multi_indices,
     probs_to_multihot,
     probs_to_multinames,
 )
@@ -29,7 +29,7 @@ class TestMultilabel(TestCase):
             dtype=torch.bool,
         )
 
-        result = indices_to_multihot(indices, num_classes=num_classes)
+        result = multi_indices_to_multihot(indices, num_classes=num_classes)
 
         assert torch.equal(result, expected_multihot)
 
@@ -37,7 +37,7 @@ class TestMultilabel(TestCase):
         probs = torch.as_tensor([[1.0, 0.4, 0.1, 0.9]])
         expected_indices = [[0, 3]]
 
-        result = probs_to_indices(probs, threshold=0.5)
+        result = probs_to_multi_indices(probs, threshold=0.5)
 
         assert result == expected_indices
 
@@ -68,12 +68,12 @@ class TestMultilabel(TestCase):
         probs_1 = torch.rand(num_samples, num_classes)
         multihot_1 = probs_1.ge(threshold)
 
-        indices_1 = multihot_to_indices(multihot_1)
-        multinames_1 = indices_to_multinames(indices_1, idx_to_name)
+        indices_1 = multihot_to_multi_indices(multihot_1)
+        multinames_1 = multi_indices_to_multinames(indices_1, idx_to_name)
         multihot_2 = multinames_to_multihot(multinames_1, idx_to_name)
 
         multinames_2 = multihot_to_multinames(multihot_2, idx_to_name)
-        indices_2 = multinames_to_indices(multinames_2, idx_to_name)
+        indices_2 = multinames_to_multi_indices(multinames_2, idx_to_name)
 
         assert torch.equal(multihot_1, multihot_2), f"{multihot_1=} ; {multihot_2=}"
         assert multinames_1 == multinames_2
@@ -83,7 +83,7 @@ class TestMultilabel(TestCase):
         device = as_device("cpu")
         ints = torch.as_tensor([[0, 1, 1]], device=device)
         num_classes = 5
-        multihots = indices_to_multihot(ints, num_classes, dtype=torch.int)
+        multihots = multi_indices_to_multihot(ints, num_classes, dtype=torch.int)
         expected = torch.as_tensor([[1, 1, 0, 0, 0]], device=device)
 
         assert multihots.shape == expected.shape
@@ -103,8 +103,8 @@ class TestMultilabel(TestCase):
         expected_ints = [[0, 1, 2], [], [0, 1], [2]]
 
         num_classes = multihots.shape[1]
-        ints = multihot_to_indices(multihots)
-        new_multihots = indices_to_multihot(
+        ints = multihot_to_multi_indices(multihots)
+        new_multihots = multi_indices_to_multihot(
             ints, num_classes, dtype=torch.int, device=device
         )
 
@@ -118,11 +118,11 @@ class TestMultilabel(TestCase):
 
         multihot = torch.rand(num_samples, num_classes).ge(0.5)
         with self.assertRaises(ValueError):
-            multihot_to_indices(multihot)
+            multihot_to_multi_indices(multihot)
 
         indices = torch.empty(0, 5)
         with self.assertRaises(ValueError):
-            indices_to_multihot(indices, num_classes)
+            multi_indices_to_multihot(indices, num_classes)
 
     def test_empty_case_2(self) -> None:
         num_samples = 5
@@ -131,10 +131,10 @@ class TestMultilabel(TestCase):
 
         multihot = torch.rand(num_samples, num_classes).ge(0.5)
 
-        result_1 = multihot_to_indices(multihot)
+        result_1 = multihot_to_multi_indices(multihot)
         assert result_1 == expected
 
-        result_2 = indices_to_multihot(expected, num_classes)
+        result_2 = multi_indices_to_multihot(expected, num_classes)
         assert torch.equal(result_2, multihot)
 
     def test_empty_case_3(self) -> None:
@@ -145,11 +145,11 @@ class TestMultilabel(TestCase):
         multihot = torch.rand(num_steps, num_samples, num_classes).ge(0.5)
 
         with self.assertRaises(ValueError):
-            multihot_to_indices(multihot)
+            multihot_to_multi_indices(multihot)
 
         indices = [torch.empty(0, 5) for _ in range(num_steps)]
         with self.assertRaises(ValueError):
-            indices_to_multihot(indices, num_classes)
+            multi_indices_to_multihot(indices, num_classes)
 
     def test_probs_to_multihot_dim(self) -> None:
         probs = torch.rand(16, 10, 5)
@@ -166,16 +166,16 @@ class TestMultilabel(TestCase):
                 [0.0, 0.1, 0.9, 0.0, 1.0],
             ]
         )
-        indices_0 = probs_to_indices(probs, 0.5, dim=0)
+        indices_0 = probs_to_multi_indices(probs, 0.5, dim=0)
         assert indices_0 == [[0], [0], [1], [], [0, 1]]
 
-        indices_1 = probs_to_indices(probs, 0.5, dim=1)
+        indices_1 = probs_to_multi_indices(probs, 0.5, dim=1)
         assert indices_1 == [[0, 1, 4], [2, 4]]
 
         # duplicate probs for 3D test with 2x2x5
         probs = torch.stack([probs, probs])
 
-        indices_0 = probs_to_indices(probs, 0.5, dim=0)
+        indices_0 = probs_to_multi_indices(probs, 0.5, dim=0)
         assert indices_0 == [
             [[0, 1], []],
             [[0, 1], []],
@@ -184,10 +184,10 @@ class TestMultilabel(TestCase):
             [[0, 1], [0, 1]],
         ]
 
-        indices_1 = probs_to_indices(probs, 0.5, dim=1)
+        indices_1 = probs_to_multi_indices(probs, 0.5, dim=1)
         assert indices_1 == [[[0], [0], [1], [], [0, 1]], [[0], [0], [1], [], [0, 1]]]
 
-        indices_2 = probs_to_indices(probs, 0.5, dim=2)
+        indices_2 = probs_to_multi_indices(probs, 0.5, dim=2)
         assert indices_2 == [[[0, 1, 4], [2, 4]], [[0, 1, 4], [2, 4]]]
 
 

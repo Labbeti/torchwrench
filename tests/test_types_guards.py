@@ -99,7 +99,7 @@ class TestGuards(TestCase):
                 assert len(shape) == ndim, f"{type(x)=} ; {x=}"
 
                 if _NUMPY_AVAILABLE:
-                    np_x = np.array(x)
+                    np_x = np.asarray(x)
                     assert shape == np_x.shape, f"{x=}"
 
                 # Impl: scalar => (nelements == 1)

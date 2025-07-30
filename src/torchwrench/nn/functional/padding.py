@@ -45,7 +45,21 @@ def pad_dim(
     mode: PadMode = "constant",
     generator: GeneratorLike = None,
 ) -> Tensor:
-    """Generic function for pad a single dimension."""
+    """Generic function to pad a tensor along a single dimension.
+
+    Args:
+        x: Tensor to pad of with N dims of shape (..., D, ...), where D is the size of the dim-th dimension.
+        target_length: Target length for dim.
+        dims: Axis/dim to pad. defaults to -1.
+        align: Alignement for pad.
+        pad_value: Pad value used to fill tensor. defaults to 0.0.
+        mode: Pad mode used. defaults to "constant".
+        generator: Random generator when align is "random".
+
+    Returns:
+        Padded tensor of N dims of (..., target_length, ...).
+    """
+    # """Generic function for pad a single dimension."""
     return pad_dims(
         x,
         target_lengths=[target_length],
@@ -67,7 +81,20 @@ def pad_dims(
     mode: PadMode = "constant",
     generator: GeneratorLike = None,
 ) -> Tensor:
-    """Generic function to pad multiple dimensions."""
+    """Generic function to pad a tensor along multiple dimensions.
+
+    Args:
+        x: Tensor to pad of with N dims.
+        target_lengths: List of target lengths for each dimension. The list has size M <= N.
+        dims: Dimensions for each length. Must be of size M. If "auto", creates a list of the M last dimensions.
+        aligns: Alignement or list of alignements for each dimension of size M.
+        pad_value: Pad value used to fill tensor. defaults to 0.0.
+        mode: Pad mode used. defaults to "constant".
+        generator: Random generator when aligns is "random".
+
+    Returns:
+        Padded tensor of N dims.
+    """
     if isinstance(pad_value, Callable):
         pad_value = pad_value(x)
     if isinstance(aligns, str):
