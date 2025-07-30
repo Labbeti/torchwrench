@@ -81,12 +81,12 @@ def numpy_view_as_real(x: np.ndarray) -> np.ndarray:
         return x.view(float_dtype).reshape(*x.shape, 2)
     else:
         # note: rebuild array here because view does not work on 0d arrays
-        return np.array([x.real, x.imag], dtype=float_dtype)
+        return np.array([x.real, x.imag], dtype=float_dtype)  # type: ignore
 
 
 def numpy_complex_dtype_to_float_dtype(dtype: np.dtype) -> np.dtype:
     """Returns the associated float dtype from complex dtype. If input dtype is not complex, it just returns the same dtype."""
-    return np.empty((0,), dtype=dtype).real.dtype
+    return np.empty((0,), dtype=dtype).real.dtype  # type: ignore
 
 
 def numpy_view_as_complex(x: np.ndarray) -> np.ndarray:
@@ -115,6 +115,10 @@ def numpy_is_complex_dtype(dtype: np.dtype) -> bool:
 
 def is_numpy_bool_array(x: Any) -> TypeGuard[Union[np.bool_, np.ndarray]]:
     return isinstance(x, (np.generic, np.ndarray)) and x.dtype.kind == "b"
+
+
+def is_numpy_integral_array(x: Any) -> TypeGuard[Union[np.ndarray, np.generic]]:
+    return isinstance(x, (np.generic, np.ndarray)) and issubclass(x.dtype, np.integer)
 
 
 def is_numpy_number_like(x: Any) -> TypeGuard[NumpyNumberLike]:
@@ -157,7 +161,7 @@ def numpy_item(x: Union[np.ndarray, np.generic, BuiltinScalar]) -> np.generic:
         raise ValueError(msg)
 
     indices = tuple([0] * x.ndim)
-    return x[indices]
+    return x[indices]  # type: ignore
 
 
 @overload
