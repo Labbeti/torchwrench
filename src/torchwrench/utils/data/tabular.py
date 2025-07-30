@@ -20,28 +20,34 @@ from pythonwrench.typing.classes import SupportsGetitemLen
 from speechbrain.dataio.dataset import DynamicItemDataset
 from torch import Tensor
 from torch.utils.data.dataset import Dataset
-from typing_extensions import Self, TypeVar
+from typing_extensions import TypeIs, TypeVar
 
 import torchwrench as tw
-from torchwrench.extras.numpy import np
+from torchwrench.extras.numpy import is_numpy_bool_array, is_numpy_integral_array, np
 
 T = TypeVar("T", covariant=True, default=Any)
 T_Item = TypeVar("T_Item", covariant=True, default=Any)
 T_Metadata = TypeVar("T_Metadata", covariant=False, default=Any)
 T_Index = TypeVar("T_Index", covariant=True, default=int)
-T_Column = TypeVar("T_Column", covariant=False, default=str)
+T_ColumnKey = TypeVar("T_ColumnKey", covariant=False, default=str)
 
 
-class TabularDataset(Generic[T_Item, T_Index, T_Column, T_Metadata], Dataset[T_Item]):
+class TabularDataset(
+    Generic[T_Item, T_Index, T_ColumnKey, T_Metadata], Dataset[T_Item]
+):
     def __init__(
         self,
-        data,
-        output_keys: Iterable[T_Column],
+        data=None,
+        output_keys: Optional[Iterable[T_ColumnKey]] = None,
         dynamic_fns: Iterable[
-            Tuple[Tuple[T_Column, ...], Tuple[T_Column, ...], Callable]
-        ],
-        metadata: T_Metadata,
+            Tuple[Tuple[T_ColumnKey, ...], Tuple[T_ColumnKey, ...], Callable]
+        ] = (),
+        metadata: T_Metadata = None,
     ) -> None:
+        if data is None:
+            data = {}
+        if output_keys is None:
+            output_keys = _get_static_keys(data)
         output_keys = list(output_keys)
         dynamic_fns = list(dynamic_fns)
 
@@ -56,12 +62,9 @@ class TabularDataset(Generic[T_Item, T_Index, T_Column, T_Metadata], Dataset[T_I
         cls,
         df: pd.DataFrame,
         *,
-        output_keys: Optional[Iterable[T_Column]] = None,
+        output_keys: Optional[Iterable[str]] = None,
         metadata: T_Metadata = None,
-    ) -> "TabularDataset[Dict[T_Column, T], int, T_Column, T_Metadata]":
-        if output_keys is None:
-            output_keys = list(df.keys())
-
+    ) -> "TabularDataset[Dict[str, T], int, str, T_Metadata]":
         return TabularDataset(
             df,
             output_keys=output_keys,
@@ -72,14 +75,11 @@ class TabularDataset(Generic[T_Item, T_Index, T_Column, T_Metadata], Dataset[T_I
     @classmethod
     def from_dict(
         cls,
-        dic: Mapping[T_Column, SupportsGetitemLen[T]],
+        dic: Mapping[T_ColumnKey, SupportsGetitemLen[T]],
         *,
-        output_keys: Optional[Iterable[T_Column]] = None,
+        output_keys: Optional[Iterable[T_ColumnKey]] = None,
         metadata: T_Metadata = None,
-    ) -> "TabularDataset[Dict[T_Column, T], int, T_Column, T_Metadata]":
-        if output_keys is None:
-            output_keys = list(dic.keys())
-
+    ) -> "TabularDataset[Dict[T_ColumnKey, T], int, T_ColumnKey, T_Metadata]":
         return TabularDataset(
             dic,
             output_keys=output_keys,
@@ -92,12 +92,9 @@ class TabularDataset(Generic[T_Item, T_Index, T_Column, T_Metadata], Dataset[T_I
         cls,
         dset: DynamicItemDataset,
         *,
-        output_keys: Optional[Iterable[T_Column]] = None,
+        output_keys: Optional[Iterable[T_ColumnKey]] = None,
         metadata: T_Metadata = None,
-    ) -> "TabularDataset[Dict[T_Column, T], int, T_Column, T_Metadata]":
-        if output_keys is None:
-            output_keys = list(dset.pipeline.output_mapping.keys())
-
+    ) -> "TabularDataset[Dict[T_ColumnKey, T], int, T_ColumnKey, T_Metadata]":
         return TabularDataset(
             dset,
             output_keys=output_keys,
@@ -108,11 +105,11 @@ class TabularDataset(Generic[T_Item, T_Index, T_Column, T_Metadata], Dataset[T_I
     @classmethod
     def from_list(
         cls,
-        lst: List[Dict[T_Column, Any]],
+        lst: List[Dict[T_ColumnKey, Any]],
         *,
-        output_keys: Optional[Iterable[T_Column]] = None,
+        output_keys: Optional[Iterable[T_ColumnKey]] = None,
         metadata: T_Metadata = None,
-    ) -> "TabularDataset[Dict[T_Column, Any], int, T_Column, T_Metadata]":
+    ) -> "TabularDataset[Dict[T_ColumnKey, Any], int, T_ColumnKey, T_Metadata]":
         if output_keys is None:
             if len(lst) == 0:
                 output_keys = []
@@ -145,7 +142,7 @@ class TabularDataset(Generic[T_Item, T_Index, T_Column, T_Metadata], Dataset[T_I
         )
 
     @property
-    def column_names(self) -> Tuple[T_Column, ...]:
+    def column_names(self) -> Tuple[T_ColumnKey, ...]:
         return tuple(self._output_keys)
 
     @property
@@ -175,7 +172,7 @@ class TabularDataset(Generic[T_Item, T_Index, T_Column, T_Metadata], Dataset[T_I
         return self.num_rows, self.num_columns
 
     @property
-    def static_keys(self) -> Tuple[T_Column, ...]:
+    def static_keys(self) -> Tuple[T_ColumnKey, ...]:
         if isinstance(self._data, (pd.DataFrame, dict)):
             return tuple(self._data.keys())
         elif isinstance(self._data, DynamicItemDataset):
@@ -194,29 +191,38 @@ class TabularDataset(Generic[T_Item, T_Index, T_Column, T_Metadata], Dataset[T_I
             raise TypeError
 
     @property
-    def dynamic_keys(self) -> Tuple[T_Column, ...]:
+    def dynamic_keys(self) -> Tuple[T_ColumnKey, ...]:
         return tuple(key for _, provides, _ in self._dynamic_fns for key in provides)
 
     @property
-    def output_keys(self) -> Tuple[T_Column, ...]:
+    def output_keys(self) -> Tuple[T_ColumnKey, ...]:
         return tuple(self._output_keys)
 
-    def keys(self) -> Tuple[T_Column, ...]:
+    def keys(self) -> Tuple[T_ColumnKey, ...]:
         return tuple(self._output_keys)
 
-    def values(self):
-        raise NotImplementedError
+    def values(self) -> Iterable:
+        if isinstance(self._data, (dict, pd.DataFrame)):
+            return [self._data[k] for k in self.keys()]
+        elif pw.isinstance_generic(self._data, List[Dict]):
+            return [[data_i[k] for data_i in self._data] for k in self.keys()]
+        elif isinstance(self._data, DynamicItemDataset):
+            return [self._data[i] for i in range(len(self._data))]
+        else:
+            raise TypeError
 
-    def items(self):
-        raise NotImplementedError
+    def items(self) -> Iterable[Tuple[T_ColumnKey, Any]]:
+        return zip(self.keys(), self.values())
 
     def add_dynamic_column(self, fn, takes, provides, batch) -> None:
         self._dynamic_fns.append((takes, provides, fn))
 
-    def add_column(self, key: T_Column, column_data: Any) -> None:
+    def add_column(
+        self, key: T_ColumnKey, column_data: Any, add_to_output_keys: bool = True
+    ) -> None:
         if isinstance(self._data, (pd.DataFrame, dict)):
             self._data[key] = column_data
-        elif isinstance(self._data, list):
+        elif pw.isinstance_generic(self._data, List[Dict]):
             for data_i, column_data_i in zip(self._data, column_data):
                 data_i[key] = column_data_i
         elif isinstance(self._data, DynamicItemDataset):
@@ -225,19 +231,47 @@ class TabularDataset(Generic[T_Item, T_Index, T_Column, T_Metadata], Dataset[T_I
         else:
             raise TypeError
 
-    def remove_column(self, key: T_Column):
-        raise NotImplementedError
+        if add_to_output_keys:
+            self.add_output_keys([key])
 
-    def rename_column(self, old_key: T_Column, new_key: T_Column):
-        raise NotImplementedError
+    def pop_column(self, key: T_ColumnKey) -> Any:
+        if isinstance(self._data, pd.DataFrame):
+            column_data = self._data.pop(key)  # type: ignore
+        if isinstance(self._data, dict):
+            column_data = self._data.pop(key)
+        elif pw.isinstance_generic(self._data, List[Dict]):
+            column_data = []
+            for data_i in self._data:
+                column_data.append(data_i.pop(key))
+        elif isinstance(self._data, DynamicItemDataset):
+            column_data = []
+            for data_i in self._data.data.values():
+                column_data.append(data_i.pop(key))
+        else:
+            raise TypeError
 
-    def set_output_keys(self, keys: Iterable[T_Column]) -> None:
+        return column_data
+
+    def rename_column(
+        self,
+        old_key: T_ColumnKey,
+        new_key: T_ColumnKey,
+        add_to_output_keys: bool = True,
+    ) -> None:
+        column_data = self.pop_column(old_key)
+        self.add_column(new_key, column_data, add_to_output_keys=add_to_output_keys)
+
+    def set_output_keys(self, keys: Iterable[T_ColumnKey]) -> None:
         keys = list(keys)
         self._output_keys = keys
 
-    def add_output_keys(self, keys: Iterable[T_Column]) -> None:
+    def add_output_keys(self, keys: Iterable[T_ColumnKey]) -> None:
         keys = list(keys)
         self._output_keys += keys
+
+    def pop_output_keys(self, keys: Iterable[T_ColumnKey]) -> None:
+        for key in keys:
+            self._output_keys.remove(key)
 
     def to_dataframe(self) -> pd.DataFrame:
         if isinstance(self._data, pd.DataFrame):
@@ -251,7 +285,7 @@ class TabularDataset(Generic[T_Item, T_Index, T_Column, T_Metadata], Dataset[T_I
         else:
             raise TypeError
 
-    def to_dict(self) -> Dict[T_Column, List[Any]]:
+    def to_dict(self) -> Dict[T_ColumnKey, List[Any]]:
         if isinstance(self._data, pd.DataFrame):
             return self._data.to_dict("list")  # type: ignore
         elif isinstance(self._data, list):
@@ -291,7 +325,7 @@ class TabularDataset(Generic[T_Item, T_Index, T_Column, T_Metadata], Dataset[T_I
 
     def to_dynamic_item_dataset(
         self,
-        id_column_key: Optional[T_Column] = None,
+        id_column_key: Optional[T_ColumnKey] = None,
     ) -> DynamicItemDataset:
         if isinstance(self._data, pd.DataFrame):
             if id_column_key is not None and id_column_key in self._data:
@@ -345,11 +379,51 @@ class TabularDataset(Generic[T_Item, T_Index, T_Column, T_Metadata], Dataset[T_I
             Tensor,
             np.ndarray,
             slice,
-            T_Column,
-            Iterable[T_Column],
+            T_ColumnKey,
+            Iterable[T_ColumnKey],
         ],
     ) -> Any:
-        raise NotImplementedError
+        if isinstance(self._data, pd.DataFrame):
+            if tw.is_number_like(index) or is_mask(index) or isinstance(index, slice):
+                index = tw.to_ndarray(index)
+                return self._data[index]
+            elif is_indices(index):
+                mask = tw.indices_to_multihot(index, len(self)).numpy()
+                return self[mask]
+            elif isinstance(index, str):
+                return self._data[index]
+            elif pw.isinstance_generic(index, Iterable[str]):
+                return self._data[list(index)]
+            else:
+                raise TypeError
+
+        elif pw.isinstance_generic(self._data, List[Dict]):
+            if tw.is_number_like(index) or isinstance(index, slice):
+                index = tw.as_builtin(index)  # type: ignore
+                return self._data[index]  # type: ignore
+            elif is_indices(index):
+                index = tw.as_builtin(index)
+                return [self[index_i] for index_i in index]  # type: ignore
+            elif is_mask(index):
+                return [self[i] for i, mask_i in enumerate(mask) if mask_i]  # type: ignore
+            elif isinstance(index, str):
+                return [sample[index] for sample in self._data]
+            elif pw.isinstance_generic(index, Iterable[str]):
+                return [
+                    {index_i: sample[index_i] for index_i in index}
+                    for sample in self._data
+                ]
+            else:
+                raise TypeError
+
+        elif pw.isinstance_generic(self._data, Dict[str, list]):
+            raise NotImplementedError
+
+        elif pw.isinstance_generic(self._data, DynamicItemDataset):
+            raise NotImplementedError
+
+        else:
+            raise TypeError
 
     def __setitem__(self, index, obj) -> None:
         raise NotImplementedError
@@ -362,3 +436,58 @@ class TabularDataset(Generic[T_Item, T_Index, T_Column, T_Metadata], Dataset[T_I
             f"{self.__class__.__name__}(num_rows={self.num_rows}, keys={self.keys()})"
         )
         return repr_
+
+
+def _get_static_keys(
+    data: Union[
+        pd.DataFrame,
+        List[Dict[T_ColumnKey, Any]],
+        Dict[T_ColumnKey, List],
+        DynamicItemDataset,
+    ],
+) -> Tuple[T_ColumnKey, ...]:
+    if isinstance(data, pd.DataFrame):
+        return tuple(data.keys())
+    elif pw.isinstance_generic(data, List[Dict]):
+        if len(data) == 0:
+            return ()
+        else:
+            return tuple(data[0].keys())
+    elif isinstance(data, dict):
+        return tuple(data.keys())
+    elif isinstance(data, DynamicItemDataset):
+        return tuple(data.pipeline.output_mapping.keys())
+    else:
+        raise TypeError
+
+
+def _get_dynamic_keys(
+    data: Union[
+        pd.DataFrame,
+        List[Dict[T_ColumnKey, Any]],
+        Dict[T_ColumnKey, List],
+        DynamicItemDataset,
+    ],
+) -> Tuple[T_ColumnKey, ...]:
+    if pw.isinstance_generic(data, (pd.DataFrame, List[Dict], dict)):
+        return ()
+    elif isinstance(data, DynamicItemDataset):
+        return tuple(data.pipeline.output_mapping.keys())
+    else:
+        raise TypeError
+
+
+def is_mask(x: Any) -> TypeIs[Union[Iterable[bool], np.ndarray, tw.BoolTensor1D]]:
+    return (
+        pw.isinstance_generic(x, Iterable[bool])
+        or (is_numpy_bool_array(x) and x.ndim == 1)
+        or isinstance(x, tw.BoolTensor1D)
+    )
+
+
+def is_indices(x: Any) -> TypeIs[Union[Iterable[int], np.ndarray, tw.IntegralTensor1D]]:
+    return (
+        pw.isinstance_generic(x, Iterable[int])
+        or (is_numpy_integral_array(x) and x.ndim == 1)
+        or isinstance(x, tw.IntegralTensor1D)
+    )
