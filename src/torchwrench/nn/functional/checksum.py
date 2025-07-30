@@ -18,28 +18,17 @@ from pythonwrench.checksum import (
     checksum_str,
     register_checksum_fn,
 )
-from pythonwrench.importlib import Placeholder
 from pythonwrench.inspect import get_fullname
 from torch import Tensor, nn
 
 from torchwrench.core.packaging import _NUMPY_AVAILABLE, _PANDAS_AVAILABLE
 from torchwrench.extras.numpy import np
+from torchwrench.extras.pandas import pd
 from torchwrench.nn.functional.predicate import is_complex, is_floating_point
 
-if _PANDAS_AVAILABLE:
-    import pandas as pd
 
-    DataFrame = pd.DataFrame  # type: ignore
-    Series = pd.Series
-else:
-
-    class DataFrame(Placeholder): ...
-
-    class Series(Placeholder): ...
-
-
-@register_checksum_fn(DataFrame)
-def checksum_dataframe(x: DataFrame, **kwargs) -> int:
+@register_checksum_fn(pd.DataFrame)
+def checksum_dataframe(x: pd.DataFrame, **kwargs) -> int:
     if not _PANDAS_AVAILABLE:
         msg = "Cannot call function 'checksum_dataframe' because optional dependency 'pandas' is not installed. Please install it using 'pip install torchwrench[extras]'"
         raise NotImplementedError(msg)
@@ -51,8 +40,8 @@ def checksum_dataframe(x: DataFrame, **kwargs) -> int:
     return checksum_dict(xdict, **kwargs)  # type: ignore
 
 
-@register_checksum_fn(Series)
-def checksum_series(x: Series, **kwargs) -> int:
+@register_checksum_fn(pd.Series)
+def checksum_series(x: pd.Series, **kwargs) -> int:
     if not _PANDAS_AVAILABLE:
         msg = "Cannot call function 'checksum_series' because optional dependency 'pandas' is not installed. Please install it using 'pip install torchwrench[extras]'"
         raise NotImplementedError(msg)
@@ -91,7 +80,7 @@ def checksum_module(
         params_it = (
             (n, p)
             for n, p in x.named_parameters()
-            if not only_trainable or p.requires_grad
+            if not only_trainable or p.requires_grad  # type: ignore
         )
     else:
         params_it = (
