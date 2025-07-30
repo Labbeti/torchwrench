@@ -27,6 +27,7 @@ from pythonwrench.typing import BuiltinNumber, SupportsIterLen, T_BuiltinNumber
 from torch import Tensor, nn
 
 from torchwrench.extras.numpy import np
+from torchwrench.extras.pandas import pd
 from torchwrench.nn import functional as F
 from torchwrench.types._typing import (
     LongTensor,
@@ -364,8 +365,16 @@ def deep_equal(x: T, y: T) -> bool:
             and np.equal(x[~x_isnan], y[~y_isnan]).all().item()
         )
 
+    if isinstance(x, pd.DataFrame) and isinstance(y, pd.DataFrame):
+        if not (deep_equal(x.index, y.index) and deep_equal(x.columns, y.columns)):
+            return False
+        return (x.isna() == y.isna()).all(None).item() and (
+            (x == y) | x.isna() | y.isna()
+        ).all(None).item()  # type: ignore
+
     if isinstance(x, Mapping) and isinstance(y, Mapping):
         return deep_equal(list(x.items()), list(y.items()))
+
     if isinstance(x, SupportsIterLen) and isinstance(y, SupportsIterLen):
         return len(x) == len(y) and all(deep_equal(xi, yi) for xi, yi in zip(x, y))
 
