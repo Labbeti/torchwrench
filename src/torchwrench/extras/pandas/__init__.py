@@ -3,11 +3,11 @@
 
 from torchwrench.core.packaging import _PANDAS_AVAILABLE
 
-if _PANDAS_AVAILABLE:
-    import pandas as pd
+if not _PANDAS_AVAILABLE:
+    from torchwrench.extras.pandas import _pandas_fallback as pd
 
 else:
-    from torchwrench.extras.pandas import _pandas_fallback as pd
+    import pandas as pd
 
 
 __all__ = [

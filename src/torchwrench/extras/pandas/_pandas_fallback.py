@@ -4,6 +4,7 @@
 from typing import Any
 
 from pythonwrench.importlib import Placeholder
+from pythonwrench.inspect import get_current_fn_name
 
 
 class DataFrame(Placeholder):
@@ -24,3 +25,8 @@ class RangeIndex(Placeholder): ...
 
 
 class Index(Placeholder): ...
+
+
+def read_csv(*args, **kwargs) -> DataFrame:
+    msg = f"Cannot call function '{get_current_fn_name()}' because optional dependency 'pandas' is not installed. Please install it using 'pip install torchwrench[extras]'"
+    raise NotImplementedError(msg)

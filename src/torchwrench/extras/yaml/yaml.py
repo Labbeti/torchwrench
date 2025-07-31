@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import io
 from argparse import Namespace
-from io import TextIOBase
 from pathlib import Path
 from typing import Any, Iterable, Literal, Mapping, Optional, Type, Union
 
@@ -13,28 +13,7 @@ from typing_extensions import TypeAlias
 from torchwrench.core.packaging import _OMEGACONF_AVAILABLE, _YAML_AVAILABLE
 from torchwrench.serialization.common import as_builtin
 
-if _YAML_AVAILABLE:
-    import yaml
-    from yaml import (
-        BaseLoader,
-        CBaseLoader,
-        CFullLoader,
-        CLoader,
-        CSafeLoader,
-        CUnsafeLoader,
-        FullLoader,
-        Loader,
-        MappingNode,
-        Node,
-        SafeLoader,
-        ScalarNode,
-        SequenceNode,
-        UnsafeLoader,
-    )
-    from yaml.parser import ParserError
-    from yaml.scanner import ScannerError
-
-else:
+if not _YAML_AVAILABLE:
     from torchwrench.extras.yaml import _yaml_fallback as yaml
     from torchwrench.extras.yaml._yaml_fallback import (
         BaseLoader,
@@ -54,6 +33,27 @@ else:
         SequenceNode,
         UnsafeLoader,
     )
+
+else:
+    import yaml
+    from yaml import (
+        BaseLoader,
+        CBaseLoader,
+        CFullLoader,
+        CLoader,
+        CSafeLoader,
+        CUnsafeLoader,
+        FullLoader,
+        Loader,
+        MappingNode,
+        Node,
+        SafeLoader,
+        ScalarNode,
+        SequenceNode,
+        UnsafeLoader,
+    )
+    from yaml.parser import ParserError
+    from yaml.scanner import ScannerError
 
 
 if _OMEGACONF_AVAILABLE:
@@ -144,7 +144,7 @@ def save_yaml(*args, **kwargs): ...
 
 
 def load_yaml(
-    fpath: Union[str, Path, TextIOBase],
+    file: Union[str, Path, io.TextIOBase],
     *,
     Loader: YamlLoaders = SafeLoader,
     on_error: Literal["raise", "ignore"] = "raise",
@@ -154,22 +154,34 @@ def load_yaml(
         msg = f"Cannot use python module {__file__} since pyyaml package is not installed. Please install it with `pip install torchwrench[extras]`."
         raise ImportError(msg)
 
-    if isinstance(fpath, (str, Path)):
-        with open(fpath, "r") as file:
-            return load_yaml(file, Loader=Loader, on_error=on_error)
+    if isinstance(file, (str, Path)):
+        with open(file, "r") as buffer:
+            return loads_yaml(buffer, Loader=Loader, on_error=on_error)
+    elif isinstance(file, io.TextIOBase):
+        return loads_yaml(file, Loader=Loader, on_error=on_error)
+    else:
+        msg = f"Invalid argument type {type(file)}."
+        raise TypeError(msg)
+
+
+def loads_yaml(
+    content: Union[str, io.TextIOBase],
+    *,
+    Loader: YamlLoaders = SafeLoader,
+    on_error: Literal["raise", "ignore"] = "raise",
+) -> Any:
+    if isinstance(content, str):
+        with io.StringIO(content) as buffer:
+            return loads_yaml(buffer, Loader=Loader, on_error=on_error)
 
     try:
-        data = yaml.load(fpath, Loader=Loader)  # type: ignore
+        data = yaml.load(content, Loader=Loader)  # type: ignore
     except (ScannerError, ParserError) as err:
         if on_error == "ignore":
             return None
         else:
             raise err
     return data
-
-
-@function_alias(load_yaml)
-def loads_yaml(*args, **kwargs): ...
 
 
 @function_alias(load_yaml)

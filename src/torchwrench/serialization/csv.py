@@ -271,14 +271,14 @@ def _load_csv_with_pandas(
         msg = f"Invalid arguments {backend_kwds=} with {backend=}."
         raise ValueError(msg)
 
-    df = pd.read_csv(fpath, delimiter=delimiter)  # type: ignore
+    df = pd.read_csv(fpath, delimiter=delimiter)
 
     if orient == "list":
         return df.to_dict("records")  # type: ignore
     elif orient == "dict":
         return df.to_dict("list")  # type: ignore
     elif orient in ("pandas", "auto"):
-        return df  # type: ignore
+        return df
     else:
         msg = (
             f"Invalid argument {orient=}. (expected one of {get_args(OrientExtended)})"

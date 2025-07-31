@@ -3,11 +3,11 @@
 
 from torchwrench.core.packaging import _SPEECHBRAIN_AVAILABLE
 
-if _SPEECHBRAIN_AVAILABLE:
-    from speechbrain.dataio.dataset import DynamicItemDataset
+if not _SPEECHBRAIN_AVAILABLE:
+    from torchwrench.extras.speechbrain._speechbrain_fallback import DynamicItemDataset
 
 else:
-    from torchwrench.extras.speechbrain._speechbrain_fallback import DynamicItemDataset
+    from speechbrain.dataio.dataset import DynamicItemDataset
 
 
 __all__ = [
