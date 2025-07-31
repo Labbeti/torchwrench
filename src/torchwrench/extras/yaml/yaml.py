@@ -6,6 +6,7 @@ from io import TextIOBase
 from pathlib import Path
 from typing import Any, Iterable, Literal, Mapping, Optional, Type, Union
 
+from pythonwrench.functools import function_alias
 from pythonwrench.typing import DataclassInstance, NamedTupleInstance
 from typing_extensions import TypeAlias
 
@@ -134,6 +135,14 @@ def dump_yaml(
     return content
 
 
+@function_alias(dump_yaml)
+def dumps_yaml(*args, **kwargs): ...
+
+
+@function_alias(dump_yaml)
+def save_yaml(*args, **kwargs): ...
+
+
 def load_yaml(
     fpath: Union[str, Path, TextIOBase],
     *,
@@ -159,7 +168,15 @@ def load_yaml(
     return data
 
 
-class IgnoreTagLoader(SafeLoader):
+@function_alias(load_yaml)
+def loads_yaml(*args, **kwargs): ...
+
+
+@function_alias(load_yaml)
+def read_yaml(*args, **kwargs): ...
+
+
+class IgnoreTagLoader(SafeLoader):  # type: ignore
     """SafeLoader that ignores yaml tags.
 
     Examples
@@ -187,7 +204,7 @@ class IgnoreTagLoader(SafeLoader):
             raise NotImplementedError(msg)
 
 
-class SplitTagLoader(SafeLoader):
+class SplitTagLoader(SafeLoader):  # type: ignore
     """SafeLoader that store tags inside value.
 
     Examples

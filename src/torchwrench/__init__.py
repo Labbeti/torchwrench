@@ -66,16 +66,44 @@ from .core.make import (
     GeneratorLike,
 )
 from .extras.numpy import ndarray_to_tensor, tensor_to_ndarray, to_ndarray
-from .extras.yaml import dump_yaml, load_yaml
+from .extras.yaml.yaml import (
+    dump_yaml,
+    dumps_yaml,
+    load_yaml,
+    loads_yaml,
+    read_yaml,
+    save_yaml,
+)
 from .hub.download import download_file
 from .hub.paths import get_cache_dir, get_tmp_dir
 from .nn.functional import *
 from .serialization.common import as_builtin
-from .serialization.csv import dump_csv, load_csv
+from .serialization.csv import (
+    dump_csv,
+    dumps_csv,
+    load_csv,
+    loads_csv,
+    read_csv,
+    save_csv,
+)
 from .serialization.dump_fn import dump, save
-from .serialization.json import dump_json, load_json
+from .serialization.json import (
+    dump_json,
+    dumps_json,
+    load_json,
+    loads_json,
+    read_json,
+    save_json,
+)
 from .serialization.load_fn import load
-from .serialization.pickle import dump_pickle, load_pickle
+from .serialization.pickle import (
+    dump_pickle,
+    dumps_pickle,
+    load_pickle,
+    loads_pickle,
+    read_pickle,
+    save_pickle,
+)
 from .serialization.torch import dump_torch, load_torch
 from .types.guards import (
     is_number_like,

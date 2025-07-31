@@ -53,9 +53,9 @@ if _H5PY_AVAILABLE:
 
 
 if _NUMPY_AVAILABLE:
-    from .numpy import load_numpy
+    from .numpy import load_ndarray
 
-    LOAD_FNS["numpy"] = load_numpy
+    LOAD_FNS["numpy"] = load_ndarray
 
 
 if _SAFETENSORS_AVAILABLE:

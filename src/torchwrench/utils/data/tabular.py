@@ -519,9 +519,6 @@ class TabularDataset(
         else:
             raise TypeError
 
-    def get_item(self, row_indexer: RowIndexer, column_indexer: ColumnIndexer) -> Any:
-        raise NotImplementedError
-
     def __len__(self) -> int:
         return self.num_rows
 

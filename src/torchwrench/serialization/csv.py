@@ -18,6 +18,7 @@ from typing import (
 
 from pythonwrench.csv import dump_csv as _dump_csv_base
 from pythonwrench.csv import load_csv as _load_csv_base
+from pythonwrench.functools import function_alias
 from pythonwrench.io import _setup_output_fpath
 from pythonwrench.warnings import warn_once
 
@@ -78,6 +79,14 @@ def dump_csv(
     else:
         msg = f"Invalid argument {backend=}. (expected one of {get_args(CSVBackend)})"
         raise ValueError(msg)
+
+
+@function_alias(dump_csv)
+def dumps_csv(*args, **kwargs): ...
+
+
+@function_alias(dump_csv)
+def save_csv(*args, **kwargs): ...
 
 
 @overload
@@ -192,6 +201,14 @@ def load_csv(
         raise ValueError(msg)
 
     return result
+
+
+@function_alias(load_csv)
+def loads_csv(*args, **kwargs): ...
+
+
+@function_alias(load_csv)
+def read_csv(*args, **kwargs): ...
 
 
 def _dump_csv_with_pandas(
