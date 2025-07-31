@@ -19,11 +19,12 @@ class TestSplit(TestCase):
         assert ds.column_names == ds.keys() == ("a", "b")
         assert ds.values() == [list(range(5)), list(range(5, 10))]
         assert ds.to_dict() == data
+        assert ds.shape == (5, 2)
 
         if not _PANDAS_AVAILABLE:
             return None
+
         assert tw.deep_equal(ds.to_dataframe(), pd.DataFrame(data))
-        assert ds.shape == (5, 2)
 
 
 if __name__ == "__main__":

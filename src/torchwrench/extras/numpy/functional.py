@@ -117,6 +117,10 @@ def is_numpy_bool_array(x: Any) -> TypeGuard[Union[np.bool_, np.ndarray]]:
     return isinstance(x, (np.generic, np.ndarray)) and x.dtype.kind == "b"
 
 
+def is_numpy_str_array(x: Any) -> TypeGuard[Union[np.str_, np.ndarray]]:
+    return isinstance(x, (np.generic, np.ndarray)) and x.dtype.kind in ("U", "S")
+
+
 def is_numpy_integral_array(x: Any) -> TypeGuard[Union[np.ndarray, np.generic]]:
     return isinstance(x, (np.generic, np.ndarray)) and issubclass(x.dtype, np.integer)
 

@@ -4,6 +4,10 @@
 All notable changes to this project will be documented in this file.
 
 ## [0.7.5] UNRELEASED
+### Added
+- `is_numpy_str_array` and `is_numpy_integral_array` functions.
+- `TabularDataset` interface to unify dataset interface with dataframes, list of dicts, dict of lists, tensor, ndarray and DynamicItemDataset.
+
 ### Fixed
 - Args for `__exit__` method in `HDFDataset`.
 
