@@ -388,7 +388,7 @@ class TabularDataset(
                 index = tw.to_ndarray(index)
                 return self._data[index]
             elif is_indices(index):
-                mask = tw.indices_to_multihot(index, len(self)).numpy()
+                mask = tw.multi_indices_to_multihot(index, len(self)).numpy()
                 return self[mask]
             elif isinstance(index, str):
                 return self._data[index]
@@ -417,16 +417,47 @@ class TabularDataset(
                 raise TypeError
 
         elif pw.isinstance_generic(self._data, Dict[str, list]):
-            raise NotImplementedError
+            if tw.is_number_like(index) or isinstance(index, slice):
+                index = tw.as_builtin(index)  # type: ignore
+                return {k: v[index] for k, v in self._data.items()}  # type: ignore
+            elif is_indices(index):
+                index = tw.as_builtin(index)
+                return {
+                    k: [v[index_i] for index_i in index] for k, v in self._data.item()
+                }  # type: ignore
+            elif is_mask(index):
+                return {
+                    k: [v[i] for i, mask_i in enumerate(mask) if mask_i]
+                    for k, v in self._data.items()
+                }  # type: ignore
+            elif isinstance(index, str):
+                return self._data[index]
+            elif pw.isinstance_generic(index, Iterable[str]):
+                return {index_i: self._data[index_i] for index_i in index}
+            else:
+                raise TypeError
 
         elif pw.isinstance_generic(self._data, DynamicItemDataset):
-            raise NotImplementedError
+            if tw.is_number_like(index) or isinstance(index, slice):
+                index = tw.as_builtin(index)  # type: ignore
+                return self._data[index]  # type: ignore n
+            elif is_indices(index):
+                index = tw.as_builtin(index)
+                return [self[index_i] for index_i in index]  # type: ignore
+            elif is_mask(index):
+                return [self[i] for i, mask_i in enumerate(mask) if mask_i]  # type: ignore
+            elif isinstance(index, str):
+                return [sample[index] for sample in self._data]
+            elif pw.isinstance_generic(index, Iterable[str]):
+                return [
+                    {index_i: sample[index_i] for index_i in index}
+                    for sample in self._data
+                ]
+            else:
+                raise TypeError
 
         else:
             raise TypeError
-
-    def __setitem__(self, index, obj) -> None:
-        raise NotImplementedError
 
     def __len__(self) -> int:
         return self.num_rows
