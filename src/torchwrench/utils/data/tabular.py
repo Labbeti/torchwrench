@@ -405,7 +405,8 @@ class TabularDataset(
                 index = tw.as_builtin(index)
                 return [self[index_i] for index_i in index]  # type: ignore
             elif is_mask(index):
-                return [self[i] for i, mask_i in enumerate(index) if mask_i]  # type: ignore
+                indices = tw.multihot_to_multi_indices(index)
+                return self[indices]  # type: ignore
             elif isinstance(index, str):
                 return [sample[index] for sample in self._data]
             elif pw.isinstance_generic(index, Iterable[str]):
@@ -426,10 +427,8 @@ class TabularDataset(
                     k: [v[index_i] for index_i in index] for k, v in self._data.items()
                 }  # type: ignore
             elif is_mask(index):
-                return {
-                    k: [v[i] for i, mask_i in enumerate(index) if mask_i]
-                    for k, v in self._data.items()
-                }  # type: ignore
+                indices = tw.multihot_to_multi_indices(index)
+                return self[indices]  # type: ignore
             elif isinstance(index, str):
                 return self._data[index]
             elif pw.isinstance_generic(index, Iterable[str]):
@@ -445,7 +444,8 @@ class TabularDataset(
                 index = tw.as_builtin(index)
                 return [self[index_i] for index_i in index]  # type: ignore
             elif is_mask(index):
-                return [self[i] for i, mask_i in enumerate(index) if mask_i]  # type: ignore
+                indices = tw.multihot_to_multi_indices(index)
+                return self[indices]  # type: ignore
             elif isinstance(index, str):
                 return [sample[index] for sample in self._data]
             elif pw.isinstance_generic(index, Iterable[str]):
