@@ -17,7 +17,6 @@ from typing import (
     overload,
 )
 
-import pandas as pd
 import pythonwrench as pw
 from pythonwrench.typing.classes import SupportsGetitemLen
 from torch import Tensor
@@ -32,6 +31,7 @@ from torchwrench.extras.numpy import (
     is_numpy_str_array,
     np,
 )
+from torchwrench.extras.pandas import pd
 from torchwrench.extras.speechbrain import DynamicItemDataset
 
 T = TypeVar("T", covariant=True, default=Any)
@@ -42,6 +42,12 @@ T_Item = TypeVar("T_Item", covariant=True, default=Any)
 T_Metadata = TypeVar("T_Metadata", covariant=False, default=Any)
 T_Index = TypeVar("T_Index", covariant=True, default=int)
 T_ColumnKey = TypeVar("T_ColumnKey", bound=Hashable, covariant=False, default=str)
+
+
+RowIndexer = Union[
+    int, tw.IntegralTensor0D, np.ndarray, Iterable[bool], tw.BoolTensor1D, slice
+]
+ColumnIndexer = Union[str, Iterable[str], np.ndarray]
 
 
 class TabularDataset(
@@ -271,7 +277,8 @@ class TabularDataset(
         self.add_column(new_key, column_data, add_to_output_keys=add_to_output_keys)
 
     def rename_columns(
-        self, keys: Union[Iterable[T_ColumnKey], Mapping[T_ColumnKey, T_ColumnKey]]
+        self,
+        keys: Union[Iterable[T_ColumnKey], Mapping[T_ColumnKey, T_ColumnKey]],
     ) -> None:
         if isinstance(keys, Mapping):
             mapper = keys
@@ -410,6 +417,18 @@ class TabularDataset(
         else:
             raise TypeError
 
+    def unique(self, column_key: T_ColumnKey) -> Any:
+        col_data = self[column_key]
+
+        if isinstance(col_data, np.ndarray):
+            uniq = np.unique(col_data)
+        elif isinstance(col_data, Tensor):
+            uniq = col_data.unique()
+        else:
+            uniq = list(dict.fromkeys(col_data))
+
+        return uniq
+
     def __getitem__(
         self,
         index: Union[
@@ -500,6 +519,9 @@ class TabularDataset(
         else:
             raise TypeError
 
+    def get_item(self, row_indexer: RowIndexer, column_indexer: ColumnIndexer) -> Any:
+        raise NotImplementedError
+
     def __len__(self) -> int:
         return self.num_rows
 
@@ -581,17 +603,13 @@ def _get_dynamic_keys(
         raise TypeError
 
 
-def is_row_indexer(
-    x: Any,
-) -> TypeGuard[
-    Union[int, tw.IntegralTensor0D, np.ndarray, Iterable[bool], tw.BoolTensor1D, slice]
-]:
+def is_row_indexer(x: Any) -> TypeGuard[RowIndexer]:
     return (
         is_single_index(x) or is_mult_indices(x) or is_mask(x) or isinstance(x, slice)
     )
 
 
-def is_column_indexer(x: Any) -> TypeGuard[Union[str, Iterable[str], np.ndarray]]:
+def is_column_indexer(x: Any) -> TypeGuard[ColumnIndexer]:
     return pw.isinstance_generic(x, (str, Iterable[str])) or (
         is_numpy_str_array(x) and x.ndim in (0, 1)
     )
