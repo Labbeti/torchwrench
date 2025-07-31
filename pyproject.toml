@@ -97,8 +97,6 @@ dev = [
     "typing-extensions>=4.10.0",
     "ipykernel",
     "numpy!=2.0.0,!=2.0.1,!=2.0.2",
-    "datasets>=3.1.0",
-    "speechbrain>=1.0.3",
 ]
 extras = [
     "colorlog",
@@ -109,6 +107,7 @@ extras = [
     "pyyaml",
     "safetensors",
     "scipy",
+    "speechbrain>=1.0.3",
     "tensorboard",
     "torchaudio",
     "torchvision",
