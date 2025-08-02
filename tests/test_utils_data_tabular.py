@@ -12,7 +12,7 @@ from torchwrench.extras.pandas import _PANDAS_AVAILABLE, pd
 from torchwrench.utils.data.tabular import TabularDataset
 
 
-class TestSplit(TestCase):
+class TestTabularDataset(TestCase):
     def test_dict_list(self) -> None:
         data = {"a": list(range(5)), "b": list(range(5, 10))}
         ds = TabularDataset(data)

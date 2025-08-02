@@ -6,7 +6,6 @@ from typing import (
     Callable,
     Dict,
     Generic,
-    Hashable,
     Iterable,
     List,
     Literal,
@@ -140,7 +139,9 @@ class TabularDataset(
         data: pd.DataFrame,
         *,
         output_columns: Optional[Iterable[str]] = None,
-        dynamic_fns: Iterable[Tuple[Tuple[str, ...], Tuple[str, ...], Callable]] = (),
+        dynamic_fns: Iterable[
+            Tuple[Tuple[str, ...], Tuple[str, ...], Callable, bool]
+        ] = (),
         metadata: V = None,
     ) -> None: ...
 
@@ -151,7 +152,7 @@ class TabularDataset(
         *,
         output_columns: Optional[Iterable[T_ColumnKey2]] = None,
         dynamic_fns: Iterable[
-            Tuple[Tuple[T_ColumnKey2, ...], Tuple[T_ColumnKey2, ...], Callable]
+            Tuple[Tuple[T_ColumnKey2, ...], Tuple[T_ColumnKey2, ...], Callable, bool]
         ] = (),
         metadata: V = None,
     ) -> None: ...
@@ -163,7 +164,7 @@ class TabularDataset(
         *,
         output_columns: Optional[Iterable[T_ColumnKey2]] = None,
         dynamic_fns: Iterable[
-            Tuple[Tuple[T_ColumnKey2, ...], Tuple[T_ColumnKey2, ...], Callable]
+            Tuple[Tuple[T_ColumnKey2, ...], Tuple[T_ColumnKey2, ...], Callable, bool]
         ] = (),
         metadata: V = None,
     ) -> None: ...
@@ -174,7 +175,9 @@ class TabularDataset(
         data: DynamicItemDataset,
         *,
         output_columns: Optional[Iterable[str]] = None,
-        dynamic_fns: Iterable[Tuple[Tuple[str, ...], Tuple[str, ...], Callable]] = (),
+        dynamic_fns: Iterable[
+            Tuple[Tuple[str, ...], Tuple[str, ...], Callable, bool]
+        ] = (),
         metadata: V = None,
     ) -> None: ...
 
@@ -184,7 +187,9 @@ class TabularDataset(
         data: Union[np.ndarray, Tensor],
         *,
         output_columns: Optional[Iterable[int]] = None,
-        dynamic_fns: Iterable[Tuple[Tuple[int, ...], Tuple[int, ...], Callable]] = (),
+        dynamic_fns: Iterable[
+            Tuple[Tuple[int, ...], Tuple[int, ...], Callable, bool]
+        ] = (),
         metadata: V = None,
     ) -> None: ...
 
@@ -194,7 +199,9 @@ class TabularDataset(
         data: Literal[None] = None,
         *,
         output_columns: Optional[Iterable[Any]] = None,
-        dynamic_fns: Iterable[Tuple[Tuple[Any, ...], Tuple[Any, ...], Callable]] = (),
+        dynamic_fns: Iterable[
+            Tuple[Tuple[Any, ...], Tuple[Any, ...], Callable, bool]
+        ] = (),
         metadata: V = None,
     ) -> None: ...
 
@@ -203,7 +210,7 @@ class TabularDataset(
         data=None,
         *,
         output_columns: Optional[Iterable] = None,
-        dynamic_fns: Iterable[Tuple[tuple, tuple, Callable]] = (),
+        dynamic_fns: Iterable[Tuple[tuple, tuple, Callable, bool]] = (),
         metadata: T_Metadata = None,
     ) -> None:
         if data is None:
@@ -245,7 +252,7 @@ class TabularDataset(
 
     @property
     def dynamic_keys(self) -> Tuple[T_ColumnKey, ...]:
-        return tuple(key for _, provides, _ in self._dynamic_fns for key in provides)
+        return tuple(key for _, provides, _, _ in self._dynamic_fns for key in provides)
 
     @property
     def metadata(self) -> T_Metadata:
@@ -323,7 +330,7 @@ class TabularDataset(
         provides: Tuple[T_ColumnKey, ...],
         batch: bool = False,
     ) -> None:
-        self._dynamic_fns.append((takes, provides, fn))
+        self._dynamic_fns.append((takes, provides, fn, batch))
 
     def add_column(
         self,
@@ -671,7 +678,7 @@ class TabularDataset(
                 raise TypeError
 
         elif pw.isinstance_generic(self._data, (Tensor, np.ndarray)):
-            return self._data[row_indexer, col_indexer, *sub_indexer]  # type: ignore
+            return self._data.__getitem__((row_indexer, col_indexer) + sub_indexer)  # type: ignore
 
         else:
             raise TypeError
