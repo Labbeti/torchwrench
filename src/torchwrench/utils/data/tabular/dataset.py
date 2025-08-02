@@ -20,18 +20,27 @@ import pythonwrench as pw
 from pythonwrench.typing.classes import SupportsGetitemLen
 from torch import Tensor
 from torch.utils.data.dataset import Dataset
-from typing_extensions import TypeGuard, TypeVar
+from typing_extensions import TypeVar
 
 import torchwrench as tw
-from torchwrench.extras.numpy import (
-    _NUMPY_AVAILABLE,
-    is_numpy_bool_array,
-    is_numpy_integral_array,
-    is_numpy_str_array,
-    np,
-)
+from torchwrench.extras.numpy import _NUMPY_AVAILABLE, np
 from torchwrench.extras.pandas import pd
 from torchwrench.extras.speechbrain import DynamicItemDataset
+from torchwrench.utils.data.tabular._typechecks import (
+    ColumnIndexer,
+    MultiIndexer,
+    RowIndexer,
+    SingleIndexer,
+    is_column_indexer,
+    is_mask,
+    is_multi_columns,
+    is_multi_indices,
+    is_multi_names,
+    is_row_indexer,
+    is_single_column,
+    is_single_index,
+    is_single_indexer,
+)
 
 T = TypeVar("T", covariant=True, default=Any)
 U = TypeVar("U", covariant=True, default=Any)
@@ -42,92 +51,6 @@ T_Metadata = TypeVar("T_Metadata", covariant=False, default=Any)
 T_Index = TypeVar("T_Index", bound=int, covariant=True)
 T_ColumnKey = TypeVar("T_ColumnKey", int, str, covariant=False)
 T_ColumnKey2 = TypeVar("T_ColumnKey2", int, str, covariant=False)
-
-SingleIndex = Union[int, np.ndarray, np.generic, tw.IntegralTensor0D]
-MultiIndices = Union[Iterable[int], np.ndarray, tw.IntegralTensor1D]
-Mask = Union[Iterable[bool], np.ndarray, tw.BoolTensor1D]
-SingleName = Union[str, np.ndarray, np.generic]
-MultiNames = Union[Iterable[str], np.ndarray]
-
-SingleRow = SingleIndex
-MultiRows = Union[MultiIndices, Mask, slice]
-
-SingleColumn = Union[SingleIndex, SingleName]
-MultiColumns = Union[MultiIndices, Mask, slice, MultiNames]
-
-RowIndexer = Union[SingleRow, MultiRows]
-ColumnIndexer = Union[SingleColumn, MultiColumns]
-
-SingleIndexer = Union[SingleIndex, SingleName]
-MultiIndexer = Union[MultiIndices, Mask, slice, MultiNames]
-
-
-def is_single_index(x) -> TypeGuard[SingleIndex]:
-    return pw.isinstance_generic(x, (int, tw.IntegralTensor0D)) or (
-        is_numpy_integral_array(x) and x.ndim == 0
-    )
-
-
-def is_mask(x: Any) -> TypeGuard[Mask]:
-    return (
-        pw.isinstance_generic(x, Iterable[bool])
-        or (is_numpy_bool_array(x) and x.ndim == 1)
-        or isinstance(x, tw.BoolTensor1D)
-    ) and not isinstance(x, tuple)
-
-
-def is_multi_indices(x: Any) -> TypeGuard[MultiIndices]:
-    return (
-        pw.isinstance_generic(x, Iterable[int])
-        or (is_numpy_integral_array(x) and x.ndim == 1)
-        or isinstance(x, tw.IntegralTensor1D)
-    ) and not isinstance(x, tuple)
-
-
-def is_single_name(x: Any) -> TypeGuard[SingleName]:
-    return pw.isinstance_generic(x, str) or (is_numpy_str_array(x) and x.ndim == 0)
-
-
-def is_multi_names(x: Any) -> TypeGuard[MultiNames]:
-    return pw.isinstance_generic(x, (Iterable[str])) or (
-        is_numpy_str_array(x) and x.ndim == 1
-    )
-
-
-def is_single_row(x: Any) -> TypeGuard[SingleRow]:
-    return is_single_index(x)
-
-
-def is_multi_rows(x: Any) -> TypeGuard[MultiRows]:
-    return is_multi_indices(x) or is_mask(x) or isinstance(x, slice)
-
-
-def is_single_column(x: Any) -> TypeGuard[SingleColumn]:
-    return is_single_index(x) or is_single_name(x)
-
-
-def is_multi_columns(x: Any) -> TypeGuard[MultiColumns]:
-    return (
-        is_multi_indices(x) or is_mask(x) or isinstance(x, slice) or is_multi_names(x)
-    )
-
-
-def is_row_indexer(x: Any) -> TypeGuard[RowIndexer]:
-    return is_single_row(x) or is_multi_rows(x)
-
-
-def is_column_indexer(x: Any) -> TypeGuard[ColumnIndexer]:
-    return is_single_column(x) or is_multi_columns(x)
-
-
-def is_single_indexer(x: Any) -> TypeGuard[SingleIndexer]:
-    return is_single_index(x) or is_single_name(x)
-
-
-def is_multi_indexer(x: Any) -> TypeGuard[MultiIndexer]:
-    return (
-        is_multi_indices(x) or is_mask(x) or isinstance(x, slice) or is_multi_names(x)
-    )
 
 
 class TabularDataset(
@@ -679,8 +602,8 @@ class TabularDataset(
 
         elif pw.isinstance_generic(self._data, (Tensor, np.ndarray)):
             return self._data.__getitem__(
-                (row_indexer, col_indexer) + tuple(sub_indexer)
-            )  # type: ignore
+                (row_indexer, col_indexer) + tuple(sub_indexer)  # type: ignore
+            )
 
         else:
             raise TypeError
