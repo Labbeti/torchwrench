@@ -47,10 +47,14 @@ U = TypeVar("U", covariant=True, default=Any)
 V = TypeVar("V", covariant=True, default=Any)
 
 T_Item = TypeVar("T_Item", covariant=True, default=Any)
-T_Metadata = TypeVar("T_Metadata", covariant=False, default=Any)
 T_Index = TypeVar("T_Index", bound=int, covariant=True)
 T_ColumnKey = TypeVar("T_ColumnKey", int, str, covariant=False)
+T_Metadata = TypeVar("T_Metadata", covariant=False, default=Any)
+
+T_Item2 = TypeVar("T_Item2", covariant=True, default=Any)
+T_Index2 = TypeVar("T_Index2", bound=int, covariant=True)
 T_ColumnKey2 = TypeVar("T_ColumnKey2", int, str, covariant=False)
+T_Metadata2 = TypeVar("T_Metadata2", covariant=False, default=Any)
 
 
 class TabularDataset(
@@ -114,6 +118,18 @@ class TabularDataset(
             Tuple[Tuple[int, ...], Tuple[int, ...], Callable, bool]
         ] = (),
         metadata: V = None,
+    ) -> None: ...
+
+    @overload
+    def __init__(
+        self: "TabularDataset[T_Index2, T_ColumnKey2, T_Item2, T_Metadata2]",
+        data: "TabularDataset[T_Index2, T_ColumnKey2, T_Item2, T_Metadata2]",
+        *,
+        output_columns: Optional[Iterable[T_ColumnKey2]] = None,
+        dynamic_fns: Iterable[
+            Tuple[Tuple[T_ColumnKey2, ...], Tuple[T_ColumnKey2, ...], Callable, bool]
+        ] = (),
+        metadata: T_Metadata2 = None,
     ) -> None: ...
 
     @overload
