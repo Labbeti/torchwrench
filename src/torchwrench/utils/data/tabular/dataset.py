@@ -678,7 +678,9 @@ class TabularDataset(
                 raise TypeError
 
         elif pw.isinstance_generic(self._data, (Tensor, np.ndarray)):
-            return self._data.__getitem__((row_indexer, col_indexer) + sub_indexer)  # type: ignore
+            return self._data.__getitem__(
+                (row_indexer, col_indexer) + tuple(sub_indexer)
+            )  # type: ignore
 
         else:
             raise TypeError
