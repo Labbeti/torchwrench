@@ -66,9 +66,9 @@ class TabularDataset(
         data: pd.DataFrame,
         *,
         output_columns: Optional[Iterable[str]] = None,
-        dynamic_fns: Iterable[
-            Tuple[Tuple[str, ...], Tuple[str, ...], Callable, bool]
-        ] = (),
+        dynamic_fns: Optional[
+            Iterable[Tuple[Tuple[str, ...], Tuple[str, ...], Callable, bool]]
+        ] = None,
         metadata: V = None,
     ) -> None: ...
 
@@ -78,9 +78,13 @@ class TabularDataset(
         data: Mapping[T_ColumnKey2, SupportsGetitemLen[U]],
         *,
         output_columns: Optional[Iterable[T_ColumnKey2]] = None,
-        dynamic_fns: Iterable[
-            Tuple[Tuple[T_ColumnKey2, ...], Tuple[T_ColumnKey2, ...], Callable, bool]
-        ] = (),
+        dynamic_fns: Optional[
+            Iterable[
+                Tuple[
+                    Tuple[T_ColumnKey2, ...], Tuple[T_ColumnKey2, ...], Callable, bool
+                ]
+            ]
+        ] = None,
         metadata: V = None,
     ) -> None: ...
 
@@ -90,9 +94,13 @@ class TabularDataset(
         data: List[Dict[T_ColumnKey2, U]],
         *,
         output_columns: Optional[Iterable[T_ColumnKey2]] = None,
-        dynamic_fns: Iterable[
-            Tuple[Tuple[T_ColumnKey2, ...], Tuple[T_ColumnKey2, ...], Callable, bool]
-        ] = (),
+        dynamic_fns: Optional[
+            Iterable[
+                Tuple[
+                    Tuple[T_ColumnKey2, ...], Tuple[T_ColumnKey2, ...], Callable, bool
+                ]
+            ]
+        ] = None,
         metadata: V = None,
     ) -> None: ...
 
@@ -102,9 +110,9 @@ class TabularDataset(
         data: DynamicItemDataset,
         *,
         output_columns: Optional[Iterable[str]] = None,
-        dynamic_fns: Iterable[
-            Tuple[Tuple[str, ...], Tuple[str, ...], Callable, bool]
-        ] = (),
+        dynamic_fns: Optional[
+            Iterable[Tuple[Tuple[str, ...], Tuple[str, ...], Callable, bool]]
+        ] = None,
         metadata: V = None,
     ) -> None: ...
 
@@ -114,9 +122,9 @@ class TabularDataset(
         data: Union[np.ndarray, Tensor],
         *,
         output_columns: Optional[Iterable[int]] = None,
-        dynamic_fns: Iterable[
-            Tuple[Tuple[int, ...], Tuple[int, ...], Callable, bool]
-        ] = (),
+        dynamic_fns: Optional[
+            Iterable[Tuple[Tuple[int, ...], Tuple[int, ...], Callable, bool]]
+        ] = None,
         metadata: V = None,
     ) -> None: ...
 
@@ -126,9 +134,13 @@ class TabularDataset(
         data: "TabularDataset[T_Index2, T_ColumnKey2, T_Item2, T_Metadata2]",
         *,
         output_columns: Optional[Iterable[T_ColumnKey2]] = None,
-        dynamic_fns: Iterable[
-            Tuple[Tuple[T_ColumnKey2, ...], Tuple[T_ColumnKey2, ...], Callable, bool]
-        ] = (),
+        dynamic_fns: Optional[
+            Iterable[
+                Tuple[
+                    Tuple[T_ColumnKey2, ...], Tuple[T_ColumnKey2, ...], Callable, bool
+                ]
+            ]
+        ] = None,
         metadata: T_Metadata2 = None,
     ) -> None: ...
 
@@ -138,9 +150,9 @@ class TabularDataset(
         data: Literal[None] = None,
         *,
         output_columns: Optional[Iterable[Any]] = None,
-        dynamic_fns: Iterable[
-            Tuple[Tuple[Any, ...], Tuple[Any, ...], Callable, bool]
-        ] = (),
+        dynamic_fns: Optional[
+            Iterable[Tuple[Tuple[Any, ...], Tuple[Any, ...], Callable, bool]]
+        ] = None,
         metadata: V = None,
     ) -> None: ...
 
@@ -149,7 +161,7 @@ class TabularDataset(
         data=None,
         *,
         output_columns: Optional[Iterable] = None,
-        dynamic_fns: Iterable[Tuple[tuple, tuple, Callable, bool]] = (),
+        dynamic_fns: Optional[Iterable[Tuple[tuple, tuple, Callable, bool]]] = None,
         metadata: T_Metadata = None,
     ) -> None:
         if data is None:
@@ -175,6 +187,12 @@ class TabularDataset(
 
         if output_columns is None:
             output_columns = _get_static_keys(data)
+
+        if dynamic_fns is None:
+            if isinstance(data, TabularDataset):
+                dynamic_fns = data._dynamic_fns
+            else:
+                dynamic_fns = []
 
         output_columns = list(output_columns)
         dynamic_fns = list(dynamic_fns)
@@ -666,6 +684,7 @@ def _get_static_keys(
         DynamicItemDataset,
         np.ndarray,
         Tensor,
+        TabularDataset,
     ],
 ) -> tuple:
     if isinstance(data, pd.DataFrame):
@@ -681,6 +700,8 @@ def _get_static_keys(
         return tuple(data.pipeline.output_mapping.keys())
     elif isinstance(data, (np.ndarray, Tensor)):
         return tuple(range(data.shape[1]))
+    elif isinstance(data, TabularDataset):
+        return data.static_keys
     else:
         raise TypeError
 
