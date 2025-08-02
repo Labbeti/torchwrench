@@ -29,6 +29,9 @@ class TestSplit(TestCase):
         assert ds[[3, 4, 3], "b"] == [8, 9, 8]
         assert ds[[3, 4, 3], ["b"]] == [{"b": 8}, {"b": 9}, {"b": 8}]
 
+        assert ds["a"] == list(range(5))
+        assert ds[["a"]] == [{"a": 0}, {"a": 1}, {"a": 2}, {"a": 3}, {"a": 4}]
+
         assert ds.to_dict() == data
         assert ds.to_list() == pw.dict_list_to_list_dict(data)
 
@@ -43,11 +46,12 @@ class TestSplit(TestCase):
         if not _NUMPY_AVAILABLE:
             return None
 
-        data: np.ndarray = np.random.rand(10, 3)
+        data: np.ndarray = np.random.rand(10, 3, 2)
         ds = TabularDataset(data)
 
-        assert ds[1, 0] == data[1, 0]
-        assert np.equal(ds.to_matrix(), data).all()
+        assert tw.deep_equal(ds.to_matrix(), data)
+        assert tw.deep_equal(ds[1, 0], data[1, 0])
+        assert tw.deep_equal(ds[5, 1, 0], data[5, 1, 0])
 
 
 if __name__ == "__main__":

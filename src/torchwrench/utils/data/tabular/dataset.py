@@ -40,69 +40,160 @@ V = TypeVar("V", covariant=True, default=Any)
 
 T_Item = TypeVar("T_Item", covariant=True, default=Any)
 T_Metadata = TypeVar("T_Metadata", covariant=False, default=Any)
-T_Index = TypeVar("T_Index", covariant=True, default=int)
-T_ColumnKey = TypeVar("T_ColumnKey", bound=Hashable, covariant=False, default=str)
+T_Index = TypeVar("T_Index", bound=int, covariant=True)
+T_ColumnKey = TypeVar("T_ColumnKey", int, str, covariant=False)
+T_ColumnKey2 = TypeVar("T_ColumnKey2", int, str, covariant=False)
+
+SingleIndex = Union[int, np.ndarray, np.generic, tw.IntegralTensor0D]
+MultiIndices = Union[Iterable[int], np.ndarray, tw.IntegralTensor1D]
+Mask = Union[Iterable[bool], np.ndarray, tw.BoolTensor1D]
+SingleName = Union[str, np.ndarray, np.generic]
+MultiNames = Union[Iterable[str], np.ndarray]
+
+SingleRow = SingleIndex
+MultiRows = Union[MultiIndices, Mask, slice]
+
+SingleColumn = Union[SingleIndex, SingleName]
+MultiColumns = Union[MultiIndices, Mask, slice, MultiNames]
+
+RowIndexer = Union[SingleRow, MultiRows]
+ColumnIndexer = Union[SingleColumn, MultiColumns]
+
+SingleIndexer = Union[SingleIndex, SingleName]
+MultiIndexer = Union[MultiIndices, Mask, slice, MultiNames]
 
 
-RowIndexer = Union[
-    int, tw.IntegralTensor0D, np.ndarray, Iterable[bool], tw.BoolTensor1D, slice
-]
-ColumnIndexer = Union[str, Iterable[str], np.ndarray]
+def is_single_index(x) -> TypeGuard[SingleIndex]:
+    return pw.isinstance_generic(x, (int, tw.IntegralTensor0D)) or (
+        is_numpy_integral_array(x) and x.ndim == 0
+    )
+
+
+def is_mask(x: Any) -> TypeGuard[Mask]:
+    return (
+        pw.isinstance_generic(x, Iterable[bool])
+        or (is_numpy_bool_array(x) and x.ndim == 1)
+        or isinstance(x, tw.BoolTensor1D)
+    ) and not isinstance(x, tuple)
+
+
+def is_multi_indices(x: Any) -> TypeGuard[MultiIndices]:
+    return (
+        pw.isinstance_generic(x, Iterable[int])
+        or (is_numpy_integral_array(x) and x.ndim == 1)
+        or isinstance(x, tw.IntegralTensor1D)
+    ) and not isinstance(x, tuple)
+
+
+def is_single_name(x: Any) -> TypeGuard[SingleName]:
+    return pw.isinstance_generic(x, str) or (is_numpy_str_array(x) and x.ndim == 0)
+
+
+def is_multi_names(x: Any) -> TypeGuard[MultiNames]:
+    return pw.isinstance_generic(x, (Iterable[str])) or (
+        is_numpy_str_array(x) and x.ndim == 1
+    )
+
+
+def is_single_row(x: Any) -> TypeGuard[SingleRow]:
+    return is_single_index(x)
+
+
+def is_multi_rows(x: Any) -> TypeGuard[MultiRows]:
+    return is_multi_indices(x) or is_mask(x) or isinstance(x, slice)
+
+
+def is_single_column(x: Any) -> TypeGuard[SingleColumn]:
+    return is_single_index(x) or is_single_name(x)
+
+
+def is_multi_columns(x: Any) -> TypeGuard[MultiColumns]:
+    return (
+        is_multi_indices(x) or is_mask(x) or isinstance(x, slice) or is_multi_names(x)
+    )
+
+
+def is_row_indexer(x: Any) -> TypeGuard[RowIndexer]:
+    return is_single_row(x) or is_multi_rows(x)
+
+
+def is_column_indexer(x: Any) -> TypeGuard[ColumnIndexer]:
+    return is_single_column(x) or is_multi_columns(x)
+
+
+def is_single_indexer(x: Any) -> TypeGuard[SingleIndexer]:
+    return is_single_index(x) or is_single_name(x)
+
+
+def is_multi_indexer(x: Any) -> TypeGuard[MultiIndexer]:
+    return (
+        is_multi_indices(x) or is_mask(x) or isinstance(x, slice) or is_multi_names(x)
+    )
 
 
 class TabularDataset(
-    Generic[T_Item, T_Index, T_ColumnKey, T_Metadata], Dataset[T_Item]
+    Generic[T_Index, T_ColumnKey, T_Item, T_Metadata], Dataset[T_Item]
 ):
     @overload
     def __init__(
-        self: "TabularDataset[Dict[str, Any], int, str, V]",
+        self: "TabularDataset[int, str, Dict[str, Any], V]",
         data: pd.DataFrame,
-        output_keys: Optional[Iterable[str]] = None,
+        *,
+        output_columns: Optional[Iterable[str]] = None,
         dynamic_fns: Iterable[Tuple[Tuple[str, ...], Tuple[str, ...], Callable]] = (),
         metadata: V = None,
     ) -> None: ...
 
     @overload
     def __init__(
-        self: "TabularDataset[Dict[T, U], int, T, V]",
-        data: Mapping[T, SupportsGetitemLen[U]],
-        output_keys: Optional[Iterable[T]] = None,
-        dynamic_fns: Iterable[Tuple[Tuple[T, ...], Tuple[T, ...], Callable]] = (),
+        self: "TabularDataset[int, T_ColumnKey2, Dict[T_ColumnKey2, U], V]",
+        data: Mapping[T_ColumnKey2, SupportsGetitemLen[U]],
+        *,
+        output_columns: Optional[Iterable[T_ColumnKey2]] = None,
+        dynamic_fns: Iterable[
+            Tuple[Tuple[T_ColumnKey2, ...], Tuple[T_ColumnKey2, ...], Callable]
+        ] = (),
         metadata: V = None,
     ) -> None: ...
 
     @overload
     def __init__(
-        self: "TabularDataset[Dict[T, U], int, T, V]",
-        data: List[Dict[T, U]],
-        output_keys: Optional[Iterable[T]] = None,
-        dynamic_fns: Iterable[Tuple[Tuple[T, ...], Tuple[T, ...], Callable]] = (),
+        self: "TabularDataset[int, T_ColumnKey2, Dict[T_ColumnKey2, U], V]",
+        data: List[Dict[T_ColumnKey2, U]],
+        *,
+        output_columns: Optional[Iterable[T_ColumnKey2]] = None,
+        dynamic_fns: Iterable[
+            Tuple[Tuple[T_ColumnKey2, ...], Tuple[T_ColumnKey2, ...], Callable]
+        ] = (),
         metadata: V = None,
     ) -> None: ...
 
     @overload
     def __init__(
-        self: "TabularDataset[Dict[str, Any], int, str, V]",
+        self: "TabularDataset[int, str, Dict[str, Any], V]",
         data: DynamicItemDataset,
-        output_keys: Optional[Iterable[str]] = None,
+        *,
+        output_columns: Optional[Iterable[str]] = None,
         dynamic_fns: Iterable[Tuple[Tuple[str, ...], Tuple[str, ...], Callable]] = (),
         metadata: V = None,
     ) -> None: ...
 
     @overload
     def __init__(
-        self: "TabularDataset[Dict[int, Any], int, int, V]",
+        self: "TabularDataset[int, int, Dict[int, Any], V]",
         data: Union[np.ndarray, Tensor],
-        output_keys: Optional[Iterable[int]] = None,
+        *,
+        output_columns: Optional[Iterable[int]] = None,
         dynamic_fns: Iterable[Tuple[Tuple[int, ...], Tuple[int, ...], Callable]] = (),
         metadata: V = None,
     ) -> None: ...
 
     @overload
     def __init__(
-        self: "TabularDataset[Dict[Any, Any], int, Any, V]",
+        self: "TabularDataset[int, Any, Dict[Any, Any], V]",
         data: Literal[None] = None,
-        output_keys: Optional[Iterable[Any]] = None,
+        *,
+        output_columns: Optional[Iterable[Any]] = None,
         dynamic_fns: Iterable[Tuple[Tuple[Any, ...], Tuple[Any, ...], Callable]] = (),
         metadata: V = None,
     ) -> None: ...
@@ -110,7 +201,8 @@ class TabularDataset(
     def __init__(
         self,
         data=None,
-        output_keys: Optional[Iterable] = None,
+        *,
+        output_columns: Optional[Iterable] = None,
         dynamic_fns: Iterable[Tuple[tuple, tuple, Callable]] = (),
         metadata: T_Metadata = None,
     ) -> None:
@@ -131,25 +223,29 @@ class TabularDataset(
                 raise ValueError(msg)
 
         elif isinstance(data, (np.ndarray, Tensor)):
-            if data.ndim != 2:
-                msg = f"Invalid number of dimensions for data. (found {data.ndim=} but expected 2)"
+            if data.ndim < 2:
+                msg = f"Invalid number of dimensions for data. (found {data.ndim=} but expected >=2)"
                 raise ValueError(msg)
 
-        if output_keys is None:
-            output_keys = _get_static_keys(data)
+        if output_columns is None:
+            output_columns = _get_static_keys(data)
 
-        output_keys = list(output_keys)
+        output_columns = list(output_columns)
         dynamic_fns = list(dynamic_fns)
 
         super().__init__()
         self._data = data
-        self._output_keys: List[T_ColumnKey] = output_keys  # type: ignore
+        self._output_columns: List[T_ColumnKey] = output_columns  # type: ignore
         self._dynamic_fns = dynamic_fns
         self._metadata = metadata
 
     @property
     def column_names(self) -> Tuple[T_ColumnKey, ...]:
-        return tuple(self._output_keys)
+        return tuple(self._output_columns)
+
+    @property
+    def dynamic_keys(self) -> Tuple[T_ColumnKey, ...]:
+        return tuple(key for _, provides, _ in self._dynamic_fns for key in provides)
 
     @property
     def metadata(self) -> T_Metadata:
@@ -174,6 +270,14 @@ class TabularDataset(
             raise TypeError
 
     @property
+    def output_columns(self) -> Tuple[T_ColumnKey, ...]:
+        return tuple(self._output_columns)
+
+    @property
+    def output_keys(self) -> Tuple[T_ColumnKey, ...]:
+        return tuple(self._output_columns)
+
+    @property
     def shape(self) -> Tuple[int, int]:
         return self.num_rows, self.num_columns
 
@@ -196,16 +300,8 @@ class TabularDataset(
         else:
             raise TypeError
 
-    @property
-    def dynamic_keys(self) -> Tuple[T_ColumnKey, ...]:
-        return tuple(key for _, provides, _ in self._dynamic_fns for key in provides)
-
-    @property
-    def output_keys(self) -> Tuple[T_ColumnKey, ...]:
-        return tuple(self._output_keys)
-
     def keys(self) -> Tuple[T_ColumnKey, ...]:
-        return tuple(self._output_keys)
+        return tuple(self._output_columns)
 
     def values(self) -> Iterable:
         if isinstance(self._data, (dict, pd.DataFrame)):
@@ -278,7 +374,7 @@ class TabularDataset(
 
     def rename_columns(
         self,
-        keys: Union[Iterable[T_ColumnKey], Mapping[T_ColumnKey, T_ColumnKey]],
+        keys: Union[Mapping[T_ColumnKey, T_ColumnKey], Iterable[T_ColumnKey]],
     ) -> None:
         if isinstance(keys, Mapping):
             mapper = keys
@@ -290,15 +386,15 @@ class TabularDataset(
 
     def set_output_keys(self, keys: Iterable[T_ColumnKey]) -> None:
         keys = list(keys)
-        self._output_keys = keys
+        self._output_columns = keys
 
     def add_output_keys(self, keys: Iterable[T_ColumnKey]) -> None:
         keys = list(keys)
-        self._output_keys += keys
+        self._output_columns += keys
 
     def pop_output_keys(self, keys: Iterable[T_ColumnKey]) -> None:
         for key in keys:
-            self._output_keys.remove(key)
+            self._output_columns.remove(key)
 
     def to_dataframe(self) -> pd.DataFrame:
         if isinstance(self._data, pd.DataFrame):
@@ -344,31 +440,30 @@ class TabularDataset(
 
     def to_matrix(self) -> Union[List[List], np.ndarray, Tensor]:
         if isinstance(self._data, pd.DataFrame):
-            return self._data.to_numpy()
+            result = self._data.to_numpy()
 
         elif pw.isinstance_generic(self._data, List[Dict]):
-            result = [list(data_i.values() for data_i in self._data)]
+            result = [list(data_i.values()) for data_i in self._data]
             if _NUMPY_AVAILABLE:
                 result = np.array(result)
-            return result
 
-        elif pw.isinstance_generic(self._data, Dict[Any, Iterable]):
-            result = [list(data_i) for data_i in self._data.values()]
+        elif pw.isinstance_generic(self._data, Dict[Any, pw.SupportsGetitemLen]):
+            result = [[self._data[k][i] for k in self.keys()] for i in range(len(self))]
             if _NUMPY_AVAILABLE:
                 result = np.array(result)
-            return result
 
         elif isinstance(self._data, DynamicItemDataset):
-            result = [list(data_i.values()) for data_i in self._data.data.values()]
+            result = [list(self._data[i].values()) for i in range(len(self))]
             if _NUMPY_AVAILABLE:
                 result = np.array(result)
-            return result
 
         elif isinstance(self._data, (np.ndarray, Tensor)):
             return self._data
 
         else:
             raise TypeError
+
+        return result
 
     def to_dynamic_item_dataset(
         self,
@@ -431,90 +526,152 @@ class TabularDataset(
 
     def __getitem__(
         self,
-        index: Union[
-            T_Index,
-            Iterable[T_Index],
-            Iterable[bool],
-            Tensor,
-            np.ndarray,
-            slice,
-            T_ColumnKey,
-            Iterable[T_ColumnKey],
+        indexer: Union[
+            SingleIndexer,
+            MultiIndexer,
+            Tuple[RowIndexer, ColumnIndexer],
         ],
     ) -> Any:
+        if isinstance(indexer, tuple):
+            if not (
+                len(indexer) >= 2
+                and is_row_indexer(indexer[0])
+                and is_column_indexer(indexer[1])
+            ):
+                raise ValueError
+            row_indexer, col_indexer, *sub_indexer = indexer
+
+        elif is_row_indexer(indexer):
+            row_indexer = indexer
+            col_indexer = None
+            sub_indexer = ()
+        else:
+            row_indexer = slice(None)
+            col_indexer = indexer
+            sub_indexer = ()
+        del indexer
+
+        if col_indexer is None:
+            col_indexer = self.keys()
+        elif isinstance(col_indexer, slice):
+            col_indexer = self.keys()[col_indexer]
+        elif is_mask(col_indexer):
+            keys = self.keys()
+            col_indexer = tw.multihot_to_multi_indices(col_indexer)
+            col_indexer = [keys[idx] for idx in col_indexer]
+
         if isinstance(self._data, pd.DataFrame):
-            if tw.is_number_like(index) or is_mask(index) or isinstance(index, slice):
-                index = tw.to_ndarray(index)
-                return self._data[index]
-            elif is_mult_indices(index):
-                mask = tw.multi_indices_to_multihot(index, len(self)).numpy()
-                return self[mask]
-            elif isinstance(index, str):
-                return self._data[index]
-            elif pw.isinstance_generic(index, Iterable[str]):
-                return self._data[list(index)]
+            row_indexer = tw.to_ndarray(row_indexer)
+            return self._data[col_indexer][row_indexer][sub_indexer]
+
+        elif pw.isinstance_generic(self._data, List[Dict]):
+            if len(sub_indexer) != 0:
+                raise NotImplementedError(f"{sub_indexer=}")
+
+            if is_single_index(row_indexer) or isinstance(row_indexer, slice):
+                row_indexer = tw.as_builtin(row_indexer)
+                result = self._data[row_indexer]  # type: ignore
+            elif is_multi_indices(row_indexer):
+                row_indexer = tw.as_builtin(row_indexer)
+                result = [self._data[index_i] for index_i in row_indexer]  # type: ignore
+            elif is_mask(row_indexer):
+                row_indexer = tw.multihot_to_multi_indices(row_indexer)
+                result = [self._data[index_i] for index_i in row_indexer]  # type: ignore
             else:
                 raise TypeError
 
-        elif pw.isinstance_generic(self._data, List[Dict]):
-            if tw.is_number_like(index) or isinstance(index, slice):
-                index = tw.as_builtin(index)  # type: ignore
-                return self._data[index]  # type: ignore
-            elif is_mult_indices(index):
-                builtin_index = tw.as_builtin(index)
-                return [self[index_i] for index_i in builtin_index]  # type: ignore
-            elif is_mask(index):
-                indices = tw.multihot_to_multi_indices(index)
-                return self[indices]  # type: ignore
-            elif isinstance(index, str):
-                return [sample[index] for sample in self._data]
-            elif pw.isinstance_generic(index, Iterable[str]):
-                return [
-                    {index_i: sample[index_i] for index_i in index}
-                    for sample in self._data
+            if is_single_column(col_indexer):
+                result = [sample[col_indexer] for sample in result]
+            elif is_multi_indices(col_indexer) or is_multi_names(col_indexer):
+                result = [
+                    {col: sample[col] for col in col_indexer} for sample in result
                 ]
             else:
                 raise TypeError
 
+            return result
+
         elif pw.isinstance_generic(self._data, Dict[str, list]):
-            if tw.is_number_like(index) or isinstance(index, slice):
-                index = tw.as_builtin(index)  # type: ignore
-                return {k: v[index] for k, v in self._data.items()}  # type: ignore
-            elif is_mult_indices(index):
-                builtin_index = tw.as_builtin(index)
-                return {
-                    k: [v[index_i] for index_i in builtin_index]
-                    for k, v in self._data.items()
-                }
-            elif is_mask(index):
-                indices = tw.multihot_to_multi_indices(index)
-                return self[indices]  # type: ignore
-            elif isinstance(index, str):
-                return self._data[index]
-            elif pw.isinstance_generic(index, Iterable[str]):
-                return {index_i: self._data[index_i] for index_i in index}
+            if len(sub_indexer) != 0:
+                raise NotImplementedError(f"{sub_indexer=}")
+
+            if is_single_indexer(col_indexer):
+                result = self._data[col_indexer]  # type: ignore
+
+                if is_single_index(row_indexer) or isinstance(row_indexer, slice):
+                    result = result[row_indexer]  # type: ignore
+                elif is_multi_indices(row_indexer):
+                    result = [result[idx] for idx in row_indexer]
+                elif is_mask(row_indexer):
+                    row_indexer = tw.multihot_to_multi_indices(row_indexer)
+                    result = [result[idx] for idx in row_indexer]
+                else:
+                    raise TypeError
+                return result
+
+            elif is_multi_indices(col_indexer) or is_multi_names(col_indexer):
+                result = {col: self._data[col] for col in col_indexer}  # type: ignore
+
+                if is_single_index(row_indexer):
+                    result = {k: v[row_indexer] for k, v in result.items()}  # type: ignore
+                    return result
+
+                elif isinstance(row_indexer, slice):
+                    result = {k: v[row_indexer] for k, v in result.items()}  # type: ignore
+                elif is_multi_indices(row_indexer):
+                    row_indexer = tw.as_builtin(row_indexer)
+                    result = {
+                        k: [v[idx] for idx in row_indexer] for k, v in result.items()
+                    }
+                elif is_mask(row_indexer):
+                    row_indexer = tw.multihot_to_multi_indices(row_indexer)
+                    result = {
+                        k: [v[idx] for idx in row_indexer] for k, v in result.items()
+                    }
+                else:
+                    raise TypeError
+
+                result = pw.dict_list_to_list_dict(result, "same")
+                return result
+
             else:
                 raise TypeError
 
         elif pw.isinstance_generic(self._data, DynamicItemDataset):
-            if tw.is_number_like(index) or isinstance(index, slice):
-                index = tw.as_builtin(index)  # type: ignore
-                return self._data[index]  # type: ignore n
-            elif is_mult_indices(index):
-                builtin_index = tw.as_builtin(index)
-                return [self[index_i] for index_i in builtin_index]  # type: ignore
-            elif is_mask(index):
-                indices = tw.multihot_to_multi_indices(index)
-                return self[indices]  # type: ignore
-            elif isinstance(index, str):
-                return [sample[index] for sample in self._data]
-            elif pw.isinstance_generic(index, Iterable[str]):
-                return [
-                    {index_i: sample[index_i] for index_i in index}
-                    for sample in self._data
-                ]
+            if len(sub_indexer) != 0:
+                raise NotImplementedError(f"{sub_indexer=}")
+
+            if is_single_index(row_indexer):
+                result = self._data[row_indexer]
+                if is_single_indexer(col_indexer):
+                    return result[col_indexer]
+                elif is_multi_indices(col_indexer) or is_multi_columns(col_indexer):
+                    return {k: result[k] for k in col_indexer}  # type: ignore
+                else:
+                    raise TypeError
+
+            elif isinstance(row_indexer, slice):
+                row_indexer = range(
+                    row_indexer.start, row_indexer.stop, row_indexer.step
+                )
+                result = [self._data[idx] for idx in row_indexer]
+            elif is_multi_indices(row_indexer):
+                result = [self._data[idx] for idx in row_indexer]
+            elif is_mask(row_indexer):
+                row_indexer = tw.multihot_to_multi_indices(row_indexer)
+                result = [self._data[idx] for idx in row_indexer]
             else:
                 raise TypeError
+
+            if is_single_indexer(col_indexer):
+                return [result_i[col_indexer] for result_i in result]
+            elif is_multi_indices(col_indexer) or is_multi_columns(col_indexer):
+                return [{k: result_i[k] for k in col_indexer} for result_i in result]  # type: ignore
+            else:
+                raise TypeError
+
+        elif pw.isinstance_generic(self._data, (Tensor, np.ndarray)):
+            return self._data[row_indexer, col_indexer, *sub_indexer]  # type: ignore
 
         else:
             raise TypeError
@@ -598,39 +755,3 @@ def _get_dynamic_keys(
         return tuple(data.pipeline.output_mapping.keys())
     else:
         raise TypeError
-
-
-def is_row_indexer(x: Any) -> TypeGuard[RowIndexer]:
-    return (
-        is_single_index(x) or is_mult_indices(x) or is_mask(x) or isinstance(x, slice)
-    )
-
-
-def is_column_indexer(x: Any) -> TypeGuard[ColumnIndexer]:
-    return pw.isinstance_generic(x, (str, Iterable[str])) or (
-        is_numpy_str_array(x) and x.ndim in (0, 1)
-    )
-
-
-def is_single_index(x) -> TypeGuard[Union[int, np.ndarray, tw.IntegralTensor0D]]:
-    return pw.isinstance_generic(x, (int, tw.IntegralTensor0D)) or (
-        is_numpy_integral_array(x) and x.ndim == 0
-    )
-
-
-def is_mask(x: Any) -> TypeGuard[Union[Iterable[bool], np.ndarray, tw.BoolTensor1D]]:
-    return (
-        pw.isinstance_generic(x, Iterable[bool])
-        or (is_numpy_bool_array(x) and x.ndim == 1)
-        or isinstance(x, tw.BoolTensor1D)
-    )
-
-
-def is_mult_indices(
-    x: Any,
-) -> TypeGuard[Union[Iterable[int], np.ndarray, tw.IntegralTensor1D]]:
-    return (
-        pw.isinstance_generic(x, Iterable[int])
-        or (is_numpy_integral_array(x) and x.ndim == 1)
-        or isinstance(x, tw.IntegralTensor1D)
-    )

@@ -190,7 +190,7 @@ jobs:
 
     - name: Test with coverage + pytest
       run: |
-        coverage run -m pytest -v '--ignore-glob=tests/test_extras*.py'
+        coverage run -m pytest -v '--ignore-glob=tests/**test_extras*.py'
 
     - name: Show coverage results
       run: |
