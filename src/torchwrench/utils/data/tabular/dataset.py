@@ -26,6 +26,7 @@ import torchwrench as tw
 from torchwrench.extras.numpy import _NUMPY_AVAILABLE, np
 from torchwrench.extras.pandas import pd
 from torchwrench.extras.speechbrain import DynamicItemDataset
+from torchwrench.types import T_TensorOrArray
 from torchwrench.utils.data.tabular._typechecks import (
     ColumnIndexer,
     MultiIndexer,
@@ -62,20 +63,20 @@ class TabularDataset(
 ):
     @overload
     def __init__(
-        self: "TabularDataset[int, str, Dict[str, Any], V]",
+        self: "TabularDataset[int, str, Dict[str, Any], T_Metadata2]",
         data: pd.DataFrame,
         *,
         output_columns: Optional[Iterable[str]] = None,
         dynamic_fns: Optional[
             Iterable[Tuple[Tuple[str, ...], Tuple[str, ...], Callable, bool]]
         ] = None,
-        metadata: V = None,
+        metadata: T_Metadata2 = None,
     ) -> None: ...
 
     @overload
     def __init__(
-        self: "TabularDataset[int, T_ColumnKey2, Dict[T_ColumnKey2, U], V]",
-        data: Mapping[T_ColumnKey2, SupportsGetitemLen[U]],
+        self: "TabularDataset[int, T_ColumnKey2, Dict[T_ColumnKey2, T], T_Metadata2]",
+        data: Mapping[T_ColumnKey2, SupportsGetitemLen[T]],
         *,
         output_columns: Optional[Iterable[T_ColumnKey2]] = None,
         dynamic_fns: Optional[
@@ -85,13 +86,13 @@ class TabularDataset(
                 ]
             ]
         ] = None,
-        metadata: V = None,
+        metadata: T_Metadata2 = None,
     ) -> None: ...
 
     @overload
     def __init__(
-        self: "TabularDataset[int, T_ColumnKey2, Dict[T_ColumnKey2, U], V]",
-        data: List[Dict[T_ColumnKey2, U]],
+        self: "TabularDataset[int, T_ColumnKey2, Dict[T_ColumnKey2, T], T_Metadata2]",
+        data: List[Dict[T_ColumnKey2, T]],
         *,
         output_columns: Optional[Iterable[T_ColumnKey2]] = None,
         dynamic_fns: Optional[
@@ -101,31 +102,31 @@ class TabularDataset(
                 ]
             ]
         ] = None,
-        metadata: V = None,
+        metadata: T_Metadata2 = None,
     ) -> None: ...
 
     @overload
     def __init__(
-        self: "TabularDataset[int, str, Dict[str, Any], V]",
+        self: "TabularDataset[int, str, Dict[str, Any], T_Metadata2]",
         data: DynamicItemDataset,
         *,
         output_columns: Optional[Iterable[str]] = None,
         dynamic_fns: Optional[
             Iterable[Tuple[Tuple[str, ...], Tuple[str, ...], Callable, bool]]
         ] = None,
-        metadata: V = None,
+        metadata: T_Metadata2 = None,
     ) -> None: ...
 
     @overload
     def __init__(
-        self: "TabularDataset[int, int, Dict[int, Any], V]",
-        data: Union[np.ndarray, Tensor],
+        self: "TabularDataset[int, int, T_TensorOrArray, T_Metadata2]",
+        data: T_TensorOrArray,
         *,
         output_columns: Optional[Iterable[int]] = None,
         dynamic_fns: Optional[
             Iterable[Tuple[Tuple[int, ...], Tuple[int, ...], Callable, bool]]
         ] = None,
-        metadata: V = None,
+        metadata: T_Metadata2 = None,
     ) -> None: ...
 
     @overload
@@ -496,6 +497,8 @@ class TabularDataset(
             Tuple[RowIndexer, ColumnIndexer],
         ],
     ) -> Any:
+        row_indexer: RowIndexer
+
         if isinstance(indexer, tuple):
             if not (
                 len(indexer) >= 2
@@ -503,11 +506,11 @@ class TabularDataset(
                 and is_column_indexer(indexer[1])
             ):
                 raise ValueError
-            row_indexer, col_indexer, *sub_indexer = indexer
+            row_indexer, col_indexer, *sub_indexer = indexer  # type: ignore
 
         elif is_row_indexer(indexer):
             row_indexer = indexer
-            col_indexer = None
+            col_indexer = slice(None)
             sub_indexer = ()
         else:
             row_indexer = slice(None)
@@ -524,6 +527,55 @@ class TabularDataset(
             col_indexer = tw.multihot_to_multi_indices(col_indexer)
             col_indexer = [keys[idx] for idx in col_indexer]
 
+        sub_indexer = tuple(sub_indexer)
+
+        if is_single_column(col_indexer):
+            if col_indexer in self.static_keys:
+                return self._get_static_items(row_indexer, col_indexer, sub_indexer)
+            elif col_indexer in self.dynamic_keys:
+                return self._get_dynamic_items(row_indexer, col_indexer, sub_indexer)
+            else:
+                raise KeyError
+
+        elif is_multi_indices(col_indexer) or is_multi_names(col_indexer):
+            static_cols = [
+                col_indexer_i
+                for col_indexer_i in col_indexer
+                if col_indexer_i in self.static_keys
+            ]
+            dynamic_cols = [
+                col_indexer_i
+                for col_indexer_i in col_indexer
+                if col_indexer_i in self.dynamic_keys
+            ]
+            if len(static_cols) > 0 and len(dynamic_cols) == 0:
+                return self._get_static_items(row_indexer, col_indexer, sub_indexer)
+            elif len(static_cols) == 0 and len(dynamic_cols) > 0:
+                return self._get_dynamic_items(row_indexer, col_indexer, sub_indexer)
+            else:
+                result = {}
+                for col_indexer_i in col_indexer:
+                    if col_indexer_i in self.static_keys:
+                        result_i = self._get_static_items(
+                            row_indexer, col_indexer, sub_indexer
+                        )
+                    elif col_indexer_i in self.dynamic_keys:
+                        result_i = self._get_dynamic_items(
+                            row_indexer, col_indexer, sub_indexer
+                        )
+                    else:
+                        raise ValueError
+                    result[col_indexer_i] = result_i
+                return pw.dict_list_to_list_dict(result, "same")
+        else:
+            raise TypeError
+
+    def _get_static_items(
+        self,
+        row_indexer: RowIndexer,
+        col_indexer: Union[SingleIndexer, MultiIndexer],
+        sub_indexer: tuple,
+    ) -> Any:
         if isinstance(self._data, pd.DataFrame):
             row_indexer = tw.to_ndarray(row_indexer)
             return self._data[col_indexer][row_indexer][sub_indexer]
@@ -636,11 +688,19 @@ class TabularDataset(
 
         elif pw.isinstance_generic(self._data, (Tensor, np.ndarray)):
             return self._data.__getitem__(
-                (row_indexer, col_indexer) + tuple(sub_indexer)  # type: ignore
+                (row_indexer, col_indexer) + sub_indexer  # type: ignore
             )
 
         else:
             raise TypeError
+
+    def _get_dynamic_items(
+        self,
+        row_indexer: RowIndexer,
+        col_indexer: Union[SingleIndexer, MultiIndexer],
+        sub_indexer: tuple,
+    ) -> Any:
+        raise NotImplementedError
 
     def __len__(self) -> int:
         return self.num_rows
