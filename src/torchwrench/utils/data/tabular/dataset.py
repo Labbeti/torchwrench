@@ -26,11 +26,13 @@ import torchwrench as tw
 from torchwrench.extras.numpy import _NUMPY_AVAILABLE, np
 from torchwrench.extras.pandas import pd
 from torchwrench.extras.speechbrain import DynamicItemDataset
-from torchwrench.types import T_TensorOrArray
 from torchwrench.utils.data.tabular._typechecks import (
     ColumnIndexer,
+    MultiColumns,
     MultiIndexer,
+    MultiRows,
     RowIndexer,
+    SingleColumn,
     SingleIndexer,
     is_column_indexer,
     is_mask,
@@ -47,23 +49,31 @@ T = TypeVar("T", covariant=True, default=Any)
 U = TypeVar("U", covariant=True, default=Any)
 V = TypeVar("V", covariant=True, default=Any)
 
+T_Index = TypeVar("T_Index", bound=int, covariant=True, default=int)
+T_ColumnKey = TypeVar("T_ColumnKey", int, str, covariant=False, default=str)
+T_Value = TypeVar("T_Value", covariant=True, default=Any)
 T_Item = TypeVar("T_Item", covariant=True, default=Any)
-T_Index = TypeVar("T_Index", bound=int, covariant=True)
-T_ColumnKey = TypeVar("T_ColumnKey", int, str, covariant=False)
-T_Metadata = TypeVar("T_Metadata", covariant=False, default=Any)
+T_Metadata = TypeVar("T_Metadata", covariant=True, default=Any)
 
+T_Index2 = TypeVar("T_Index2", bound=int, covariant=True, default=int)
+T_ColumnKey2 = TypeVar("T_ColumnKey2", int, str, covariant=False, default=str)
+T_Value2 = TypeVar("T_Value2", covariant=True, default=Any)
 T_Item2 = TypeVar("T_Item2", covariant=True, default=Any)
-T_Index2 = TypeVar("T_Index2", bound=int, covariant=True)
-T_ColumnKey2 = TypeVar("T_ColumnKey2", int, str, covariant=False)
-T_Metadata2 = TypeVar("T_Metadata2", covariant=False, default=Any)
+T_Metadata2 = TypeVar("T_Metadata2", covariant=True, default=Any)
 
 
 class TabularDataset(
-    Generic[T_Index, T_ColumnKey, T_Item, T_Metadata], Dataset[T_Item]
+    Generic[T_Index, T_ColumnKey, T_Value, T_Item, T_Metadata],
+    Dataset[T_Item],
 ):
+    """TabularDataset wrapper.
+
+    This class wrap a dataset-like object and provide an unifsed interface to it.
+    """
+
     @overload
     def __init__(
-        self: "TabularDataset[int, str, Dict[str, Any], T_Metadata2]",
+        self: "TabularDataset[int, str, Any, Dict[str, Any], T_Metadata2]",
         data: pd.DataFrame,
         *,
         output_columns: Optional[Iterable[str]] = None,
@@ -75,8 +85,8 @@ class TabularDataset(
 
     @overload
     def __init__(
-        self: "TabularDataset[int, T_ColumnKey2, Dict[T_ColumnKey2, T], T_Metadata2]",
-        data: Mapping[T_ColumnKey2, SupportsGetitemLen[T]],
+        self: "TabularDataset[int, T_ColumnKey2, T_Value2, Dict[T_ColumnKey2, T_Value2], T_Metadata2]",
+        data: Mapping[T_ColumnKey2, SupportsGetitemLen[T_Value2]],
         *,
         output_columns: Optional[Iterable[T_ColumnKey2]] = None,
         dynamic_fns: Optional[
@@ -91,8 +101,8 @@ class TabularDataset(
 
     @overload
     def __init__(
-        self: "TabularDataset[int, T_ColumnKey2, Dict[T_ColumnKey2, T], T_Metadata2]",
-        data: List[Dict[T_ColumnKey2, T]],
+        self: "TabularDataset[int, T_ColumnKey2, T_Value2, Dict[T_ColumnKey2, T_Value2], T_Metadata2]",
+        data: List[Dict[T_ColumnKey2, T_Value2]],
         *,
         output_columns: Optional[Iterable[T_ColumnKey2]] = None,
         dynamic_fns: Optional[
@@ -107,7 +117,7 @@ class TabularDataset(
 
     @overload
     def __init__(
-        self: "TabularDataset[int, str, Dict[str, Any], T_Metadata2]",
+        self: "TabularDataset[int, str, Any, Dict[str, Any], T_Metadata2]",
         data: DynamicItemDataset,
         *,
         output_columns: Optional[Iterable[str]] = None,
@@ -119,8 +129,8 @@ class TabularDataset(
 
     @overload
     def __init__(
-        self: "TabularDataset[int, int, T_TensorOrArray, T_Metadata2]",
-        data: T_TensorOrArray,
+        self: "TabularDataset[int, int, Union[np.ndarray, np.generic], np.ndarray, T_Metadata2]",
+        data: np.ndarray,
         *,
         output_columns: Optional[Iterable[int]] = None,
         dynamic_fns: Optional[
@@ -131,8 +141,20 @@ class TabularDataset(
 
     @overload
     def __init__(
-        self: "TabularDataset[T_Index2, T_ColumnKey2, T_Item2, T_Metadata2]",
-        data: "TabularDataset[T_Index2, T_ColumnKey2, T_Item2, T_Metadata2]",
+        self: "TabularDataset[int, int, Tensor, Tensor, T_Metadata2]",
+        data: Tensor,
+        *,
+        output_columns: Optional[Iterable[int]] = None,
+        dynamic_fns: Optional[
+            Iterable[Tuple[Tuple[int, ...], Tuple[int, ...], Callable, bool]]
+        ] = None,
+        metadata: T_Metadata2 = None,
+    ) -> None: ...
+
+    @overload
+    def __init__(
+        self: "TabularDataset[T_Index2, T_ColumnKey2, T_Value2, T_Item2, T_Metadata2]",
+        data: "TabularDataset[T_Index2, T_ColumnKey2, T_Value2, T_Item2, T_Metadata2]",
         *,
         output_columns: Optional[Iterable[T_ColumnKey2]] = None,
         dynamic_fns: Optional[
@@ -147,7 +169,7 @@ class TabularDataset(
 
     @overload
     def __init__(
-        self: "TabularDataset[int, Any, Dict[Any, Any], V]",
+        self: "TabularDataset[int, Any, Any, Dict[Any, Any], V]",
         data: Literal[None] = None,
         *,
         output_columns: Optional[Iterable[Any]] = None,
@@ -218,21 +240,25 @@ class TabularDataset(
 
     @property
     def num_columns(self) -> int:
-        return len(self.column_names)
+        return len(self._output_columns)
 
     @property
     def num_rows(self) -> int:
-        if isinstance(
-            self._data, (pd.DataFrame, DynamicItemDataset, list, Tensor, np.ndarray)
+        if pw.isinstance_generic(
+            self._data,
+            (pd.DataFrame, DynamicItemDataset, List[Dict], Tensor, np.ndarray),
         ):
             return len(self._data)
-        elif isinstance(self._data, dict):
+
+        elif pw.isinstance_generic(self._data, Dict[Any, list]):
             if len(self._data) == 0:
                 return 0
             else:
                 return len(next(iter(self._data.values())))
+
         else:
-            raise TypeError
+            msg = f"Invalid data type {type(self._data)=}."
+            raise TypeError(msg)
 
     @property
     def output_columns(self) -> Tuple[T_ColumnKey, ...]:
@@ -263,7 +289,8 @@ class TabularDataset(
             else:
                 return tuple(self._data[0].keys())
         else:
-            raise TypeError
+            msg = f"Invalid data type {type(self._data)=}."
+            raise TypeError(msg)
 
     def keys(self) -> Tuple[T_ColumnKey, ...]:
         return tuple(self._output_columns)
@@ -276,7 +303,8 @@ class TabularDataset(
         elif isinstance(self._data, DynamicItemDataset):
             return [self._data[i] for i in range(len(self._data))]
         else:
-            raise TypeError
+            msg = f"Invalid data type {type(self._data)=}."
+            raise TypeError(msg)
 
     def items(self) -> Iterable[Tuple[T_ColumnKey, Any]]:
         return zip(self.keys(), self.values())
@@ -296,7 +324,7 @@ class TabularDataset(
         column_data: Any,
         add_to_output_keys: bool = True,
     ) -> None:
-        if isinstance(self._data, (pd.DataFrame, dict)):
+        if pw.isinstance_generic(self._data, (pd.DataFrame, Dict[Any, List])):
             self._data[key] = column_data
         elif pw.isinstance_generic(self._data, List[Dict]):
             for data_i, column_data_i in zip(self._data, column_data):
@@ -305,7 +333,8 @@ class TabularDataset(
             for sample, column_data_i in zip(self._data.data.values(), column_data):
                 sample[key] = column_data_i
         else:
-            raise TypeError
+            msg = f"Invalid data type {type(self._data)=}."
+            raise TypeError(msg)
 
         if add_to_output_keys:
             self.add_output_keys([key])
@@ -313,7 +342,7 @@ class TabularDataset(
     def pop_column(self, key: T_ColumnKey) -> Any:
         if isinstance(self._data, pd.DataFrame):
             column_data = self._data.pop(key)  # type: ignore
-        if isinstance(self._data, dict):
+        if pw.isinstance_generic(self._data, Dict[Any, List]):
             column_data = self._data.pop(key)
         elif pw.isinstance_generic(self._data, List[Dict]):
             column_data = []
@@ -324,7 +353,8 @@ class TabularDataset(
             for data_i in self._data.data.values():
                 column_data.append(data_i.pop(key))
         else:
-            raise TypeError
+            msg = f"Invalid data type {type(self._data)=}."
+            raise TypeError(msg)
 
         return column_data
 
@@ -373,7 +403,8 @@ class TabularDataset(
             lst = self._data.data.values()
             return pd.DataFrame(lst, index=ids)
         else:
-            raise TypeError
+            msg = f"Invalid data type {type(self._data)=}."
+            raise TypeError(msg)
 
     def to_dict(self) -> Dict[T_ColumnKey, pw.SupportsGetitemIterLen]:
         if isinstance(self._data, pd.DataFrame):
@@ -387,7 +418,8 @@ class TabularDataset(
         elif isinstance(self._data, (np.ndarray, Tensor)):
             return dict(zip(self.keys(), map(list, self._data)))  # type: ignore
         else:
-            raise TypeError
+            msg = f"Invalid data type {type(self._data)=}."
+            raise TypeError(msg)
 
     def to_list(self) -> List[T_Item]:
         if isinstance(self._data, pd.DataFrame):
@@ -401,7 +433,8 @@ class TabularDataset(
         elif isinstance(self._data, (np.ndarray, Tensor)):
             return [dict(zip(self.keys(), data_i)) for data_i in self._data]  # type: ignore
         else:
-            raise TypeError
+            msg = f"Invalid data type {type(self._data)=}."
+            raise TypeError(msg)
 
     def to_matrix(self) -> Union[List[List], np.ndarray, Tensor]:
         if isinstance(self._data, pd.DataFrame):
@@ -426,7 +459,8 @@ class TabularDataset(
             return self._data
 
         else:
-            raise TypeError
+            msg = f"Invalid data type {type(self._data)=}."
+            raise TypeError(msg)
 
         return result
 
@@ -475,9 +509,13 @@ class TabularDataset(
             return self._data
 
         else:
-            raise TypeError
+            msg = f"Invalid data type {type(self._data)=}."
+            raise TypeError(msg)
 
-    def unique(self, column_key: T_ColumnKey) -> Any:
+    def unique(
+        self,
+        column_key: T_ColumnKey,
+    ) -> Union[np.ndarray, Tensor, List[T_Value]]:
         col_data = self[column_key]
 
         if isinstance(col_data, np.ndarray):
@@ -489,15 +527,30 @@ class TabularDataset(
 
         return uniq
 
+    @overload
+    def __getitem__(
+        self,
+        indexer: int,
+        /,
+    ) -> T_Item: ...
+
+    @overload
+    def __getitem__(
+        self,
+        indexer: Union[MultiRows, SingleColumn, MultiColumns, tuple],
+        /,
+    ) -> Any: ...
+
     def __getitem__(
         self,
         indexer: Union[
             SingleIndexer,
             MultiIndexer,
-            Tuple[RowIndexer, ColumnIndexer],
+            Tuple,
         ],
     ) -> Any:
         row_indexer: RowIndexer
+        col_indexer: ColumnIndexer
 
         if isinstance(indexer, tuple):
             if not (
@@ -510,22 +563,23 @@ class TabularDataset(
 
         elif is_row_indexer(indexer):
             row_indexer = indexer
-            col_indexer = slice(None)
+            col_indexer = list(self.keys())  # type: ignore
             sub_indexer = ()
         else:
             row_indexer = slice(None)
             col_indexer = indexer
             sub_indexer = ()
+
         del indexer
 
         if col_indexer is None:
-            col_indexer = self.keys()
+            col_indexer = list(self.keys())  # type: ignore
         elif isinstance(col_indexer, slice):
-            col_indexer = self.keys()[col_indexer]
+            col_indexer = list(self.keys()[col_indexer])  # type: ignore
         elif is_mask(col_indexer):
             keys = self.keys()
             col_indexer = tw.multihot_to_multi_indices(col_indexer)
-            col_indexer = [keys[idx] for idx in col_indexer]
+            col_indexer = [keys[col_indexer_i] for col_indexer_i in col_indexer]  # type: ignore
 
         sub_indexer = tuple(sub_indexer)
 
@@ -567,8 +621,10 @@ class TabularDataset(
                         raise ValueError
                     result[col_indexer_i] = result_i
                 return pw.dict_list_to_list_dict(result, "same")
+
         else:
-            raise TypeError
+            msg = f"Invalid argument type {type(col_indexer)=}"
+            raise TypeError(msg)
 
     def _get_static_items(
         self,
@@ -603,7 +659,8 @@ class TabularDataset(
                     {col: sample[col] for col in col_indexer} for sample in result
                 ]
             else:
-                raise TypeError
+                msg = f"Invalid argument type {type(col_indexer)=}"
+                raise TypeError(msg)
 
             return result
 
@@ -622,7 +679,8 @@ class TabularDataset(
                     row_indexer = tw.multihot_to_multi_indices(row_indexer)
                     result = [result[idx] for idx in row_indexer]
                 else:
-                    raise TypeError
+                    msg = f"Invalid argument type {type(col_indexer)=}"
+                    raise TypeError(msg)
                 return result
 
             elif is_multi_indices(col_indexer) or is_multi_names(col_indexer):
@@ -645,13 +703,15 @@ class TabularDataset(
                         k: [v[idx] for idx in row_indexer] for k, v in result.items()
                     }
                 else:
-                    raise TypeError
+                    msg = f"Invalid argument type {type(row_indexer)=}"
+                    raise TypeError(msg)
 
                 result = pw.dict_list_to_list_dict(result, "same")
                 return result
 
             else:
-                raise TypeError
+                msg = f"Invalid argument type {type(col_indexer)=}"
+                raise TypeError(msg)
 
         elif pw.isinstance_generic(self._data, DynamicItemDataset):
             if len(sub_indexer) != 0:
@@ -664,11 +724,12 @@ class TabularDataset(
                 elif is_multi_indices(col_indexer) or is_multi_columns(col_indexer):
                     return {k: result[k] for k in col_indexer}  # type: ignore
                 else:
-                    raise TypeError
+                    msg = f"Invalid argument type {type(col_indexer)=}"
+                    raise TypeError(msg)
 
             elif isinstance(row_indexer, slice):
-                row_indexer = range(
-                    row_indexer.start, row_indexer.stop, row_indexer.step
+                row_indexer = list(
+                    range(row_indexer.start, row_indexer.stop, row_indexer.step)
                 )
                 result = [self._data[idx] for idx in row_indexer]
             elif is_multi_indices(row_indexer):
@@ -677,14 +738,16 @@ class TabularDataset(
                 row_indexer = tw.multihot_to_multi_indices(row_indexer)
                 result = [self._data[idx] for idx in row_indexer]
             else:
-                raise TypeError
+                msg = f"Invalid argument type {type(row_indexer)=}"
+                raise TypeError(msg)
 
             if is_single_indexer(col_indexer):
                 return [result_i[col_indexer] for result_i in result]
             elif is_multi_indices(col_indexer) or is_multi_columns(col_indexer):
                 return [{k: result_i[k] for k in col_indexer} for result_i in result]  # type: ignore
             else:
-                raise TypeError
+                msg = f"Invalid argument type {type(col_indexer)=}"
+                raise TypeError(msg)
 
         elif pw.isinstance_generic(self._data, (Tensor, np.ndarray)):
             return self._data.__getitem__(
@@ -692,7 +755,8 @@ class TabularDataset(
             )
 
         else:
-            raise TypeError
+            msg = f"Invalid data type {type(self._data)=}."
+            raise TypeError(msg)
 
     def _get_dynamic_items(
         self,
@@ -700,7 +764,43 @@ class TabularDataset(
         col_indexer: Union[SingleIndexer, MultiIndexer],
         sub_indexer: tuple,
     ) -> Any:
-        raise NotImplementedError
+        if len(sub_indexer) != 0:
+            raise ValueError
+
+        if is_single_column(col_indexer):
+            for gives, provides, fn, _ in self._dynamic_fns:
+                idx = pw.find(col_indexer, provides)
+                if idx == -1:
+                    continue
+
+                input_values = self[row_indexer, gives]
+                output_values = []
+                for in_i in input_values:
+                    out_i = fn(in_i)
+                    out_i = out_i[idx]
+                    output_values.append(out_i)
+                return output_values
+
+        elif is_multi_indices(col_indexer) or is_multi_names(col_indexer):
+            result = {}
+
+            for col_indexer_i in col_indexer:
+                for gives, provides, fn, _ in self._dynamic_fns:
+                    idx = pw.find(col_indexer_i, provides)
+                    if idx == -1:
+                        continue
+
+                    input_values = self[row_indexer, gives]
+                    output_values = []
+                    for in_i in input_values:
+                        out_i = fn(in_i)
+                        out_i = out_i[idx]
+                        output_values.append(out_i)
+                    result[col_indexer_i] = output_values
+            return pw.dict_list_to_list_dict(result, "same")
+
+        else:
+            raise TypeError
 
     def __len__(self) -> int:
         return self.num_rows
@@ -763,7 +863,8 @@ def _get_static_keys(
     elif isinstance(data, TabularDataset):
         return data.static_keys
     else:
-        raise TypeError
+        msg = f"Invalid data type {type(data)=}."
+        raise TypeError(msg)
 
 
 def _get_dynamic_keys(
@@ -783,4 +884,5 @@ def _get_dynamic_keys(
     elif isinstance(data, DynamicItemDataset):
         return tuple(data.pipeline.output_mapping.keys())
     else:
-        raise TypeError
+        msg = f"Invalid data type {type(data)=}."
+        raise TypeError(msg)

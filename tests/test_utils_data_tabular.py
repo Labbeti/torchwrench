@@ -49,6 +49,7 @@ class TestTabularDataset(TestCase):
         data: np.ndarray = np.random.rand(10, 3, 2)
         ds = TabularDataset(data)
 
+        assert tw.deep_equal(ds[0], data[0])
         assert tw.deep_equal(ds.to_matrix(), data)
         assert tw.deep_equal(ds[1, 0], data[1, 0])
         assert tw.deep_equal(ds[5, 1, 0], data[5, 1, 0])

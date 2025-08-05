@@ -3,11 +3,12 @@
 
 from typing import (
     Any,
-    Iterable,
+    List,
     Union,
 )
 
 import pythonwrench as pw
+from torch import Tensor
 from typing_extensions import TypeGuard
 
 import torchwrench as tw
@@ -18,11 +19,11 @@ from torchwrench.extras.numpy import (
     np,
 )
 
-SingleIndex = Union[int, np.ndarray, np.generic, tw.IntegralTensor0D]
-MultiIndices = Union[Iterable[int], np.ndarray, tw.IntegralTensor1D]
-Mask = Union[Iterable[bool], np.ndarray, tw.BoolTensor1D]
+SingleIndex = Union[int, np.ndarray, np.generic, Tensor]
+MultiIndices = Union[List[int], np.ndarray, Tensor]
+Mask = Union[List[bool], np.ndarray, Tensor]
 SingleName = Union[str, np.ndarray, np.generic]
-MultiNames = Union[Iterable[str], np.ndarray]
+MultiNames = Union[List[str], np.ndarray]
 
 SingleRow = SingleIndex
 MultiRows = Union[MultiIndices, Mask, slice]
@@ -45,17 +46,15 @@ def is_single_index(x) -> TypeGuard[SingleIndex]:
 
 def is_mask(x: Any) -> TypeGuard[Mask]:
     return (
-        pw.isinstance_generic(x, Iterable[bool])
+        pw.isinstance_generic(x, (List[bool], tw.BoolTensor1D))
         or (is_numpy_bool_array(x) and x.ndim == 1)
-        or isinstance(x, tw.BoolTensor1D)
     ) and not isinstance(x, tuple)
 
 
 def is_multi_indices(x: Any) -> TypeGuard[MultiIndices]:
     return (
-        pw.isinstance_generic(x, Iterable[int])
+        pw.isinstance_generic(x, (List[int], tw.IntegralTensor1D))
         or (is_numpy_integral_array(x) and x.ndim == 1)
-        or isinstance(x, tw.IntegralTensor1D)
     ) and not isinstance(x, tuple)
 
 
@@ -64,7 +63,7 @@ def is_single_name(x: Any) -> TypeGuard[SingleName]:
 
 
 def is_multi_names(x: Any) -> TypeGuard[MultiNames]:
-    return pw.isinstance_generic(x, (Iterable[str])) or (
+    return pw.isinstance_generic(x, List[str]) or (
         is_numpy_str_array(x) and x.ndim == 1
     )
 
