@@ -66,9 +66,9 @@ class TabularDataset(
     Generic[T_Index, T_ColumnKey, T_Value, T_Item, T_Metadata],
     Dataset[T_Item],
 ):
-    """TabularDataset wrapper.
+    """TabularDataset wrapper class.
 
-    This class wrap a dataset-like object and provide an unifsed interface to it.
+    This class wrap a dataset-like object and provide an unified interface to it.
     """
 
     @overload
