@@ -333,7 +333,22 @@ def rmse(
     return mse(x1, x2, dim=dim).sqrt()
 
 
-def deep_equal(x: T, y: T) -> bool:
+def deep_equal(x: T, y: T, *args: T) -> bool:
+    """Recursive comparison between objects.
+
+    Supports Scalar-like, NDArrays, Tensors, DataFrames, Mapping and List-like objects.
+    Unlike default equal, NaNs values are considered equal.
+    Tensors and NDArrays of different shapes are supported and returns False.
+    """
+    others = (y,) + args
+    for other in others:
+        result = _deep_equal_binary(x, other)
+        if not result:
+            return False
+    return True
+
+
+def _deep_equal_binary(x: T, y: T) -> bool:
     if is_scalar_like(x) and is_scalar_like(y):
         x_isnan = math.isnan(x) if F.is_floating_point(x) else False
         y_isnan = math.isnan(y) if F.is_floating_point(y) else False

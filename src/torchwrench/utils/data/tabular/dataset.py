@@ -78,7 +78,7 @@ class TabularDataset(
         *,
         output_columns: Optional[Iterable[str]] = None,
         dynamic_fns: Optional[
-            Iterable[Tuple[Tuple[str, ...], Tuple[str, ...], Callable, bool]]
+            Iterable[Tuple[List[str], List[str], Callable, bool]]
         ] = None,
         metadata: T_Metadata2 = None,
     ) -> None: ...
@@ -92,7 +92,7 @@ class TabularDataset(
         dynamic_fns: Optional[
             Iterable[
                 Tuple[
-                    Tuple[T_ColumnKey2, ...], Tuple[T_ColumnKey2, ...], Callable, bool
+                    List[T_ColumnKey2], List[T_ColumnKey2], Callable, bool
                 ]
             ]
         ] = None,
@@ -108,7 +108,7 @@ class TabularDataset(
         dynamic_fns: Optional[
             Iterable[
                 Tuple[
-                    Tuple[T_ColumnKey2, ...], Tuple[T_ColumnKey2, ...], Callable, bool
+                    List[T_ColumnKey2], List[T_ColumnKey2], Callable, bool
                 ]
             ]
         ] = None,
@@ -122,7 +122,7 @@ class TabularDataset(
         *,
         output_columns: Optional[Iterable[str]] = None,
         dynamic_fns: Optional[
-            Iterable[Tuple[Tuple[str, ...], Tuple[str, ...], Callable, bool]]
+            Iterable[Tuple[List[str], List[str], Callable, bool]]
         ] = None,
         metadata: T_Metadata2 = None,
     ) -> None: ...
@@ -134,7 +134,7 @@ class TabularDataset(
         *,
         output_columns: Optional[Iterable[int]] = None,
         dynamic_fns: Optional[
-            Iterable[Tuple[Tuple[int, ...], Tuple[int, ...], Callable, bool]]
+            Iterable[Tuple[List[int], List[int], Callable, bool]]
         ] = None,
         metadata: T_Metadata2 = None,
     ) -> None: ...
@@ -146,7 +146,7 @@ class TabularDataset(
         *,
         output_columns: Optional[Iterable[int]] = None,
         dynamic_fns: Optional[
-            Iterable[Tuple[Tuple[int, ...], Tuple[int, ...], Callable, bool]]
+            Iterable[Tuple[List[int], List[int], Callable, bool]]
         ] = None,
         metadata: T_Metadata2 = None,
     ) -> None: ...
@@ -160,7 +160,7 @@ class TabularDataset(
         dynamic_fns: Optional[
             Iterable[
                 Tuple[
-                    Tuple[T_ColumnKey2, ...], Tuple[T_ColumnKey2, ...], Callable, bool
+                    List[T_ColumnKey2], List[T_ColumnKey2], Callable, bool
                 ]
             ]
         ] = None,
@@ -174,7 +174,7 @@ class TabularDataset(
         *,
         output_columns: Optional[Iterable[Any]] = None,
         dynamic_fns: Optional[
-            Iterable[Tuple[Tuple[Any, ...], Tuple[Any, ...], Callable, bool]]
+            Iterable[Tuple[list, list, Callable, bool]]
         ] = None,
         metadata: V = None,
     ) -> None: ...
@@ -184,7 +184,7 @@ class TabularDataset(
         data=None,
         *,
         output_columns: Optional[Iterable] = None,
-        dynamic_fns: Optional[Iterable[Tuple[tuple, tuple, Callable, bool]]] = None,
+        dynamic_fns: Optional[Iterable[Tuple[list, list, Callable, bool]]] = None,
         metadata: T_Metadata = None,
     ) -> None:
         if data is None:
@@ -227,7 +227,13 @@ class TabularDataset(
         self._metadata = metadata
 
     @property
+    def all_keys(self) -> Tuple[T_ColumnKey, ...]:
+        """Alias of `output_columns`."""
+        return self.static_keys + self.dynamic_keys
+    
+    @property
     def column_names(self) -> Tuple[T_ColumnKey, ...]:
+        """Alias of `output_columns`."""
         return tuple(self._output_columns)
 
     @property
@@ -262,10 +268,12 @@ class TabularDataset(
 
     @property
     def output_columns(self) -> Tuple[T_ColumnKey, ...]:
+        """Output columns used when indexing the dataset."""
         return tuple(self._output_columns)
 
     @property
     def output_keys(self) -> Tuple[T_ColumnKey, ...]:
+        """Alias of `output_columns`."""
         return tuple(self._output_columns)
 
     @property
@@ -280,9 +288,9 @@ class TabularDataset(
             if len(self._data.data) == 0:
                 return ()
             else:
-                return tuple(next(iter(self._data.data.values())))
+                return tuple(next(iter(self._data.data.values())).keys())
         elif isinstance(self._data, (Tensor, np.ndarray)):
-            return tuple(range(len(self._data)))  # type: ignore
+            return tuple(range(self._data.shape[1]))  # type: ignore
         elif isinstance(self._data, list):
             if len(self._data) == 0:
                 return ()
@@ -293,6 +301,7 @@ class TabularDataset(
             raise TypeError(msg)
 
     def keys(self) -> Tuple[T_ColumnKey, ...]:
+        """Alias of `output_columns`."""
         return tuple(self._output_columns)
 
     def values(self) -> Iterable:
@@ -312,11 +321,12 @@ class TabularDataset(
     def add_dynamic_column(
         self,
         fn: Callable,
-        takes: Tuple[T_ColumnKey, ...],
-        provides: Tuple[T_ColumnKey, ...],
+        takes: Iterable[T_ColumnKey],
+        provides: Iterable[T_ColumnKey],
         batch: bool = False,
     ) -> None:
-        self._dynamic_fns.append((takes, provides, fn, batch))
+        dynamic_data = (list(takes), list(provides), fn, batch)
+        self._dynamic_fns.append(dynamic_data)
 
     def add_column(
         self,
@@ -369,22 +379,39 @@ class TabularDataset(
 
     def rename_columns(
         self,
-        keys: Union[Mapping[T_ColumnKey, T_ColumnKey], Iterable[T_ColumnKey]],
+        keys: Union[Mapping[T_ColumnKey, T_ColumnKey], pw.SupportsIterLen[T_ColumnKey]],
     ) -> None:
         if isinstance(keys, Mapping):
             mapper = keys
         else:
+            if len(keys) != self.num_columns:
+                msg = f"Invalid number of keys to rename. (found {len(keys)}, but expected {self.num_columns})"
+                raise ValueError(msg)
+
             mapper = dict(zip(self.keys(), keys))
+        del keys
 
         for old_key, new_key in mapper.items():
             self.rename_column(old_key, new_key)
 
     def set_output_keys(self, keys: Iterable[T_ColumnKey]) -> None:
         keys = list(keys)
+        all_keys = dict.fromkeys(self.all_keys)
+        invalid = [k for k in keys if k not in all_keys]
+        if len(invalid) > 0:
+            msg = f"Found {len(invalid)}/{len(keys)} invalid keys not in static or dynamic keys. ({invalid=})"
+            raise ValueError(msg)
+    
         self._output_columns = keys
 
     def add_output_keys(self, keys: Iterable[T_ColumnKey]) -> None:
         keys = list(keys)
+        all_keys = dict.fromkeys(self.all_keys)
+        invalid = [k for k in keys if k not in all_keys]
+        if len(invalid) > 0:
+            msg = f"Found {len(invalid)}/{len(keys)} invalid keys not in static or dynamic keys. ({invalid=})"
+            raise ValueError(msg)
+        
         self._output_columns += keys
 
     def pop_output_keys(self, keys: Iterable[T_ColumnKey]) -> None:
@@ -553,18 +580,26 @@ class TabularDataset(
         col_indexer: ColumnIndexer
 
         if isinstance(indexer, tuple):
-            if not (
-                len(indexer) >= 2
-                and is_row_indexer(indexer[0])
-                and is_column_indexer(indexer[1])
-            ):
-                raise ValueError
+            if len(indexer) < 2:
+                msg = f"Invalid number of indexers. (expected at least 2 but found {len(indexer)})"
+                raise ValueError(msg)
+
             row_indexer, col_indexer, *sub_indexer = indexer  # type: ignore
+            sub_indexer = tuple(sub_indexer)
+            
+            if not is_row_indexer(row_indexer):
+                msg = f"Invalid row indexer. (found {row_indexer})"
+                raise ValueError(msg)
+
+            if not is_column_indexer(col_indexer):
+                msg = f"Invalid column indexer. (found {col_indexer})"
+                raise ValueError(msg)
 
         elif is_row_indexer(indexer):
             row_indexer = indexer
             col_indexer = list(self.keys())  # type: ignore
             sub_indexer = ()
+
         else:
             row_indexer = slice(None)
             col_indexer = indexer
@@ -580,8 +615,6 @@ class TabularDataset(
             keys = self.keys()
             col_indexer = tw.multihot_to_multi_indices(col_indexer)
             col_indexer = [keys[col_indexer_i] for col_indexer_i in col_indexer]  # type: ignore
-
-        sub_indexer = tuple(sub_indexer)
 
         if is_single_column(col_indexer):
             if col_indexer in self.static_keys:
@@ -772,13 +805,18 @@ class TabularDataset(
                 idx = pw.find(col_indexer, provides)
                 if idx == -1:
                     continue
-
+                
                 input_values = self[row_indexer, gives]
+                # TODO: rm debug
+                # input_values = {give_i: self[row_indexer, give_i] for give_i in gives}
+                # input_values = pw.dict_list_to_list_dict(input_values)
+
                 output_values = []
                 for in_i in input_values:
                     out_i = fn(in_i)
                     out_i = out_i[idx]
                     output_values.append(out_i)
+
                 return output_values
 
         elif is_multi_indices(col_indexer) or is_multi_names(col_indexer):
@@ -797,6 +835,7 @@ class TabularDataset(
                         out_i = out_i[idx]
                         output_values.append(out_i)
                     result[col_indexer_i] = output_values
+
             return pw.dict_list_to_list_dict(result, "same")
 
         else:

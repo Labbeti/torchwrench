@@ -4,6 +4,8 @@
 from typing import (
     Any,
     List,
+    Tuple,
+    TypeVar,
     Union,
 )
 
@@ -19,10 +21,13 @@ from torchwrench.extras.numpy import (
     np,
 )
 
-SingleIndex = Union[int, np.ndarray, np.generic, Tensor]
+T = TypeVar("T")
+ListOrTuple = Union[List[T], Tuple[T, ...]]
+
+SingleIndex = Union[int, np.ndarray, np.integer, Tensor]
 MultiIndices = Union[List[int], np.ndarray, Tensor]
 Mask = Union[List[bool], np.ndarray, Tensor]
-SingleName = Union[str, np.ndarray, np.generic]
+SingleName = Union[str, np.ndarray, np.character]
 MultiNames = Union[List[str], np.ndarray]
 
 SingleRow = SingleIndex
@@ -48,14 +53,14 @@ def is_mask(x: Any) -> TypeGuard[Mask]:
     return (
         pw.isinstance_generic(x, (List[bool], tw.BoolTensor1D))
         or (is_numpy_bool_array(x) and x.ndim == 1)
-    ) and not isinstance(x, tuple)
+    )
 
 
 def is_multi_indices(x: Any) -> TypeGuard[MultiIndices]:
     return (
         pw.isinstance_generic(x, (List[int], tw.IntegralTensor1D))
         or (is_numpy_integral_array(x) and x.ndim == 1)
-    ) and not isinstance(x, tuple)
+    )
 
 
 def is_single_name(x: Any) -> TypeGuard[SingleName]:

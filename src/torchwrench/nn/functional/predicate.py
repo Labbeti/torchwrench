@@ -38,7 +38,7 @@ U = TypeVar("U")
 def is_stackable(
     tensors: Union[List[Any], Tuple[Any, ...]],
 ) -> TypeGuard[Union[List[Tensor], Tuple[Tensor, ...]]]:
-    """Returns True if inputs can be passed to `torch.stack` function, i.e. contains a list or tuple of tensors with the same shape."""
+    """Returns True if inputs can be passed to `torch.stack` function, i.e. contains a non-empty list or tuple of tensors with the same shape."""
     if not isinstance_generic(tensors, List[Tensor]) and not isinstance_generic(
         tensors, Tuple[Tensor, ...]
     ):

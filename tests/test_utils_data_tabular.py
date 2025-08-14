@@ -51,8 +51,30 @@ class TestTabularDataset(TestCase):
 
         assert tw.deep_equal(ds[0], data[0])
         assert tw.deep_equal(ds.to_matrix(), data)
+        assert tw.deep_equal(ds[:2], data[:2])
+
         assert tw.deep_equal(ds[1, 0], data[1, 0])
         assert tw.deep_equal(ds[5, 1, 0], data[5, 1, 0])
+        assert (
+            ds.keys()
+            == ds.column_names
+            == ds.output_keys
+            == ds.output_columns
+            == (0, 1, 2)
+        )
+
+
+    def test_dynamic_column(self) -> None:
+        data = {"a": list(range(5)), "b": list(range(5, 10))}
+        ds = TabularDataset(data)
+
+        def double(x):
+            return x * 2
+
+        ds.add_dynamic_column(double, takes=("a",), provides=("c",))
+        ds.add_output_keys(("c",))
+
+        assert tw.deep_equal(ds[4, "c"], data["a"][4] * 2)
 
 
 if __name__ == "__main__":
