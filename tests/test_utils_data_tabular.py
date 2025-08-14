@@ -63,7 +63,6 @@ class TestTabularDataset(TestCase):
             == (0, 1, 2)
         )
 
-
     def test_dynamic_column(self) -> None:
         data = {"a": list(range(5)), "b": list(range(5, 10))}
         ds = TabularDataset(data)

@@ -90,11 +90,7 @@ class TabularDataset(
         *,
         output_columns: Optional[Iterable[T_ColumnKey2]] = None,
         dynamic_fns: Optional[
-            Iterable[
-                Tuple[
-                    List[T_ColumnKey2], List[T_ColumnKey2], Callable, bool
-                ]
-            ]
+            Iterable[Tuple[List[T_ColumnKey2], List[T_ColumnKey2], Callable, bool]]
         ] = None,
         metadata: T_Metadata2 = None,
     ) -> None: ...
@@ -106,11 +102,7 @@ class TabularDataset(
         *,
         output_columns: Optional[Iterable[T_ColumnKey2]] = None,
         dynamic_fns: Optional[
-            Iterable[
-                Tuple[
-                    List[T_ColumnKey2], List[T_ColumnKey2], Callable, bool
-                ]
-            ]
+            Iterable[Tuple[List[T_ColumnKey2], List[T_ColumnKey2], Callable, bool]]
         ] = None,
         metadata: T_Metadata2 = None,
     ) -> None: ...
@@ -158,11 +150,7 @@ class TabularDataset(
         *,
         output_columns: Optional[Iterable[T_ColumnKey2]] = None,
         dynamic_fns: Optional[
-            Iterable[
-                Tuple[
-                    List[T_ColumnKey2], List[T_ColumnKey2], Callable, bool
-                ]
-            ]
+            Iterable[Tuple[List[T_ColumnKey2], List[T_ColumnKey2], Callable, bool]]
         ] = None,
         metadata: T_Metadata2 = None,
     ) -> None: ...
@@ -173,9 +161,7 @@ class TabularDataset(
         data: Literal[None] = None,
         *,
         output_columns: Optional[Iterable[Any]] = None,
-        dynamic_fns: Optional[
-            Iterable[Tuple[list, list, Callable, bool]]
-        ] = None,
+        dynamic_fns: Optional[Iterable[Tuple[list, list, Callable, bool]]] = None,
         metadata: V = None,
     ) -> None: ...
 
@@ -230,7 +216,7 @@ class TabularDataset(
     def all_keys(self) -> Tuple[T_ColumnKey, ...]:
         """Alias of `output_columns`."""
         return self.static_keys + self.dynamic_keys
-    
+
     @property
     def column_names(self) -> Tuple[T_ColumnKey, ...]:
         """Alias of `output_columns`."""
@@ -401,7 +387,7 @@ class TabularDataset(
         if len(invalid) > 0:
             msg = f"Found {len(invalid)}/{len(keys)} invalid keys not in static or dynamic keys. ({invalid=})"
             raise ValueError(msg)
-    
+
         self._output_columns = keys
 
     def add_output_keys(self, keys: Iterable[T_ColumnKey]) -> None:
@@ -411,7 +397,7 @@ class TabularDataset(
         if len(invalid) > 0:
             msg = f"Found {len(invalid)}/{len(keys)} invalid keys not in static or dynamic keys. ({invalid=})"
             raise ValueError(msg)
-        
+
         self._output_columns += keys
 
     def pop_output_keys(self, keys: Iterable[T_ColumnKey]) -> None:
@@ -586,7 +572,7 @@ class TabularDataset(
 
             row_indexer, col_indexer, *sub_indexer = indexer  # type: ignore
             sub_indexer = tuple(sub_indexer)
-            
+
             if not is_row_indexer(row_indexer):
                 msg = f"Invalid row indexer. (found {row_indexer})"
                 raise ValueError(msg)
@@ -805,7 +791,7 @@ class TabularDataset(
                 idx = pw.find(col_indexer, provides)
                 if idx == -1:
                     continue
-                
+
                 input_values = self[row_indexer, gives]
                 # TODO: rm debug
                 # input_values = {give_i: self[row_indexer, give_i] for give_i in gives}

@@ -50,16 +50,14 @@ def is_single_index(x) -> TypeGuard[SingleIndex]:
 
 
 def is_mask(x: Any) -> TypeGuard[Mask]:
-    return (
-        pw.isinstance_generic(x, (List[bool], tw.BoolTensor1D))
-        or (is_numpy_bool_array(x) and x.ndim == 1)
+    return pw.isinstance_generic(x, (List[bool], tw.BoolTensor1D)) or (
+        is_numpy_bool_array(x) and x.ndim == 1
     )
 
 
 def is_multi_indices(x: Any) -> TypeGuard[MultiIndices]:
-    return (
-        pw.isinstance_generic(x, (List[int], tw.IntegralTensor1D))
-        or (is_numpy_integral_array(x) and x.ndim == 1)
+    return pw.isinstance_generic(x, (List[int], tw.IntegralTensor1D)) or (
+        is_numpy_integral_array(x) and x.ndim == 1
     )
 
 
