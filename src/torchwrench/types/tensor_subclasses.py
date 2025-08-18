@@ -624,7 +624,7 @@ class _TensorNDBase(
     ) -> T_Tensor: ...
 
     @overload
-    def tolist(self) -> Union[list, T_BuiltinNumber]:  # type: ignore
+    def tolist(self) -> Any:  # type: ignore
         ...
 
     @overload
