@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - Args for `__exit__` method in `HDFDataset`.
+- `get_githash_short` and `get_githash_full` now catch FileNotFoundError exception.
 
 ## [0.7.4] 2025-07-24
 ### Added
