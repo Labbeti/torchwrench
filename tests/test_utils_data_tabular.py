@@ -73,6 +73,7 @@ class TestTabularDataset(TestCase):
         ds.add_dynamic_column(double, takes=("a",), provides=("c",))
         ds.add_output_keys(("c",))
 
+        assert ds[3] == {"a": 3, "b": 8, "c": 6}
         assert tw.deep_equal(ds[4, "c"], data["a"][4] * 2)
 
 
