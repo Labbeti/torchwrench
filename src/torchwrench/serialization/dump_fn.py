@@ -39,9 +39,9 @@ if _H5PY_AVAILABLE:
     DUMP_FNS["h5py"] = dump_hdf
 
 if _NUMPY_AVAILABLE:
-    from .numpy import dump_numpy
+    from .numpy import dump_ndarray
 
-    DUMP_FNS["numpy"] = dump_numpy
+    DUMP_FNS["numpy"] = dump_ndarray
 
 if _SAFETENSORS_AVAILABLE:
     from torchwrench.extras.safetensors import dump_safetensors

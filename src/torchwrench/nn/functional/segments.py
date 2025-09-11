@@ -107,6 +107,14 @@ def segments_list_to_activity(
 ) -> BoolTensor:
     """Convert list of (start, end) tuples to activity boolean tensor.
 
+    Example
+    =======
+    ```python
+    >>> segments = [(3, 6), (8, 9)]
+    >>> segments_list_to_activity(segments)
+    ... tensor([False, False, False, True, True, True, False, False, True])
+    ```
+
     Args:
         segments_list: list of (start, end) tuples of shape (*, N, 2).
         maxsize: Optional max size. If None, use segments_list.max(). defaults to None.

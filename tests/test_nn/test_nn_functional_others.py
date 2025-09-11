@@ -10,7 +10,13 @@ import torch
 import torchwrench as tw
 from torchwrench.core.packaging import _NUMPY_AVAILABLE
 from torchwrench.extras.numpy import np
-from torchwrench.nn.functional.others import deep_equal, get_ndim, get_shape
+from torchwrench.nn.functional.others import (
+    deep_equal,
+    get_ndim,
+    get_shape,
+    nelement,
+    ranks,
+)
 
 
 class TestNDimShape(TestCase):
@@ -144,6 +150,18 @@ class TestDeepEqual(TestCase):
 
         for x, y, expected in tests:
             assert deep_equal(x, y) == expected, f"{x=}, {y=}"
+
+
+class TestOtherFns(TestCase):
+    def test_ranks(self) -> None:
+        x = tw.as_tensor([3, 1, 0, 5, 2, 4])
+        result = ranks(x)
+        assert tw.equal(result, x)
+
+    def test_nelement(self) -> None:
+        x = tw.as_tensor([3, 1, 0, 5, 2, 4])
+        result = nelement(x)
+        assert result == x.nelement()
 
 
 if __name__ == "__main__":

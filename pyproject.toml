@@ -107,6 +107,7 @@ extras = [
     "pyyaml",
     "safetensors",
     "scipy",
+    "speechbrain>=1.0.3",
     "tensorboard",
     "torchaudio",
     "torchvision",

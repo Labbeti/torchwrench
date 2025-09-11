@@ -12,7 +12,7 @@ import pythonwrench as pw
 import torch
 
 import torchwrench as tw
-from torchwrench.extras import (
+from torchwrench.core.packaging import (
     _NUMPY_AVAILABLE,
     _PANDAS_AVAILABLE,
     _SAFETENSORS_AVAILABLE,

@@ -10,7 +10,7 @@ from torchwrench import (
     insert_at_indices,
     lengths_to_non_pad_mask,
     masked_mean,
-    multihot_to_indices,
+    multihot_to_multi_indices,
     probs_to_multinames,
     probs_to_name,
 )
@@ -55,9 +55,9 @@ class TestReadme(TestCase):
 
         assert names == expected
 
-    def test_multihot_to_indices_example(self) -> None:
+    def test_multihot_to_multi_indices_example(self) -> None:
         multihot = tw.as_tensor([[1, 0, 0], [0, 1, 1], [0, 0, 0]])
-        indices = multihot_to_indices(multihot)
+        indices = multihot_to_multi_indices(multihot)
         expected = [[0], [1, 2], []]
 
         assert indices == expected

@@ -8,12 +8,12 @@ import torch
 
 from torchwrench.nn.modules import ESequential
 from torchwrench.nn.modules.multilabel import (
-    IndicesToMultihot,
-    IndicesToMultinames,
-    MultihotToIndices,
+    MultihotToMultiIndices,
     MultihotToMultinames,
-    MultinamesToIndices,
+    MultiIndicesToMultihot,
+    MultiIndicesToMultinames,
     MultinamesToMultihot,
+    MultinamesToMultiIndices,
 )
 
 
@@ -30,12 +30,12 @@ class TestMultilabel(TestCase):
 
             # dummy pipeline to convert labels multiple times
             pipeline = ESequential(
-                MultihotToIndices(),
-                IndicesToMultinames(idx_to_name),
+                MultihotToMultiIndices(),
+                MultiIndicesToMultinames(idx_to_name),
                 MultinamesToMultihot(idx_to_name),
                 MultihotToMultinames(idx_to_name),
-                MultinamesToIndices(idx_to_name),
-                IndicesToMultihot(num_classes),
+                MultinamesToMultiIndices(idx_to_name),
+                MultiIndicesToMultihot(num_classes),
             )
             result = pipeline(multihot)
 

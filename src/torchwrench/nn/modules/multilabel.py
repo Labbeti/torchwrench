@@ -10,13 +10,13 @@ from torch import Tensor, nn
 from torchwrench.core.make import DeviceLike, DTypeLike
 from torchwrench.nn.functional.multilabel import (
     T_Name,
-    indices_to_multihot,
-    indices_to_multinames,
-    multihot_to_indices,
+    multi_indices_to_multihot,
+    multi_indices_to_multinames,
+    multihot_to_multi_indices,
     multihot_to_multinames,
-    multinames_to_indices,
+    multinames_to_multi_indices,
     multinames_to_multihot,
-    probs_to_indices,
+    probs_to_multi_indices,
     probs_to_multihot,
     probs_to_multinames,
 )
@@ -25,7 +25,7 @@ from torchwrench.types import LongTensor
 from .module import Module
 
 
-class IndicesToMultihot(Module):
+class MultiIndicesToMultihot(Module):
     """
     For more information, see :func:`~torchwrench.nn.functional.multilabel.indices_to_multihot`.
     """
@@ -48,7 +48,7 @@ class IndicesToMultihot(Module):
         self,
         indices: Union[List[List[int]], List[Tensor]],
     ) -> Tensor:
-        multihot = indices_to_multihot(
+        multihot = multi_indices_to_multihot(
             indices,
             self.num_classes,
             padding_idx=self.padding_idx,
@@ -69,7 +69,7 @@ class IndicesToMultihot(Module):
         )
 
 
-class IndicesToMultinames(Generic[T_Name], nn.Module):
+class MultiIndicesToMultinames(Generic[T_Name], nn.Module):
     """
     For more information, see :func:`~torchwrench.nn.functional.multilabel.indices_to_multinames`.
     """
@@ -88,7 +88,7 @@ class IndicesToMultinames(Generic[T_Name], nn.Module):
         self,
         indices: Union[List[List[int]], List[Tensor]],
     ) -> List[List[T_Name]]:
-        names = indices_to_multinames(
+        names = multi_indices_to_multinames(
             indices,
             self.idx_to_name,
             padding_idx=self.padding_idx,
@@ -104,7 +104,7 @@ class IndicesToMultinames(Generic[T_Name], nn.Module):
         )
 
 
-class MultihotToIndices(Module):
+class MultihotToMultiIndices(Module):
     """
     For more information, see :func:`~torchwrench.nn.functional.multilabel.multihot_to_indices`.
     """
@@ -117,7 +117,7 @@ class MultihotToIndices(Module):
         self,
         multihot: Tensor,
     ) -> Union[List, LongTensor]:
-        indices = multihot_to_indices(multihot, padding_idx=self.padding_idx)
+        indices = multihot_to_multi_indices(multihot, padding_idx=self.padding_idx)
         return indices
 
     def extra_repr(self) -> str:
@@ -149,7 +149,7 @@ class MultihotToMultinames(Generic[T_Name], nn.Module):
         return names
 
 
-class MultinamesToIndices(Generic[T_Name], nn.Module):
+class MultinamesToMultiIndices(Generic[T_Name], nn.Module):
     """
     For more information, see :func:`~torchwrench.nn.functional.multilabel.multinames_to_indices`.
     """
@@ -165,7 +165,7 @@ class MultinamesToIndices(Generic[T_Name], nn.Module):
         self,
         names: List[List[T_Name]],
     ) -> List[List[int]]:
-        indices = multinames_to_indices(names, self.idx_to_name)
+        indices = multinames_to_multi_indices(names, self.idx_to_name)
         return indices
 
 
@@ -208,7 +208,7 @@ class MultinamesToMultihot(Generic[T_Name], nn.Module):
         )
 
 
-class ProbsToIndices(Module):
+class ProbsToMultiIndices(Module):
     """
     For more information, see :func:`~torchwrench.nn.functional.multilabel.probs_to_indices`.
     """
@@ -227,7 +227,9 @@ class ProbsToIndices(Module):
         self,
         probs: Tensor,
     ) -> Union[List, LongTensor]:
-        indices = probs_to_indices(probs, self.threshold, padding_idx=self.padding_idx)
+        indices = probs_to_multi_indices(
+            probs, self.threshold, padding_idx=self.padding_idx
+        )
         return indices
 
 
@@ -290,3 +292,11 @@ class ProbsToMultinames(Generic[T_Name], nn.Module):
     ) -> List[List[T_Name]]:
         names = probs_to_multinames(probs, self.threshold, self.idx_to_name)
         return names
+
+
+# aliases for backward compatibility
+IndicesToMultihot = MultiIndicesToMultihot
+IndicesToMultinames = MultiIndicesToMultinames
+MultihotToIndices = MultihotToMultiIndices
+MultinamesToIndices = MultinamesToMultiIndices
+ProbsToIndices = ProbsToMultiIndices

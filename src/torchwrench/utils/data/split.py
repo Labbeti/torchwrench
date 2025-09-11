@@ -21,7 +21,7 @@ def random_split(
     """Generate indices for a random dataset split.
 
     Args:
-        num_samples: Number of total samples.
+        num_samples_or_indices: Number of total samples or list of indices to split.
         lengths: Ratios of the target splits. Values should be in range [0, 1].
         generator: Torch Generator or seed to make this function deterministic. defaults to None.
         round_fn: Function to round ratios to integer sizes. defaults to math.floor.
@@ -72,7 +72,6 @@ def balanced_monolabel_split(
         f"Target classes indices must be lower than {num_classes=}."
     )
 
-    lengths = list(lengths)
     generator = as_generator(generator)
 
     indices_per_class = []
@@ -116,7 +115,7 @@ def _shuffle_indices_per_class(
 
 def _split_indices_per_class(
     indices_per_class: List[List[int]],
-    lengths: List[float],
+    lengths: Iterable[float],
     round_fn: Callable[[float], int],
 ) -> List[List[List[int]]]:
     """
@@ -133,6 +132,7 @@ def _split_indices_per_class(
         indices_per_class: List of indices of each class.
         lengths: The ratios of each indices split.
     """
+    lengths = list(lengths)
     assert 0.0 <= sum(lengths) <= 1.0, "Ratio sum cannot be greater than 1.0."
 
     num_classes = len(indices_per_class)

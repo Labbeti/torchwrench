@@ -27,6 +27,7 @@ from pythonwrench.typing import BuiltinNumber, SupportsIterLen, T_BuiltinNumber
 from torch import Tensor, nn
 
 from torchwrench.extras.numpy import np
+from torchwrench.extras.pandas import pd
 from torchwrench.nn import functional as F
 from torchwrench.types._typing import (
     LongTensor,
@@ -129,7 +130,7 @@ def get_ndim(
     ) -> Tuple[bool, int]:
         if is_scalar_like(x):
             return True, 0
-        elif isinstance(x, (Tensor, np.ndarray, np.generic)):
+        elif isinstance(x, (Tensor, np.ndarray, np.generic, pd.DataFrame)):
             return True, x.ndim
         elif isinstance(x, (set, frozenset, dict)):
             return True, 0
@@ -207,7 +208,7 @@ def get_shape(
     ) -> Tuple[bool, Tuple[int, ...]]:
         if is_scalar_like(x):
             return True, ()
-        elif isinstance(x, (Tensor, np.ndarray, np.generic)):
+        elif isinstance(x, (Tensor, np.ndarray, np.generic, pd.DataFrame)):
             return True, tuple(x.shape)
         elif isinstance(x, (set, frozenset, dict)):
             return True, ()
@@ -332,7 +333,22 @@ def rmse(
     return mse(x1, x2, dim=dim).sqrt()
 
 
-def deep_equal(x: T, y: T) -> bool:
+def deep_equal(x: T, y: T, *args: T) -> bool:
+    """Recursive comparison between objects.
+
+    Supports Scalar-like, NDArrays, Tensors, DataFrames, Mapping and List-like objects.
+    Unlike default equal, NaNs values are considered equal.
+    Tensors and NDArrays of different shapes are supported and returns False.
+    """
+    others = (y,) + args
+    for other in others:
+        result = _deep_equal_binary(x, other)
+        if not result:
+            return False
+    return True
+
+
+def _deep_equal_binary(x: T, y: T) -> bool:
     if is_scalar_like(x) and is_scalar_like(y):
         x_isnan = math.isnan(x) if F.is_floating_point(x) else False
         y_isnan = math.isnan(y) if F.is_floating_point(y) else False
@@ -364,8 +380,16 @@ def deep_equal(x: T, y: T) -> bool:
             and np.equal(x[~x_isnan], y[~y_isnan]).all().item()
         )
 
+    if isinstance(x, pd.DataFrame) and isinstance(y, pd.DataFrame):
+        if not (deep_equal(x.index, y.index) and deep_equal(x.columns, y.columns)):
+            return False
+        return (x.isna() == y.isna()).all(None).item() and (
+            (x == y) | x.isna() | y.isna()
+        ).all(None).item()  # type: ignore
+
     if isinstance(x, Mapping) and isinstance(y, Mapping):
         return deep_equal(list(x.items()), list(y.items()))
+
     if isinstance(x, SupportsIterLen) and isinstance(y, SupportsIterLen):
         return len(x) == len(y) and all(deep_equal(xi, yi) for xi, yi in zip(x, y))
 

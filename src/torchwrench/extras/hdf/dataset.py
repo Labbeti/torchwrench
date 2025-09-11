@@ -457,7 +457,7 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
     def __enter__(self) -> Self:
         return self
 
-    def __exit__(self) -> None:
+    def __exit__(self, *args, **kwargs) -> None:
         if self.is_open():
             self.close()
 
@@ -594,7 +594,7 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
 
     def _sanity_check(self) -> None:
         lens = [dset.shape[0] for dset in self._hdf_file.values()]
-        if not pw.all_eq(lens) or lens[0] != len(self):
+        if not pw.all_eq(lens) or (len(lens) > 0 and lens[0] != len(self)):
             msg = (
                 f"Incorrect length stored in HDF file. (found {lens=} and {len(self)=})"
             )

@@ -18,21 +18,13 @@ from typing import (
 
 from pythonwrench.csv import dump_csv as _dump_csv_base
 from pythonwrench.csv import load_csv as _load_csv_base
-from pythonwrench.importlib import Placeholder
+from pythonwrench.functools import function_alias
 from pythonwrench.io import _setup_output_fpath
 from pythonwrench.warnings import warn_once
 
 from torchwrench.core.packaging import _PANDAS_AVAILABLE
+from torchwrench.extras.pandas import pd
 from torchwrench.serialization.common import as_builtin
-
-if _PANDAS_AVAILABLE:
-    import pandas as pd  # type: ignore
-
-    DataFrame = pd.DataFrame  # type: ignore
-else:
-
-    class DataFrame(Placeholder): ...
-
 
 OrientExtended = Literal["list", "dict", "dataframe", "auto"]
 CSVBackend = Literal["csv", "pandas", "auto"]
@@ -51,7 +43,7 @@ def dump_csv(
 ) -> str:
     """Dump content to csv format."""
     if backend == "auto":
-        if isinstance(data, DataFrame):
+        if isinstance(data, pd.DataFrame):
             backend = "pandas"
         else:
             backend = "csv"
@@ -69,7 +61,7 @@ def dump_csv(
 
     elif backend == "pandas":
         if to_builtins:
-            if isinstance(data, DataFrame):
+            if isinstance(data, pd.DataFrame):
                 msg = f"Inconsistent combinaison of arguments: {to_builtins=}, {backend=} and {type(data)=}."
                 warn_once(msg)
             data = as_builtin(data)
@@ -87,6 +79,14 @@ def dump_csv(
     else:
         msg = f"Invalid argument {backend=}. (expected one of {get_args(CSVBackend)})"
         raise ValueError(msg)
+
+
+@function_alias(dump_csv)
+def dumps_csv(*args, **kwargs): ...
+
+
+@function_alias(dump_csv)
+def save_csv(*args, **kwargs): ...
 
 
 @overload
@@ -134,7 +134,7 @@ def load_csv(
     # CSV reader kwargs
     delimiter: Optional[str] = None,
     **backend_kwds,
-) -> DataFrame: ...
+) -> pd.DataFrame: ...
 
 
 def load_csv(
@@ -149,7 +149,7 @@ def load_csv(
     # CSV reader kwargs
     delimiter: Optional[str] = None,
     **backend_kwds,
-) -> Union[List[Dict[str, Any]], Dict[str, List[Any]], DataFrame]:
+) -> Union[List[Dict[str, Any]], Dict[str, List[Any]], pd.DataFrame]:
     """Load CSV file using CSV or pandas backend."""
     if backend == "auto":
         if _PANDAS_AVAILABLE:
@@ -183,7 +183,7 @@ def load_csv(
         )
 
         if orient == "dataframe":
-            result = DataFrame(result)
+            result = pd.DataFrame(result)
 
     elif backend == "pandas":
         result = _load_csv_with_pandas(
@@ -203,8 +203,16 @@ def load_csv(
     return result
 
 
+@function_alias(load_csv)
+def loads_csv(*args, **kwargs): ...
+
+
+@function_alias(load_csv)
+def read_csv(*args, **kwargs): ...
+
+
 def _dump_csv_with_pandas(
-    data: Union[Iterable[Mapping[str, Any]], Mapping[str, Iterable[Any]], DataFrame],
+    data: Union[Iterable[Mapping[str, Any]], Mapping[str, Iterable[Any]], pd.DataFrame],
     fpath: Union[str, Path, None] = None,
     *,
     overwrite: bool = True,
@@ -244,7 +252,7 @@ def _load_csv_with_pandas(
     # Backend kwargs
     delimiter: Optional[str] = None,
     **backend_kwds,
-) -> Union[List[Dict[str, Any]], Dict[str, List[Any]], DataFrame]:
+) -> Union[List[Dict[str, Any]], Dict[str, List[Any]], pd.DataFrame]:
     backend = "pandas"
 
     if not _PANDAS_AVAILABLE:
@@ -263,14 +271,14 @@ def _load_csv_with_pandas(
         msg = f"Invalid arguments {backend_kwds=} with {backend=}."
         raise ValueError(msg)
 
-    df = pd.read_csv(fpath, delimiter=delimiter)  # type: ignore
+    df = pd.read_csv(fpath, delimiter=delimiter)
 
     if orient == "list":
         return df.to_dict("records")  # type: ignore
     elif orient == "dict":
         return df.to_dict("list")  # type: ignore
     elif orient in ("pandas", "auto"):
-        return df  # type: ignore
+        return df
     else:
         msg = (
             f"Invalid argument {orient=}. (expected one of {get_args(OrientExtended)})"

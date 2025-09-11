@@ -6,14 +6,16 @@ from io import BytesIO
 from pathlib import Path
 from typing import Literal, Optional, Union, get_args
 
+from pythonwrench.functools import function_alias
 from pythonwrench.io import _setup_output_fpath
+from pythonwrench.warnings import deprecated_alias
 
 from .definitions import np
 
 NumpyFormat = Literal["npy", "npz"]
 
 
-def dump_numpy(
+def dump_ndarray(
     obj: np.ndarray,
     fpath: Union[str, Path, None] = None,
     *args,
@@ -52,5 +54,29 @@ def dump_numpy(
     return content
 
 
-def load_numpy(fpath: Union[str, Path], *args, **kwargs) -> np.ndarray:
+@deprecated_alias(dump_ndarray)
+def dump_numpy(*args, **kwargs): ...
+
+
+@function_alias(dump_ndarray)
+def dumps_ndarray(*args, **kwargs): ...
+
+
+@function_alias(dump_ndarray)
+def save_ndarray(*args, **kwargs): ...
+
+
+def load_ndarray(fpath: Union[str, Path], *args, **kwargs) -> np.ndarray:
     return np.load(fpath, *args, **kwargs)
+
+
+@function_alias(load_ndarray)
+def read_ndarray(*args, **kwargs): ...
+
+
+@function_alias(load_ndarray)
+def loads_ndarray(*args, **kwargs): ...
+
+
+@deprecated_alias(load_ndarray)
+def load_numpy(*args, **kwargs): ...

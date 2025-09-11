@@ -3,6 +3,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.5] 2025-09-11
+### Added
+- `is_numpy_str_array` and `is_numpy_integral_array` functions.
+- `TabularDataset` interface to unify dataset interface with dataframes, list of dicts, dict of lists, tensor, ndarray and DynamicItemDataset.
+
+### Fixed
+- Args for `__exit__` method in `HDFDataset`.
+- `get_githash_short` and `get_githash_full` now catch FileNotFoundError exception.
+
 ## [0.7.4] 2025-07-24
 ### Added
 - `col_kwds` args in `pack_to_hdf` function to add opts like 'compression' in hdf file.

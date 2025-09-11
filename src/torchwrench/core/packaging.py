@@ -20,12 +20,14 @@ def _get_extra_version(name: str) -> str:
 
 _EXTRAS_PACKAGES = (
     "colorlog",
+    "datasets",
     "h5py",
     "numpy",
     "omegaconf",
     "pandas",
     "safetensors",
     "scipy",
+    "speechbrain",
     "tensorboard",
     "torchaudio",
     "tqdm",
@@ -36,12 +38,14 @@ _EXTRA_VERSION = {name: _get_extra_version(name) for name in _EXTRAS_PACKAGES}
 
 
 _COLORLOG_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["colorlog"]
+_DATASETS_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["datasets"]
 _H5PY_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["h5py"]
 _NUMPY_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["numpy"]
 _OMEGACONF_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["omegaconf"]
 _PANDAS_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["pandas"]
 _SAFETENSORS_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["safetensors"]
 _SCIPY_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["scipy"]
+_SPEECHBRAIN_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["speechbrain"]
 _TENSORBOARD_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["tensorboard"]
 _TORCHAUDIO_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["torchaudio"]
 _TQDM_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["tqdm"]
