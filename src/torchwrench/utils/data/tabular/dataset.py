@@ -307,11 +307,21 @@ class TabularDataset(
     def add_dynamic_column(
         self,
         fn: Callable,
-        takes: Iterable[T_ColumnKey],
-        provides: Iterable[T_ColumnKey],
+        takes: Union[T_ColumnKey, Iterable[T_ColumnKey]],
+        provides: Union[T_ColumnKey, Iterable[T_ColumnKey]],
         batch: bool = False,
     ) -> None:
-        dynamic_data = (list(takes), list(provides), fn, batch)
+        if is_single_column(takes):
+            takes = [takes]
+        else:
+            takes = list(takes)
+
+        if is_single_column(provides):
+            provides = [provides]
+        else:
+            provides = list(provides)
+
+        dynamic_data = (takes, provides, fn, batch)
         self._dynamic_fns.append(dynamic_data)
 
     def add_column(
@@ -593,9 +603,7 @@ class TabularDataset(
 
         del indexer
 
-        if col_indexer is None:
-            col_indexer = list(self.keys())  # type: ignore
-        elif isinstance(col_indexer, slice):
+        if isinstance(col_indexer, slice):
             col_indexer = list(self.keys()[col_indexer])  # type: ignore
         elif is_mask(col_indexer):
             keys = self.keys()
