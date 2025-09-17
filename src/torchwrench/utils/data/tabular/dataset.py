@@ -312,17 +312,17 @@ class TabularDataset(
         batch: bool = False,
     ) -> None:
         if is_single_column(takes):
-            takes = [takes]
+            takes = [takes]  # type: ignore
         else:
-            takes = list(takes)
+            takes = list(takes)  # type: ignore
 
         if is_single_column(provides):
-            provides = [provides]
+            provides = [provides]  # type: ignore
         else:
-            provides = list(provides)
+            provides = list(provides)  # type: ignore
 
         dynamic_data = (takes, provides, fn, batch)
-        self._dynamic_fns.append(dynamic_data)
+        self._dynamic_fns.append(dynamic_data)  # type: ignore
 
     def add_column(
         self,
