@@ -3,6 +3,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.6] UNRELEASED
+### Fixed
+- HDFDataset repr when file is not open.
+
 ## [0.7.5] 2025-09-11
 ### Added
 - `is_numpy_str_array` and `is_numpy_integral_array` functions.
