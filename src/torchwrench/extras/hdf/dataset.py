@@ -528,7 +528,9 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
         return length
 
     def __repr__(self) -> str:
-        repr_hparams = {"file": osp.basename(self._hdf_fpath), "shape": self.shape}
+        repr_hparams: Dict[str, Any] = {"file": osp.basename(self._hdf_fpath)}
+        if self.is_open():
+            repr_hparams["shape"] = self.shape
         repr_ = ", ".join(f"{k}={v}" for k, v in repr_hparams.items())
         return f"{HDFDataset.__name__}({repr_})"
 
