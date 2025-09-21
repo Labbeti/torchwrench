@@ -28,9 +28,9 @@ class TestTabularDataset(TestCase):
         assert ds[2:4] == [{"a": 2, "b": 7}, {"a": 3, "b": 8}]
         assert ds[[3, 4, 3]] == [{"a": 3, "b": 8}, {"a": 4, "b": 9}, {"a": 3, "b": 8}]
         assert ds[[3, 4, 3], "b"] == [8, 9, 8]
-        assert ds[[3, 4, 3], ["b"]] == [{"b": 8}, {"b": 9}, {"b": 8}]
+        assert ds[[3, 4, 3], ["b"]] == [[8, 9, 8]]
         assert ds[:, "a"] == list(range(5))
-        assert ds[:, ["a"]] == [{"a": 0}, {"a": 1}, {"a": 2}, {"a": 3}, {"a": 4}]
+        assert ds[:, ["a"]] == [list(range(5))]
 
         if _NUMPY_AVAILABLE:
             expected = np.array([[0, 5], [1, 6], [2, 7], [3, 8], [4, 9]])

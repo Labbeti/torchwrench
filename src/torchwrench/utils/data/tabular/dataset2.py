@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from abc import abstractmethod
-from typing import Any, Dict, Iterable, List, Tuple, Union
+from typing import Any, Dict, Iterable, List, Mapping, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -10,6 +10,8 @@ import pythonwrench as pw
 from pythonwrench.typing import SupportsGetitemIterLen
 from speechbrain.dataio.dataset import DynamicItemDataset
 from torch import Tensor
+
+from torchwrench.nn.functional.multilabel import multihot_to_multi_indices
 
 
 class TabularDatasetInterface:
@@ -29,15 +31,15 @@ class TabularDatasetInterface:
     def ndim(self) -> int:
         return len(self.shape)
 
-    def keys(self) -> SupportsGetitemIterLen:
+    def keys(self) -> pw.SupportsGetitemIterLen:
         return self.column_names
 
-    def values(self) -> Iterable:
-        return [self.get_column(col_index) for col_index in self.column_names]
+    def values(self) -> list:
+        return [self[k] for k in self.keys()]
 
     def __iter__(self):
         for row_index in range(self.num_rows):
-            yield self.get_row(row_index)
+            yield self[row_index]
 
     def __len__(self) -> int:
         return self.num_rows
@@ -50,14 +52,6 @@ class TabularDatasetInterface:
     @property
     @abstractmethod
     def column_names(self) -> SupportsGetitemIterLen:
-        raise NotImplementedError
-
-    @abstractmethod
-    def get_row(self, row_indexer) -> Any:
-        raise NotImplementedError
-
-    @abstractmethod
-    def get_column(self, col_indexer) -> Any:
         raise NotImplementedError
 
     @abstractmethod
@@ -82,7 +76,11 @@ class TabularDatasetInterface:
 
 
 class DictListWrapper(TabularDatasetInterface):
-    def __init__(self, data: Dict[Any, list]) -> None:
+    def __init__(self, data: Mapping[Any, pw.SupportsGetitemIterLen]) -> None:
+        if not pw.all_eq(map(len, data.values())):
+            msg = "Invalid data dict lengths."
+            raise ValueError(msg)
+
         super().__init__()
         self._data = data
 
@@ -97,89 +95,93 @@ class DictListWrapper(TabularDatasetInterface):
     def column_names(self) -> tuple:
         return tuple(self._data.keys())
 
-    def get_row(self, row_indexer):
-        return {k: v[row_indexer] for k, v in self._data.items()}
-
-    def get_column(self, col_indexer):
-        return self._data[col_indexer]
-
     def to_dataframe(self) -> pd.DataFrame:
         return pd.DataFrame(self._data)
 
-    def to_dict_list(self) -> dict:
-        return self._data
+    def to_dict_list(self) -> Dict[Any, List]:
+        return {k: list(v) for k, v in self._data.items()}
 
-    def to_list_dict(self) -> list:
+    def to_list_dict(self) -> List[Dict]:
         return pw.dict_list_to_list_dict(self._data, "same")
 
     def to_numpy(self) -> np.ndarray:
-        return np.array(list(self.values()))
-
-    def __getitem__(self, indexer, /):
-        if isinstance(indexer, tuple) and len(indexer) == 2:
-            row_indexer, col_indexer = indexer
-        else:
-            row_indexer = indexer
-            col_indexer = None
-        del indexer
-
-        # {k: v[row_indexer] for k, v in self._data.items()}
-
-        # if isinstance(indexer, int):
-        #     return self.get_row(indexer)
-        # elif isinstance(row_indexer, slice):
-        #     data = {k: self._data[k][row_indexer] for k in col_indexer}
-        #     return pw.dict_list_to_list_dict(data, "same")
-        # elif pw.isinstance_generic(indexer, Iterable[int]):
-        #     return [self.get_row(row_index) for row_index in indexer]
-        # else:
-        #     raise TypeError
-        raise NotImplementedError
-
-
-class ListDictWrapper(TabularDatasetInterface):
-    def __init__(self, data: List[Dict]) -> None:
-        super().__init__()
-        self._data = data
-
-    @property
-    def row_names(self) -> range:
-        return range(len(self._data))
-
-    @property
-    def column_names(self) -> tuple:
-        if len(self._data) == 0:
-            return ()
-        else:
-            return tuple(next(iter(self._data[0].keys())))
-
-    def get_row(self, row_indexer):
-        return self._data[row_indexer]
-
-    def get_column(self, col_indexer):
-        return [data_i[col_indexer] for data_i in self._data]
-
-    def to_dataframe(self) -> pd.DataFrame:
-        return pd.DataFrame(self._data)
-
-    def to_dict_list(self) -> dict:
-        return pw.list_dict_to_dict_list(self._data, "same")
-
-    def to_list_dict(self) -> list:
-        return self._data
-
-    def to_numpy(self) -> np.ndarray:
-        return np.array([data_i.values() for data_i in self._data])
+        return np.array(list(self._data.values())).T
 
     def __getitem__(self, indexer, /):
         if isinstance(indexer, int):
-            return self.get_row(indexer)
+            return {k: v[indexer] for k, v in self._data.items()}
+
         elif isinstance(indexer, slice):
-            return self._data[indexer]
+            datadict = {k: v[indexer] for k, v in self._data.items()}
+            return pw.dict_list_to_list_dict(datadict, "same")
+
         elif pw.isinstance_generic(indexer, Iterable[int]):
-            return [self.get_row(row_index) for row_index in indexer]
+            datadict = {k: _get_from_indices(v, indexer) for k, v in self._data.items()}
+            return pw.dict_list_to_list_dict(datadict, "same")
+
+        elif pw.isinstance_generic(indexer, Iterable[bool]):
+            datadict = {k: _get_from_mask(v, indexer) for k, v in self._data.items()}
+            return pw.dict_list_to_list_dict(datadict, "same")
+
+        elif isinstance(indexer, tuple) and len(indexer) == 2:
+            row_indexer, col_indexer = indexer
         else:
-            raise TypeError
+            row_indexer = slice(None)
+            col_indexer = indexer
+        del indexer
+
+        single = False
+        if isinstance(col_indexer, (int, str)):
+            col_indexer = [col_indexer]
+            single = True
+
+        result = []
+
+        for col in col_indexer:
+            rows = self._data[col]
+            if isinstance(row_indexer, (int, slice)):
+                rows = rows[row_indexer]
+            elif pw.isinstance_generic(row_indexer, Iterable[int]):
+                rows = _get_from_indices(rows, row_indexer)
+            elif pw.isinstance_generic(row_indexer, Iterable[bool]):
+                rows = _get_from_mask(rows, row_indexer)
+            else:
+                raise TypeError
+            result.append(rows)
+
+        if single:
+            return result[0]
+        else:
+            return result
+
+
+def _get_from_indices(
+    x: Union[Tensor, np.ndarray, Iterable],
+    indices: Union[Tensor, np.ndarray, Iterable],
+) -> Union[Tensor, np.ndarray, list]:
+    if isinstance(x, Tensor) and isinstance(indices, Tensor):
+        return x[indices]
+    if isinstance(x, np.ndarray) and isinstance(indices, np.ndarray):
+        return x[indices]
+    if isinstance(x, list):
+        return [x[idx] for idx in indices]
+
+    raise TypeError
+
+
+def _get_from_mask(
+    x: Union[Tensor, np.ndarray, Iterable],
+    mask: Union[Tensor, np.ndarray, Iterable],
+) -> Union[Tensor, np.ndarray, list]:
+    if isinstance(x, Tensor) and isinstance(mask, Tensor):
+        return x[mask]
+    if isinstance(x, np.ndarray) and isinstance(mask, np.ndarray):
+        return x[mask]
+    if isinstance(x, list):
+        indices = multihot_to_multi_indices(mask)
+        return [x[idx] for idx in indices]
+
+    raise TypeError
 
 
 class DataFrameWrapper(TabularDatasetInterface):
@@ -195,12 +197,6 @@ class DataFrameWrapper(TabularDatasetInterface):
     def column_names(self) -> tuple:
         return tuple(self._data.keys())
 
-    def get_row(self, row_indexer):
-        return self._data[row_indexer]
-
-    def get_column(self, col_indexer):
-        return self._data[col_indexer]
-
     def to_dataframe(self) -> pd.DataFrame:
         return self._data
 
@@ -214,14 +210,7 @@ class DataFrameWrapper(TabularDatasetInterface):
         return self._data.to_numpy()
 
     def __getitem__(self, indexer, /):
-        if isinstance(indexer, int):
-            return self.get_row(indexer)
-        elif isinstance(indexer, slice):
-            return self._data[indexer]
-        elif pw.isinstance_generic(indexer, Iterable[int]):
-            return [self.get_row(row_index) for row_index in indexer]
-        else:
-            raise TypeError
+        return self._data[indexer]
 
 
 class TensorOrArrayWrapper(TabularDatasetInterface):
@@ -229,6 +218,7 @@ class TensorOrArrayWrapper(TabularDatasetInterface):
         if data.ndim < 2:
             msg = f"Invalid number of dimensions for TabularDataset. (expected at least 2 dims but found {data.ndim})"
             raise ValueError(msg)
+
         super().__init__()
         self._data = data
 
@@ -240,12 +230,6 @@ class TensorOrArrayWrapper(TabularDatasetInterface):
     def column_names(self) -> range:
         return range(self._data.shape[1])
 
-    def get_row(self, row_indexer):
-        return self._data[row_indexer]
-
-    def get_column(self, col_indexer):
-        return self._data[:, col_indexer]
-
     def to_dataframe(self) -> pd.DataFrame:
         data = self._data
         if isinstance(data, Tensor):
@@ -255,7 +239,13 @@ class TensorOrArrayWrapper(TabularDatasetInterface):
     def to_dict_list(self) -> dict:
         return dict(zip(self.column_names, map(list, self._data.transpose(0, 1))))
 
-    def to_list_dict(self) -> list:
+    def to_dynamic_item_dataset(self, id_column_name: int = 0) -> DynamicItemDataset:
+        data_ids = self._data[id_column_name]
+        data = {id_: self._data[i] for i, id_ in enumerate(data_ids)}
+        dset = DynamicItemDataset(data)
+        return dset
+
+    def to_list_dict(self) -> List[dict]:
         return [dict(zip(self.column_names, data_i)) for data_i in self._data]
 
     def to_numpy(self) -> np.ndarray:
@@ -293,45 +283,94 @@ class DynamicDatasetWrapper(TabularDatasetInterface):
             return [data_i[col_indexer] for data_i in self._data]
 
     def to_dataframe(self) -> pd.DataFrame:
-        raise NotImplementedError
+        return pd.DataFrame(self[:])
 
     def to_dict_list(self) -> dict:
-        raise NotImplementedError
+        datalist = self[:]
+        return pw.list_dict_to_dict_list(datalist)  # type: ignore
 
     def to_list_dict(self) -> list:
-        raise NotImplementedError
+        datalist = self[:]
+        return datalist  # type: ignore
 
     def to_numpy(self) -> np.ndarray:
-        return np.array([self._data[row_index] for row_index in self.row_names])
+        datalist = self[:]
+        return np.array([list(item.values()) for item in datalist])  # type: ignore
 
     def __getitem__(self, indexer, /):
         if isinstance(indexer, int):
-            return self.get_row(indexer)
+            return self._data[indexer]
+
         elif isinstance(indexer, slice):
-            return [self.get_row(row_index) for row_index in self.row_names[indexer]]
+            datalist = [self._data[idx] for idx in range(len(self))[indexer]]
+            return datalist
+
         elif pw.isinstance_generic(indexer, Iterable[int]):
-            return [self.get_row(row_index) for row_index in indexer]
+            datalist = [self._data[idx] for idx in indexer]
+            return datalist
+
+        elif pw.isinstance_generic(indexer, Iterable[bool]):
+            indices = multihot_to_multi_indices(indexer)
+            datalist = [self._data[idx] for idx in indices]
+            return datalist
+
+        elif isinstance(indexer, tuple) and len(indexer) == 2:
+            row_indexer, col_indexer = indexer
         else:
-            raise TypeError
+            row_indexer = slice(None)
+            col_indexer = indexer
+        del indexer
+
+        single = False
+        if isinstance(col_indexer, (int, str)):
+            col_indexer = [col_indexer]
+            single = True
+
+        with self._data.output_keys_as(col_indexer):
+            if isinstance(row_indexer, int):
+                result = self._data[row_indexer]
+
+            elif isinstance(row_indexer, slice):
+                datalist = [self._data[idx] for idx in range(len(self))[row_indexer]]
+                result = list(pw.list_dict_to_dict_list(datalist, "same").values())
+
+            elif pw.isinstance_generic(row_indexer, Iterable[int]):
+                datalist = [self._data[idx] for idx in row_indexer]
+                result = list(pw.list_dict_to_dict_list(datalist, "same").values())
+
+            elif pw.isinstance_generic(row_indexer, Iterable[bool]):
+                indices = multihot_to_multi_indices(row_indexer)
+                datalist = [self._data[idx] for idx in indices]
+                result = list(pw.list_dict_to_dict_list(datalist, "same").values())
+
+            else:
+                raise TypeError
+
+            if single:
+                return result[0]
+            else:
+                return result
 
 
 class TabularDataset(TabularDatasetInterface):
     def __init__(
         self,
         data: Union[
-            Dict[Any, list],
-            List[Dict],
+            Mapping[Any, pw.SupportsGetitemIterLen],
+            pw.SupportsGetitemIterLen[Dict[Any, Any]],
             pd.DataFrame,
+            Tensor,
             np.ndarray,
             DynamicItemDataset,
         ],
         row_mapper: Union[SupportsGetitemIterLen, None] = None,
         column_mapper: Union[SupportsGetitemIterLen, None] = None,
     ) -> None:
-        if pw.isinstance_generic(data, Dict[Any, list]):
+        if pw.isinstance_generic(data, Mapping[Any, pw.SupportsGetitemIterLen]):
             wrapper = DictListWrapper(data)
         elif pw.isinstance_generic(data, List[Dict]):
-            wrapper = ListDictWrapper(data)
+            datadict = pw.list_dict_to_dict_list(data, "same")
+            wrapper = DictListWrapper(datadict)
         elif isinstance(data, pd.DataFrame):
             wrapper = DataFrameWrapper(data)
         elif isinstance(data, (Tensor, np.ndarray)):
@@ -361,15 +400,8 @@ class TabularDataset(TabularDatasetInterface):
         else:
             return self._col_mapper
 
-    def get_row(self, row_indexer):
-        if self._row_mapper is not None:
-            row_indexer = self._row_mapper[row_indexer]
-        return self._wrapper.get_row(row_indexer)
-
-    def get_column(self, col_indexer):
-        if self._col_mapper is not None:
-            col_indexer = self._col_mapper[col_indexer]
-        return self._wrapper.get_column(col_indexer)
+    def to_dataframe(self) -> pd.DataFrame:
+        return self._wrapper.to_dataframe()
 
     def to_dict_list(self) -> dict:
         return self._wrapper.to_dict_list()
@@ -381,4 +413,40 @@ class TabularDataset(TabularDatasetInterface):
         return self._wrapper.to_numpy()
 
     def __getitem__(self, indexer, /) -> Any:
-        return self._wrapper[indexer]
+        if isinstance(indexer, (int, slice)):
+            if self._row_mapper is not None:
+                indexer = self._row_mapper[indexer]
+            return self._wrapper[indexer]
+
+        elif pw.isinstance_generic(indexer, Iterable[int]):
+            if self._row_mapper is not None:
+                indexer = _get_from_indices(self._row_mapper, indexer)
+            return self._wrapper[indexer]
+
+        elif pw.isinstance_generic(indexer, Iterable[bool]):
+            indices = multihot_to_multi_indices(indexer)
+            return self[indices]
+
+        elif isinstance(indexer, tuple) and len(indexer) == 2:
+            row_indexer, col_indexer = indexer
+        else:
+            row_indexer = slice(None)
+            col_indexer = indexer
+        del indexer
+
+        single = False
+        if isinstance(col_indexer, (int, str)):
+            col_indexer = [col_indexer]
+            single = True
+
+        if self._row_mapper is not None:
+            row_indexer = self._row_mapper[row_indexer]
+
+        if self._col_mapper is not None:
+            col_indexer = [self._col_mapper[col] for col in col_indexer]
+
+        result = self._wrapper[row_indexer, col_indexer]
+        if single:
+            return result[0]
+        else:
+            return result
