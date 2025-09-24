@@ -5,6 +5,7 @@ import unittest
 from unittest import TestCase
 
 import pythonwrench as pw
+from speechbrain.dataio.dataset import DynamicItemDataset
 
 import torchwrench as tw
 from torchwrench.extras.numpy import _NUMPY_AVAILABLE, np
@@ -52,6 +53,18 @@ class TestTabularDataset(TestCase):
         assert tw.deep_equal(ds[1, 0], data[1, 0])
         assert tw.deep_equal(ds[5, 1, 0], data[5, 1, 0])
         assert tuple(ds.keys()) == tuple(ds.column_names) == (0, 1, 2)
+
+    def test_dynamic_item_dataset(self) -> None:
+        data = {f"{i}": {"string": i} for i in range(100)}
+        ds = DynamicItemDataset(data)
+        ds.set_output_keys(["string"])
+        tabular = TabularDataset(ds)
+
+        assert tabular[0] == {"string": 0}
+        assert tabular[:3] == [{"string": i} for i in range(3)]
+        assert tabular[3, "string"] == 3
+        assert tabular[:3, "string"] == list(range(3))
+        assert tabular[:3, ["string"]] == [list(range(3))]
 
     # def test_dynamic_column(self) -> None:
     #     data = {"a": list(range(5)), "b": list(range(5, 10))}
