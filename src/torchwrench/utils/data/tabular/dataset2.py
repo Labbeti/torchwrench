@@ -247,13 +247,6 @@ class DynamicDatasetWrapper(TabularDatasetInterface):
     def column_names(self) -> tuple:
         return tuple(self._data.pipeline.output_mapping)
 
-    def get_row(self, row_indexer):
-        return self._data[row_indexer]
-
-    def get_column(self, col_indexer):
-        with self._data.output_keys_as(col_indexer):
-            return [data_i[col_indexer] for data_i in self._data]
-
     def to_dataframe(self) -> pd.DataFrame:
         return pd.DataFrame(self[:])
 
@@ -324,7 +317,9 @@ class DynamicDatasetWrapper(TabularDatasetInterface):
 
 class FunctionWrapper(TabularDatasetInterface):
     def __init__(
-        self, fns_list: Iterable[Tuple[Tuple[str, ...], Tuple[str, ...], Callable]]
+        self,
+        fns_list: Iterable[Tuple[Tuple[str, ...], Tuple[str, ...], Callable]],
+        size: int,
     ) -> None:
         fns = {
             tuple(provides): (tuple(requires), fn)
@@ -332,6 +327,30 @@ class FunctionWrapper(TabularDatasetInterface):
         }
         super().__init__()
         self._fns = fns
+        self._size = size
+
+    @property
+    def row_names(self) -> range:
+        return range(self._size)
+
+    @property
+    def column_names(self) -> tuple:
+        return tuple(col for provides in self._fns.keys() for col in provides)
+
+    def to_dataframe(self) -> pd.DataFrame:
+        return pd.DataFrame(self[:])
+
+    def to_dict_list(self) -> Dict[Any, List]:
+        datalist = self[:]
+        return pw.list_dict_to_dict_list(datalist)  # type: ignore
+
+    def to_list_dict(self) -> List[Dict]:
+        datalist = self[:]
+        return datalist  # type: ignore
+
+    def to_numpy(self) -> np.ndarray:
+        datalist = self[:]
+        return np.array([list(item.values()) for item in datalist])  # type: ignore
 
     def __getitem__(self, indexer, /) -> Any:
         if pw.isinstance_generic(indexer, (int, slice, Iterable[int], Iterable[bool])):
@@ -342,8 +361,61 @@ class FunctionWrapper(TabularDatasetInterface):
         else:
             row_indexer = slice(None)
             col_indexer = indexer
+        del indexer
 
-        raise NotImplementedError
+        if col_indexer is None:
+            outputs_keys = self.column_names
+        else:
+            outputs_keys = col_indexer
+
+        if isinstance(row_indexer, int):
+            result = self._get_values(row_indexer, outputs_keys)
+        elif isinstance(row_indexer, slice):
+            row_indexer = range(len(self))[row_indexer]
+            result = [self._get_values(idx, outputs_keys) for idx in row_indexer]
+        elif pw.isinstance_generic(row_indexer, Iterable[int]):
+            result = [self._get_values(idx, outputs_keys) for idx in row_indexer]
+        elif pw.isinstance_generic(row_indexer, Iterable[bool]):
+            row_indexer = multihot_to_multi_indices(row_indexer)
+            result = [self._get_values(idx, outputs_keys) for idx in row_indexer]
+        else:
+            raise TypeError
+
+        if col_indexer is None:
+            return result
+        elif isinstance(row_indexer, int):
+            return [result[col] for col in col_indexer]
+        elif isinstance(col_indexer, (int, str)):
+            return [result_i[col_indexer] for result_i in result]  # type: ignore
+        else:
+            return [[result_i[col] for col in col_indexer] for result_i in result]
+
+    def _get_values(self, idx: int, columns: Iterable[str]) -> Dict[str, Any]:
+        result = {}
+        for col in columns:
+            if col in result:
+                continue
+
+            for provides, (requires, fn) in self._fns.items():
+                if col not in provides:
+                    continue
+
+                fn_inputs_dict = self._get_values(idx, requires)
+                if not isinstance(requires, tuple):
+                    fn_inputs = [fn_inputs_dict[requires]]
+                else:
+                    fn_inputs = [fn_inputs_dict[k] for k in requires]
+
+                fn_output = fn(*fn_inputs)
+
+                if not isinstance(provides, tuple):
+                    fn_output_dict = {provides: fn_output}
+                else:
+                    fn_output_dict = dict(zip(provides, fn_output))
+
+                result |= fn_inputs_dict | fn_output_dict
+                break
+        return result
 
 
 class TabularDataset(TabularDatasetInterface):
