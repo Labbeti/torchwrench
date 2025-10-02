@@ -430,7 +430,7 @@ class TabularDataset(TabularDatasetInterface):
             DynamicItemDataset,
         ],
         row_mapper: Union[SupportsGetitemIterLen, None] = None,
-        column_mapper: Union[SupportsGetitemIterLen, None] = None,
+        col_mapper: Union[SupportsGetitemIterLen, None] = None,
     ) -> None:
         if pw.isinstance_generic(data, Mapping[Any, pw.SupportsGetitemIterLen]):
             wrapper = DictListWrapper(data)
@@ -450,7 +450,7 @@ class TabularDataset(TabularDatasetInterface):
         super().__init__()
         self._wrapper = wrapper
         self._row_mapper = row_mapper
-        self._col_mapper = column_mapper
+        self._col_mapper = col_mapper
 
     @property
     def row_names(self) -> range:
