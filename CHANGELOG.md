@@ -4,8 +4,12 @@
 All notable changes to this project will be documented in this file.
 
 ## [0.7.6] UNRELEASED
+### Added
+- Option `dims` in `pad_dims` now accepts `None` or `"auto"` value.
+
 ### Fixed
-- HDFDataset repr when file is not open.
+- `HDFDataset` repr when file is not open.
+- `pad_dims` now use correct default value for `aligns` when multiple target lengths are used.
 
 ## [0.7.5] 2025-09-11
 ### Added
