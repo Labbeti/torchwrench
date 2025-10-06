@@ -99,6 +99,7 @@ def pad_dims(
         pad_value = pad_value(x)
 
     target_lengths = list(target_lengths)
+
     if isinstance(aligns, str):
         aligns_lst = [aligns] * len(target_lengths)  # type: ignore
     else:
