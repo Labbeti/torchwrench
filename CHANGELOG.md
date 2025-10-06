@@ -7,6 +7,9 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Option `dims` in `pad_dims` now accepts `None` or `"auto"` value.
 
+### Removed
+- `TabularDataset` class since it contained too much bugs and was bad interface.
+
 ### Fixed
 - `HDFDataset` repr when file is not open.
 - `pad_dims` now use correct default value for `aligns` when multiple target lengths are used.
@@ -14,7 +17,7 @@ All notable changes to this project will be documented in this file.
 ## [0.7.5] 2025-09-11
 ### Added
 - `is_numpy_str_array` and `is_numpy_integral_array` functions.
-- `TabularDataset` interface to unify dataset interface with dataframes, list of dicts, dict of lists, tensor, ndarray and DynamicItemDataset.
+- `TabularDataset` class to unify dataset interface with dataframes, list of dicts, dict of lists, tensor, ndarray and DynamicItemDataset.
 
 ### Fixed
 - Args for `__exit__` method in `HDFDataset`.
