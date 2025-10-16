@@ -92,11 +92,11 @@ dev = [
     "setuptools",
     "soundfile",
     "sphinx",
-    "sphinx-press-theme",
     "twine",
     "typing-extensions>=4.10.0",
     "ipykernel",
     "numpy!=2.0.0,!=2.0.1,!=2.0.2",
+    "sphinx-immaterial>=0.11.14",
 ]
 extras = [
     "colorlog",

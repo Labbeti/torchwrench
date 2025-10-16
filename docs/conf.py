@@ -10,10 +10,10 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-import os
 import sys
+from pathlib import Path
 
-sys.path.insert(0, os.path.abspath(".."))
+sys.path.insert(0, str(Path("..", "src").resolve()))
 
 import torchwrench
 
@@ -37,11 +37,13 @@ release = f"{torchwrench.__status__}-{torchwrench.__version__}"
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
-    "sphinx.ext.viewcode",
-    "sphinx.ext.todo",
-    "sphinx.ext.autosummary",
-    "sphinx.ext.coverage",
     "sphinx.ext.intersphinx",
+    "sphinx.ext.todo",
+    "sphinx.ext.coverage",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.githubpages",
+    "sphinx_immaterial",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -54,6 +56,9 @@ templates_path = ["_templates"]
 # Usually you set "language" from the command line for these cases.
 language = "en"
 
+# The name of the Pygments (syntax highlighting) style to use.
+pygments_style = "sphinx"
+
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
@@ -65,7 +70,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "press"
+html_theme = "sphinx_immaterial"
 
 html_theme_options = {
     "external_links": [
@@ -77,7 +82,8 @@ html_theme_options = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["_static"]
+# html_static_path = ["_static"]
+html_static_path = []
 
 
 # -- Extension configuration -------------------------------------------------
@@ -87,12 +93,12 @@ html_static_path = ["_static"]
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
 
-add_module_names = False
-
 intersphinx_mapping = {
     "python": ("https://docs.python.org/", None),
     "torch": ("https://pytorch.org/docs/main/", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
     "h5py": ("https://docs.h5py.org/en/latest/", None),
 }
-maximum_signature_line_length = 10
+
+# add_module_names = False
+# maximum_signature_line_length = 68
