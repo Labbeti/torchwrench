@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file.
 - Option `dims` in `pad_dims` now accepts `None` or `"auto"` value.
 
 ### Removed
-- `TabularDataset` class since it contained too much bugs and was bad interface.
+- `TabularDataset` class since it contained too much bugs.
 
 ### Fixed
 - `HDFDataset` repr when file is not open.
