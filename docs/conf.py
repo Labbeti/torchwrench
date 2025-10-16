@@ -72,11 +72,15 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 #
 html_theme = "sphinx_immaterial"
 
+# html_theme_options = {
+#     "external_links": [
+#         ("Github", "https://github.com/Labbeti/torchwrench"),
+#         ("PyPI", "https://pypi.org/project/torchwrench/"),
+#     ],
+# }
 html_theme_options = {
-    "external_links": [
-        ("Github", "https://github.com/Labbeti/torchwrench"),
-        ("PyPI", "https://pypi.org/project/torchwrench/"),
-    ],
+    "repo_url": "https://github.com/Labbeti/torchwrench",
+    "site_url": "https://pypi.org/project/torchwrench",
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
