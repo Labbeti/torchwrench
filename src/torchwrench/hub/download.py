@@ -79,9 +79,9 @@ def download_file(
     return fpath
 
 
-def _get_filename_from_url(url: str) -> str:
+def _get_filename_from_url(url: str, timeout_s: Optional[float] = None) -> str:
     try:
-        response = urlopen(url)
+        response = urlopen(url, timeout=timeout_s)
         header = response.headers.get("Content-Disposition", "")
         message = Message()
         message["content-type"] = header

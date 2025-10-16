@@ -29,7 +29,7 @@ class TestFilename(TestCase):
         ]
 
         for input_, expected in tests:
-            result = _get_filename_from_url(input_)
+            result = _get_filename_from_url(input_, timeout_s=10.0)
             assert result == expected
 
 
