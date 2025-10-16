@@ -6,7 +6,11 @@ from unittest import TestCase
 
 import torch
 
-from torchwrench.nn.functional.padding import cat_padded_batch, pad_and_stack_rec
+from torchwrench.nn.functional.padding import (
+    cat_padded_batch,
+    pad_and_stack_rec,
+    pad_dims,
+)
 
 
 class TestPad(TestCase):
@@ -179,6 +183,25 @@ class TestCatPaddedBatch(TestCase):
         assert expected_lens.shape == x12_lens.shape
         assert torch.equal(expected, x12)
         assert torch.equal(expected_lens, x12_lens)
+
+
+class TestPadDims(TestCase):
+    def test_example_1(self) -> None:
+        x = torch.arange(5)[None]
+        expected = torch.as_tensor([list(range(5)) + [0] * 3])
+        padded = pad_dims(x, (1, 8))
+        assert torch.equal(padded, expected)
+
+    def test_example_2(self) -> None:
+        x = torch.arange(5)[None]
+        padded = pad_dims(x, (1, 8), dims=(1, 0), aligns=["left", "right"])
+        assert padded.shape == (8, 5)
+
+    def test_example_3(self) -> None:
+        x = torch.arange(5)
+        padded = pad_dims(x, (9,), aligns="center")
+        expected = torch.as_tensor([0, 0, 0, 1, 2, 3, 4, 0, 0])
+        assert torch.equal(padded, expected)
 
 
 if __name__ == "__main__":

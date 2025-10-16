@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import IO, Any, BinaryIO, Callable, Dict, Optional, Union
 
 import torch
-from pythonwrench.io import _setup_output_fpath
+from pythonwrench._core import _setup_output_fpath
 from pythonwrench.semver import Version
 from torch.serialization import DEFAULT_PROTOCOL
 from torch.types import Storage

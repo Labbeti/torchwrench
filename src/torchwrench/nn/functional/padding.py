@@ -8,6 +8,7 @@ from typing import (
     Iterable,
     List,
     Literal,
+    NamedTuple,
     Sized,
     Tuple,
     Union,
@@ -33,6 +34,11 @@ from torchwrench.types import is_number_like
 PadAlign: TypeAlias = Literal["left", "right", "center", "random"]
 PadValue: TypeAlias = Union[Number, Callable[[Tensor], Number]]
 PadMode: TypeAlias = Literal["constant", "reflect", "replicate", "circular"]
+
+
+class PaddedValue(NamedTuple):
+    padded: Tensor
+    lengths: Tensor
 
 
 def pad_dim(
@@ -75,8 +81,8 @@ def pad_dims(
     x: Tensor,
     target_lengths: Iterable[int],
     *,
-    dims: Iterable[int] = (-1,),
-    aligns: Union[PadAlign, Iterable[PadAlign]] = ("left",),
+    dims: Union[Iterable[int], Literal["auto"], None] = None,
+    aligns: Union[PadAlign, Iterable[PadAlign]] = "left",
     pad_value: PadValue = 0.0,
     mode: PadMode = "constant",
     generator: GeneratorLike = None,
@@ -97,14 +103,33 @@ def pad_dims(
     """
     if isinstance(pad_value, Callable):
         pad_value = pad_value(x)
+
+    target_lengths = list(target_lengths)
+
     if isinstance(aligns, str):
-        aligns = [aligns]
+        aligns_lst = [aligns] * len(target_lengths)  # type: ignore
+    else:
+        aligns_lst = list(aligns)
+    del aligns
+
+    if dims == "auto" or dims is None:
+        dims = list(range(-len(target_lengths), 0))
+    else:
+        dims = list(dims)
+
+    if len(target_lengths) != len(dims):
+        msg = f"Invalid number of targets lengths ({len(target_lengths)}) with the number of dimensions ({len(dims)})."
+        raise ValueError(msg)
+
+    if len(aligns_lst) != len(dims):
+        msg = f"Invalid number of aligns ({len(aligns_lst)}) with the number of dimensions ({len(dims)})."
+        raise ValueError(msg)
 
     pad_seq = __generate_pad_seq(
         x.shape,
         target_lengths=target_lengths,
         dims=dims,
-        aligns=aligns,
+        aligns=aligns_lst,  # type: ignore
         generator=generator,
     )
     x = F.pad(x, pad_seq, mode=mode, value=pad_value)
@@ -184,6 +209,25 @@ def pad_and_stack_rec(
             raise TypeError(msg)
 
     return _impl(sequence)
+
+
+def collate_tensors(
+    tensors: Iterable[Tensor],
+    pad_value: float = 0.0,
+    dim: int = -1,
+) -> PaddedValue:
+    tensors = list(tensors)
+    if len(tensors) == 0:
+        return PaddedValue(torch.empty((0,)), torch.empty((0,)))
+
+    device = tensors[0].device
+    lengths = torch.as_tensor([tensor.shape[dim] for tensor in tensors], device=device)
+    maxlength = int(lengths.max().item())
+    tensors = [
+        pad_dim(tensor, maxlength, dim=dim, pad_value=pad_value) for tensor in tensors
+    ]
+    padded = torch.stack(tensors)
+    return PaddedValue(padded, lengths)
 
 
 def cat_padded_batch(

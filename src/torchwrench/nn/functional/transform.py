@@ -631,6 +631,10 @@ def move_to(
 def move_to_rec(*args, **kwargs): ...
 
 
+@function_alias
+def recursive_to(*args, **kwargs): ...
+
+
 # ----------
 # as_tensor
 # ----------

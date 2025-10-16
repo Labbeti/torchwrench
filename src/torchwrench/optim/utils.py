@@ -38,6 +38,17 @@ def create_params_groups_bias(
     skip_list: Optional[Iterable[str]] = (),
     verbose: int = 2,
 ) -> List[Dict[str, Union[List[Parameter], float]]]:
+    """Split parameters into 2 groups with or without weight decay for AdamW optimizer.
+
+    Example
+    =======
+    ```
+    >>> model = nn.Linear(100, 10)
+    >>> weight_decay = 0.01
+    >>> param_groups = create_params_groups_bias(model, weight_decay=weight_decay)
+    >>> optimizer = AdamW(params_groups, weight_decay=weight_decay)
+    ```
+    """
     if isinstance(model, nn.Module):
         params = model.named_parameters()
     else:

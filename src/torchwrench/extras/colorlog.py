@@ -29,6 +29,16 @@ def get_colored_formatter(slurm_rank: bool = False) -> ColoredFormatter:
         msg = "Cannot call function get_colored_formatter because optional dependency 'colorlog' is not installed. Please install it using 'pip install torchwrench[extras]'"
         raise RuntimeError(msg)
 
+    fmt = get_colored_format(slurm_rank=slurm_rank)
+    formatter = ColoredFormatter(fmt=fmt, log_colors=LOG_COLORS)
+    return formatter
+
+
+def get_colored_format(slurm_rank: bool = False) -> str:
+    if not _COLORLOG_AVAILABLE:
+        msg = "Cannot call function get_colored_formatter because optional dependency 'colorlog' is not installed. Please install it using 'pip install torchwrench[extras]'"
+        raise RuntimeError(msg)
+
     if slurm_rank:
         rank = os.getenv("SLURM_PROCID", "0")
         rank_fmt = f"[%(purple)sRANK{rank}%(reset)s]"
@@ -39,5 +49,4 @@ def get_colored_formatter(slurm_rank: bool = False) -> ColoredFormatter:
         rank_fmt
         + "[%(cyan)s%(asctime)s%(reset)s][%(blue)s%(name)s%(reset)s][%(log_color)s%(levelname)s%(reset)s] - %(message)s"
     )
-    formatter = ColoredFormatter(fmt=fmt, log_colors=LOG_COLORS)
-    return formatter
+    return fmt
