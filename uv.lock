@@ -4281,21 +4281,6 @@ wheels = [
 ]
 
 [[package]]
-name = "sphinx-press-theme"
-version = "0.9.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "sphinx", version = "7.1.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
-    { name = "sphinx", version = "7.4.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.9.*'" },
-    { name = "sphinx", version = "8.1.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.10.*'" },
-    { name = "sphinx", version = "8.2.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/e7/25/8769ef130d57ea449309a4ee2d76eed653063b5de27d34100822e34e7e93/sphinx_press_theme-0.9.1.tar.gz", hash = "sha256:1643dee7365f7831d1d3971b389b7c255641a7aced75f0681f71574e380046cf", size = 254696 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/cf/28/fbd928e5dcde4f8acdc7b2b730685dafb35d83437cc0b955332349e12b89/sphinx_press_theme-0.9.1-py3-none-any.whl", hash = "sha256:eed3fdd8df249b67136b507dfc6a84d1a2c5feca5376960c6d4d28ada4f6cdf7", size = 83558 },
-]
-
-[[package]]
 name = "sphinxcontrib-applehelp"
 version = "1.0.4"
 source = { registry = "https://pypi.org/simple" }
@@ -4892,7 +4877,6 @@ dev = [
     { name = "sphinx-immaterial", version = "0.11.14", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
     { name = "sphinx-immaterial", version = "0.12.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.9.*'" },
     { name = "sphinx-immaterial", version = "0.13.8", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
-    { name = "sphinx-press-theme" },
     { name = "twine" },
     { name = "typing-extensions", version = "4.13.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
     { name = "typing-extensions", version = "4.14.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
@@ -4954,7 +4938,6 @@ requires-dist = [
     { name = "speechbrain", marker = "extra == 'extras'", specifier = ">=1.0.3" },
     { name = "sphinx", marker = "extra == 'dev'" },
     { name = "sphinx-immaterial", marker = "extra == 'dev'", specifier = ">=0.11.14" },
-    { name = "sphinx-press-theme", marker = "extra == 'dev'" },
     { name = "tensorboard", marker = "extra == 'extras'" },
     { name = "torch", specifier = ">=1.10.0" },
     { name = "torchaudio", marker = "extra == 'extras'" },
