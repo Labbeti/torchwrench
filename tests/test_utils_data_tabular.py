@@ -66,18 +66,18 @@ class TestTabularDataset(TestCase):
         assert tabular[:3, "string"] == list(range(3))
         assert tabular[:3, ["string"]] == [list(range(3))]
 
-    # def test_dynamic_column(self) -> None:
-    #     data = {"a": list(range(5)), "b": list(range(5, 10))}
-    #     ds = TabularDataset(data)
+    def test_dynamic_column(self) -> None:
+        data = {"a": list(range(5)), "b": list(range(5, 10))}
+        ds = TabularDataset(data)
 
-    #     def double(x):
-    #         return x * 2
+        def double(x):
+            return x * 2
 
-    #     ds.add_dynamic_column(double, takes=("a",), provides=("c",))
-    #     ds.add_output_keys(("c",))
+        ds.add_dynamic_column(double, requires=("a",), provides=("c",))
+        # ds.add_output_keys(("c",))
 
-    #     assert ds[3] == {"a": 3, "b": 8, "c": 6}
-    #     assert tw.deep_equal(ds[4, "c"], data["a"][4] * 2)
+        assert ds[3] == {"a": 3, "b": 8, "c": 6}
+        assert tw.deep_equal(ds[4, "c"], data["a"][4] * 2)
 
 
 if __name__ == "__main__":

@@ -401,14 +401,14 @@ class FunctionWrapper(TabularDatasetInterface):
                     continue
 
                 fn_inputs_dict = self._get_values(idx, requires)
-                if not isinstance(requires, tuple):
+                if not isinstance(requires, (tuple, list)):
                     fn_inputs = [fn_inputs_dict[requires]]
                 else:
                     fn_inputs = [fn_inputs_dict[k] for k in requires]
 
                 fn_output = fn(*fn_inputs)
 
-                if not isinstance(provides, tuple):
+                if not isinstance(provides, (tuple, list)):
                     fn_output_dict = {provides: fn_output}
                 else:
                     fn_output_dict = dict(zip(provides, fn_output))
@@ -416,6 +416,80 @@ class FunctionWrapper(TabularDatasetInterface):
                 result |= fn_inputs_dict | fn_output_dict
                 break
         return result
+
+
+class ColumnConcatWrapper(TabularDatasetInterface):
+    def __init__(self, tabulars: Iterable[TabularDatasetInterface]) -> None:
+        tabulars = list(tabulars)
+        super().__init__()
+        self._tabulars = tabulars
+
+    @property
+    def row_names(self) -> SupportsGetitemIterLen:
+        if len(self._tabulars) == 0:
+            return []
+        return self._tabulars[0].row_names
+
+    @property
+    def column_names(self) -> SupportsGetitemIterLen:
+        return [col for tabular in self._tabulars for col in tabular.column_names]
+
+    def to_dataframe(self) -> pd.DataFrame:
+        return pd.concat(
+            [tabular.to_dataframe() for tabular in self._tabulars], axis="columns"
+        )
+
+    def to_dict_list(self) -> Dict[Any, List]:
+        return pw.reduce_or(
+            [tabular.to_dict_list() for tabular in self._tabulars], start={}
+        )
+
+    def to_list_dict(self) -> List[Dict]:
+        return pw.dict_list_to_list_dict(self.to_dict_list())
+
+    def to_numpy(self) -> np.ndarray:
+        return np.concat([tabular.to_numpy() for tabular in self._tabulars], axis=0)
+
+    def __getitem__(self, indexer, /) -> Any:
+        if pw.isinstance_generic(indexer, (int, slice, Iterable[int], Iterable[bool])):
+            row_indexer = indexer
+            col_indexer = None
+        elif isinstance(indexer, tuple) and len(indexer) == 2:
+            row_indexer, col_indexer = indexer
+        else:
+            row_indexer = slice(None)
+            col_indexer = indexer
+        del indexer
+
+        if col_indexer is None:
+            result = [tabular[row_indexer] for tabular in self._tabulars]
+        elif isinstance(col_indexer, str):
+            result = [
+                tabular[row_indexer, col_indexer]
+                for tabular in self._tabulars
+                if col_indexer in tabular.column_names
+            ]
+            result = result[0]
+            return result
+        elif pw.isinstance_generic(col_indexer, Iterable[str]):
+            result = []
+            for tabular in self._tabulars:
+                included = [col for col in col_indexer if col in tabular.column_names]
+                if len(included) == 0:
+                    continue
+                result_i = tabular[row_indexer, included]
+                result.append(result_i)
+
+            if isinstance(row_indexer, int):
+                return pw.reduce_or(result, start={})
+            else:
+                result_2: list[dict] = []
+                for i, result_lst_dic in enumerate(result):
+                    item = pw.reduce_or(
+                        [result[i][j] for j in range(len(result_lst_dic))], start={}
+                    )
+                    result_2.append(item)
+                return result_2
 
 
 class TabularDataset(TabularDatasetInterface):
@@ -452,8 +526,18 @@ class TabularDataset(TabularDatasetInterface):
         self._row_mapper = row_mapper
         self._col_mapper = col_mapper
 
+    def add_dynamic_column(
+        self,
+        fn: Callable,
+        requires: Tuple[str, ...],
+        provides: Tuple[str, ...],
+    ) -> None:
+        self._wrapper = ColumnConcatWrapper(
+            [self._wrapper, FunctionWrapper([(requires, provides, fn)], self.num_rows)]
+        )
+
     @property
-    def row_names(self) -> range:
+    def row_names(self) -> pw.SupportsGetitemIterLen:
         if self._row_mapper is None:
             return self._wrapper.row_names
         else:
