@@ -2,7 +2,18 @@
 # -*- coding: utf-8 -*-
 
 from abc import abstractmethod
-from typing import Any, Callable, Dict, Iterable, List, Mapping, Tuple, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generic,
+    Iterable,
+    List,
+    Mapping,
+    Tuple,
+    Union,
+    overload,
+)
 
 import numpy as np
 import pandas as pd
@@ -10,52 +21,15 @@ import pythonwrench as pw
 from pythonwrench.typing import SupportsGetitemIterLen
 from speechbrain.dataio.dataset import DynamicItemDataset
 from torch import Tensor
+from typing_extensions import TypeVar
 
 from torchwrench.nn.functional.multilabel import multihot_to_multi_indices
 
-
-class TabularIndexer:
-    def __init__(self, indexer) -> None:
-        super().__init__()
-
-        if pw.isinstance_generic(indexer, (int, slice, Iterable[int], Iterable[bool])):
-            row_indexer = indexer
-            col_indexer = None
-            has_col_indexer = False
-        elif isinstance(indexer, tuple) and len(indexer) == 2:
-            row_indexer, col_indexer = indexer
-            has_col_indexer = True
-        else:
-            row_indexer = slice(None)
-            col_indexer = indexer
-            has_col_indexer = True
-
-        self._row_indexer = row_indexer
-        self._col_indexer = col_indexer
-        self._has_col_indexer = has_col_indexer
-
-    @property
-    def row(self) -> Any:
-        return self._row_indexer
-
-    @property
-    def col(self) -> Any:
-        return self._col_indexer
-
-    @property
-    def has_col_indexer(self) -> Any:
-        return self._has_col_indexer
-
-    @property
-    def single_row(self) -> Any:
-        return isinstance(self._row_indexer, (int, str))
-
-    @property
-    def single_col(self) -> Any:
-        return isinstance(self._col_indexer, (int, str))
+T_RowIndex = TypeVar("T_RowIndex", bound=int, covariant=False, default=int)
+T_ColIndex = TypeVar("T_ColIndex", bound=Union[int, str], covariant=False, default=str)
 
 
-class TabularDatasetInterface:
+class TabularDatasetInterface(Generic[T_RowIndex, T_ColIndex]):
     @property
     def num_rows(self) -> int:
         return len(self.row_names)
@@ -72,7 +46,7 @@ class TabularDatasetInterface:
     def ndim(self) -> int:
         return len(self.shape)
 
-    def keys(self) -> pw.SupportsGetitemIterLen:
+    def keys(self) -> pw.SupportsGetitemIterLen[T_ColIndex]:
         return self.column_names
 
     def values(self) -> list:
@@ -87,12 +61,12 @@ class TabularDatasetInterface:
 
     @property
     @abstractmethod
-    def row_names(self) -> SupportsGetitemIterLen:
+    def row_names(self) -> SupportsGetitemIterLen[T_RowIndex]:
         raise NotImplementedError
 
     @property
     @abstractmethod
-    def column_names(self) -> SupportsGetitemIterLen:
+    def column_names(self) -> SupportsGetitemIterLen[T_ColIndex]:
         raise NotImplementedError
 
     @abstractmethod
@@ -100,24 +74,42 @@ class TabularDatasetInterface:
         raise NotImplementedError
 
     @abstractmethod
-    def to_dict_list(self) -> Dict[Any, List]:
+    def to_dict_list(self) -> Dict[T_ColIndex, List]:
         raise NotImplementedError
 
     @abstractmethod
-    def to_list_dict(self) -> List[Dict]:
+    def to_list_dict(self) -> List[Dict[T_ColIndex, Any]]:
         raise NotImplementedError
 
     @abstractmethod
     def to_numpy(self) -> np.ndarray:
         raise NotImplementedError
 
+    @overload
+    def __getitem__(self, indexer: T_RowIndex, /) -> Dict[T_ColIndex, Any]: ...
+
+    @overload
+    def __getitem__(
+        self,
+        indexer: Union[
+            Iterable[T_RowIndex], Iterable[T_ColIndex], Iterable[bool], slice
+        ],
+        /,
+    ) -> List[Dict[T_ColIndex, Any]]: ...
+
+    @overload
+    def __getitem__(self, indexer: T_ColIndex, /) -> List[Any]: ...
+
+    @overload
+    def __getitem__(self, indexer: Tuple[T_RowIndex, T_ColIndex], /) -> Any: ...
+
     @abstractmethod
     def __getitem__(self, indexer, /) -> Any:
         raise NotImplementedError
 
 
-class DictListWrapper(TabularDatasetInterface):
-    def __init__(self, data: Mapping[Any, pw.SupportsGetitemIterLen]) -> None:
+class DictListWrapper(Generic[T_ColIndex], TabularDatasetInterface[int, T_ColIndex]):
+    def __init__(self, data: Mapping[T_ColIndex, pw.SupportsGetitemIterLen]) -> None:
         lengths = list(map(len, data.values()))
         if not pw.all_eq(lengths):
             msg = f"Invalid data dict lengths. (found {lengths})"
@@ -138,12 +130,12 @@ class DictListWrapper(TabularDatasetInterface):
         return tuple(self._data.keys())
 
     def to_dataframe(self) -> pd.DataFrame:
-        return pd.DataFrame(self._data)
+        return pd.DataFrame(self._data)  # type: ignore
 
-    def to_dict_list(self) -> Dict[Any, List]:
+    def to_dict_list(self) -> Dict[T_ColIndex, List]:
         return {k: list(v) for k, v in self._data.items()}
 
-    def to_list_dict(self) -> List[Dict]:
+    def to_list_dict(self) -> List[Dict[T_ColIndex, Any]]:
         return pw.dict_list_to_list_dict(self._data, "same")
 
     def to_numpy(self) -> np.ndarray:
@@ -153,7 +145,7 @@ class DictListWrapper(TabularDatasetInterface):
         row_indexer, col_indexer, has_col_indexer = _get_row_col_indexer(indexer)
         del indexer
 
-        if not has_col_indexer:
+        if col_indexer is None:
             col_indexer = self.column_names
 
         single_col = False
@@ -195,7 +187,7 @@ class DictListWrapper(TabularDatasetInterface):
                 return result_list
 
 
-class DataFrameWrapper(TabularDatasetInterface):
+class DataFrameWrapper(TabularDatasetInterface[int, str]):
     def __init__(self, data: pd.DataFrame) -> None:
         super().__init__()
         self._data = data
@@ -224,7 +216,7 @@ class DataFrameWrapper(TabularDatasetInterface):
         return self._data[indexer]
 
 
-class TensorOrArrayWrapper(TabularDatasetInterface):
+class TensorOrArrayWrapper(TabularDatasetInterface[int, int]):
     def __init__(self, data: Union[Tensor, np.ndarray]) -> None:
         if data.ndim < 2:
             msg = f"Invalid number of dimensions for TabularDataset. (expected at least 2 dims but found {data.ndim})"
@@ -273,7 +265,7 @@ class TensorOrArrayWrapper(TabularDatasetInterface):
         return self._data.shape
 
 
-class DynamicDatasetWrapper(TabularDatasetInterface):
+class DynamicDatasetWrapper(TabularDatasetInterface[int, str]):
     def __init__(self, data: DynamicItemDataset) -> None:
         super().__init__()
         self._data = data
@@ -347,12 +339,13 @@ class DynamicDatasetWrapper(TabularDatasetInterface):
             return [[result_i[col] for result_i in result] for col in col_indexer]
 
 
-class FunctionWrapper(TabularDatasetInterface):
+class FunctionWrapper(
+    Generic[T_RowIndex, T_ColIndex], TabularDatasetInterface[T_RowIndex, T_ColIndex]
+):
     def __init__(
         self,
-        ds: TabularDatasetInterface,
+        ds: TabularDatasetInterface[T_RowIndex, T_ColIndex],
         fns_list: Iterable[Tuple[Tuple[str, ...], Tuple[str, ...], Callable]],
-        size: int,
     ) -> None:
         fns = {
             tuple(provides): (tuple(requires), fn)
@@ -361,11 +354,10 @@ class FunctionWrapper(TabularDatasetInterface):
         super().__init__()
         self._ds = ds
         self._fns = fns
-        self._size = size
 
     @property
     def row_names(self) -> range:
-        return range(self._size)
+        return range(len(self._ds))
 
     @property
     def column_names(self) -> tuple:
@@ -449,8 +441,12 @@ class FunctionWrapper(TabularDatasetInterface):
         return result
 
 
-class ColumnConcatWrapper(TabularDatasetInterface):
-    def __init__(self, tabulars: Iterable[TabularDatasetInterface]) -> None:
+class ColumnConcatWrapper(
+    Generic[T_RowIndex, T_ColIndex], TabularDatasetInterface[T_RowIndex, T_ColIndex]
+):
+    def __init__(
+        self, tabulars: Iterable[TabularDatasetInterface[T_RowIndex, T_ColIndex]]
+    ) -> None:
         tabulars = list(tabulars)
         super().__init__()
         self._tabulars = tabulars
@@ -516,7 +512,9 @@ class ColumnConcatWrapper(TabularDatasetInterface):
                 return result_2
 
 
-class TabularDataset(TabularDatasetInterface):
+class TabularDataset(
+    Generic[T_RowIndex, T_ColIndex], TabularDatasetInterface[T_RowIndex, T_ColIndex]
+):
     def __init__(
         self,
         data: Union[
@@ -557,7 +555,8 @@ class TabularDataset(TabularDatasetInterface):
         provides: Tuple[str, ...],
     ) -> None:
         self._wrapper = FunctionWrapper(
-            self._wrapper, [(requires, provides, fn)], self.num_rows
+            self._wrapper,
+            [(requires, provides, fn)],
         )
 
     @property

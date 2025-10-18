@@ -5,11 +5,11 @@ import unittest
 from unittest import TestCase
 
 import pythonwrench as pw
-from speechbrain.dataio.dataset import DynamicItemDataset
 
 import torchwrench as tw
 from torchwrench.extras.numpy import _NUMPY_AVAILABLE, np
 from torchwrench.extras.pandas import _PANDAS_AVAILABLE, pd
+from torchwrench.extras.speechbrain import _SPEECHBRAIN_AVAILABLE, DynamicItemDataset
 from torchwrench.utils.data.tabular.dataset2 import TabularDataset
 
 
@@ -74,6 +74,9 @@ class TestTabularDataset(TestCase):
         assert tuple(ds.keys()) == tuple(ds.column_names) == (0, 1, 2)
 
     def test_dynamic_item_dataset(self) -> None:
+        if not _SPEECHBRAIN_AVAILABLE:
+            return None
+
         data = {f"{i}": {"string": i} for i in range(100)}
         ds = DynamicItemDataset(data)
         ds.set_output_keys(["string"])
