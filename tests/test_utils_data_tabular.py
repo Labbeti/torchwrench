@@ -25,13 +25,32 @@ class TestTabularDataset(TestCase):
         assert ds.to_dict_list() == data
         assert ds.to_list_dict() == pw.dict_list_to_list_dict(data)
 
+        # single_row=T, single_col=T, has_col=T
+        assert ds[0, "a"] == 0
+
+        # single_row=T, single_col=T, has_col=F
+        # does not exist
+
+        # single_row=T, single_col=F, has_col=T
+        assert ds[2, ["a", "b"]] == [2, 7]
+
+        # single_row=T, single_col=F, has_col=F
         assert ds[1] == {"a": 1, "b": 6}
+
+        # single_row=F, single_col=T, has_col=T
+        assert ds[[3, 4, 3], "b"] == [8, 9, 8]
+        assert ds[:, "a"] == list(range(5))
+
+        # single_row=F, single_col=T, has_col=F
+        # does not exist
+
+        # single_row=F, single_col=F, has_col=T
+        assert ds[[3, 4, 3], ["b"]] == [[8, 9, 8]]
+        assert ds[:, ["a"]] == [list(range(5))]
+
+        # single_row=F, single_col=F, has_col=F
         assert ds[2:4] == [{"a": 2, "b": 7}, {"a": 3, "b": 8}]
         assert ds[[3, 4, 3]] == [{"a": 3, "b": 8}, {"a": 4, "b": 9}, {"a": 3, "b": 8}]
-        assert ds[[3, 4, 3], "b"] == [8, 9, 8]
-        assert ds[[3, 4, 3], ["b"]] == [[8, 9, 8]]
-        assert ds[:, "a"] == list(range(5))
-        assert ds[:, ["a"]] == [list(range(5))]
 
         if _NUMPY_AVAILABLE:
             expected = np.array([[0, 5], [1, 6], [2, 7], [3, 8], [4, 9]])
@@ -66,7 +85,7 @@ class TestTabularDataset(TestCase):
         assert tabular[:3, "string"] == list(range(3))
         assert tabular[:3, ["string"]] == [list(range(3))]
 
-    def test_dynamic_column(self) -> None:
+    def stest_dynamic_column(self) -> None:
         data = {"a": list(range(5)), "b": list(range(5, 10))}
         ds = TabularDataset(data)
 

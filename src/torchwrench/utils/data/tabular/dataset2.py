@@ -14,6 +14,47 @@ from torch import Tensor
 from torchwrench.nn.functional.multilabel import multihot_to_multi_indices
 
 
+class TabularIndexer:
+    def __init__(self, indexer) -> None:
+        super().__init__()
+
+        if pw.isinstance_generic(indexer, (int, slice, Iterable[int], Iterable[bool])):
+            row_indexer = indexer
+            col_indexer = None
+            has_col_indexer = False
+        elif isinstance(indexer, tuple) and len(indexer) == 2:
+            row_indexer, col_indexer = indexer
+            has_col_indexer = True
+        else:
+            row_indexer = slice(None)
+            col_indexer = indexer
+            has_col_indexer = True
+
+        self._row_indexer = row_indexer
+        self._col_indexer = col_indexer
+        self._has_col_indexer = has_col_indexer
+
+    @property
+    def row(self) -> Any:
+        return self._row_indexer
+
+    @property
+    def col(self) -> Any:
+        return self._col_indexer
+
+    @property
+    def has_col_indexer(self) -> Any:
+        return self._has_col_indexer
+
+    @property
+    def single_row(self) -> Any:
+        return isinstance(self._row_indexer, (int, str))
+
+    @property
+    def single_col(self) -> Any:
+        return isinstance(self._col_indexer, (int, str))
+
+
 class TabularDatasetInterface:
     @property
     def num_rows(self) -> int:
@@ -77,8 +118,9 @@ class TabularDatasetInterface:
 
 class DictListWrapper(TabularDatasetInterface):
     def __init__(self, data: Mapping[Any, pw.SupportsGetitemIterLen]) -> None:
-        if not pw.all_eq(map(len, data.values())):
-            msg = "Invalid data dict lengths."
+        lengths = list(map(len, data.values()))
+        if not pw.all_eq(lengths):
+            msg = f"Invalid data dict lengths. (found {lengths})"
             raise ValueError(msg)
 
         super().__init__()
@@ -108,26 +150,21 @@ class DictListWrapper(TabularDatasetInterface):
         return np.array(list(self._data.values())).T
 
     def __getitem__(self, indexer, /):
-        has_col_indexer = True
-        if pw.isinstance_generic(indexer, (int, slice, Iterable[int], Iterable[bool])):
-            row_indexer = indexer
-            col_indexer = self.column_names
-            has_col_indexer = False
-        elif isinstance(indexer, tuple) and len(indexer) == 2:
-            row_indexer, col_indexer = indexer
-        else:
-            row_indexer = slice(None)
-            col_indexer = indexer
+        row_indexer, col_indexer, has_col_indexer = _get_row_col_indexer(indexer)
         del indexer
 
-        single = False
+        if not has_col_indexer:
+            col_indexer = self.column_names
+
+        single_col = False
         if isinstance(col_indexer, (int, str)):
             col_indexer = [col_indexer]
-            single = True
+            single_col = True
 
+        single_row = False
         if isinstance(row_indexer, int):
             result_dict = {col: self._data[col][row_indexer] for col in col_indexer}
-            return result_dict
+            single_row = True
         elif isinstance(row_indexer, slice):
             result_dict = {col: self._data[col][row_indexer] for col in col_indexer}
         elif pw.isinstance_generic(row_indexer, Iterable[int]):
@@ -144,15 +181,17 @@ class DictListWrapper(TabularDatasetInterface):
             raise TypeError(msg)
 
         if has_col_indexer:
-            if single:
+            if single_col:
                 return next(iter(result_dict.values()))
             else:
                 return list(result_dict.values())
         else:
-            result_list = pw.dict_list_to_list_dict(result_dict, "same")
-            if single:
-                return result_list[0]
+            if single_col:
+                return next(iter(result_dict.values()))
+            elif single_row:
+                return result_dict
             else:
+                result_list = pw.dict_list_to_list_dict(result_dict, "same")
                 return result_list
 
 
@@ -263,14 +302,7 @@ class DynamicDatasetWrapper(TabularDatasetInterface):
         return np.array([list(item.values()) for item in datalist])  # type: ignore
 
     def __getitem__(self, indexer, /):
-        if pw.isinstance_generic(indexer, (int, slice, Iterable[int], Iterable[bool])):
-            row_indexer = indexer
-            col_indexer = None
-        elif isinstance(indexer, tuple) and len(indexer) == 2:
-            row_indexer, col_indexer = indexer
-        else:
-            row_indexer = slice(None)
-            col_indexer = indexer
+        row_indexer, col_indexer, _ = _get_row_col_indexer(indexer)
         del indexer
 
         single_row = False
@@ -318,6 +350,7 @@ class DynamicDatasetWrapper(TabularDatasetInterface):
 class FunctionWrapper(TabularDatasetInterface):
     def __init__(
         self,
+        ds: TabularDatasetInterface,
         fns_list: Iterable[Tuple[Tuple[str, ...], Tuple[str, ...], Callable]],
         size: int,
     ) -> None:
@@ -326,6 +359,7 @@ class FunctionWrapper(TabularDatasetInterface):
             for requires, provides, fn in fns_list
         }
         super().__init__()
+        self._ds = ds
         self._fns = fns
         self._size = size
 
@@ -353,14 +387,7 @@ class FunctionWrapper(TabularDatasetInterface):
         return np.array([list(item.values()) for item in datalist])  # type: ignore
 
     def __getitem__(self, indexer, /) -> Any:
-        if pw.isinstance_generic(indexer, (int, slice, Iterable[int], Iterable[bool])):
-            row_indexer = indexer
-            col_indexer = None
-        elif isinstance(indexer, tuple) and len(indexer) == 2:
-            row_indexer, col_indexer = indexer
-        else:
-            row_indexer = slice(None)
-            col_indexer = indexer
+        row_indexer, col_indexer, _ = _get_row_col_indexer(indexer)
         del indexer
 
         if col_indexer is None:
@@ -394,6 +421,10 @@ class FunctionWrapper(TabularDatasetInterface):
         result = {}
         for col in columns:
             if col in result:
+                continue
+
+            if col in self._ds.column_names:
+                result |= {col: self._ds[idx, col]}
                 continue
 
             for provides, (requires, fn) in self._fns.items():
@@ -451,14 +482,7 @@ class ColumnConcatWrapper(TabularDatasetInterface):
         return np.concat([tabular.to_numpy() for tabular in self._tabulars], axis=0)
 
     def __getitem__(self, indexer, /) -> Any:
-        if pw.isinstance_generic(indexer, (int, slice, Iterable[int], Iterable[bool])):
-            row_indexer = indexer
-            col_indexer = None
-        elif isinstance(indexer, tuple) and len(indexer) == 2:
-            row_indexer, col_indexer = indexer
-        else:
-            row_indexer = slice(None)
-            col_indexer = indexer
+        row_indexer, col_indexer, _ = _get_row_col_indexer(indexer)
         del indexer
 
         if col_indexer is None:
@@ -532,8 +556,8 @@ class TabularDataset(TabularDatasetInterface):
         requires: Tuple[str, ...],
         provides: Tuple[str, ...],
     ) -> None:
-        self._wrapper = ColumnConcatWrapper(
-            [self._wrapper, FunctionWrapper([(requires, provides, fn)], self.num_rows)]
+        self._wrapper = FunctionWrapper(
+            self._wrapper, [(requires, provides, fn)], self.num_rows
         )
 
     @property
@@ -563,14 +587,7 @@ class TabularDataset(TabularDatasetInterface):
         return self._wrapper.to_numpy()
 
     def __getitem__(self, indexer, /) -> Any:
-        if pw.isinstance_generic(indexer, (int, slice, Iterable[int], Iterable[bool])):
-            row_indexer = indexer
-            col_indexer = None
-        elif isinstance(indexer, tuple) and len(indexer) == 2:
-            row_indexer, col_indexer = indexer
-        else:
-            row_indexer = slice(None)
-            col_indexer = indexer
+        row_indexer, col_indexer, _ = _get_row_col_indexer(indexer)
         del indexer
 
         if self._row_mapper is not None:
@@ -598,6 +615,28 @@ class TabularDataset(TabularDatasetInterface):
             result = self._wrapper[row_indexer, col_indexer]
 
         return result
+
+
+def _get_row_col_indexer(
+    indexer: Any,
+) -> Tuple[
+    Union[int, slice, Iterable[int], Iterable[bool]],
+    Union[int, str, Iterable[int], Iterable[str], None],
+    bool,
+]:
+    if pw.isinstance_generic(indexer, (int, slice, Iterable[int], Iterable[bool])):
+        row_indexer = indexer
+        col_indexer = None
+        has_col_indexer = False
+    elif isinstance(indexer, tuple) and len(indexer) == 2:
+        row_indexer, col_indexer = indexer
+        has_col_indexer = True
+    else:
+        row_indexer = slice(None)
+        col_indexer = indexer
+        has_col_indexer = True
+
+    return row_indexer, col_indexer, has_col_indexer
 
 
 def _get_from_indices(
