@@ -627,16 +627,13 @@ def _get_row_col_indexer(
     if pw.isinstance_generic(indexer, (int, slice, Iterable[int], Iterable[bool])):
         row_indexer = indexer
         col_indexer = None
-        has_col_indexer = False
     elif isinstance(indexer, tuple) and len(indexer) == 2:
         row_indexer, col_indexer = indexer
-        has_col_indexer = True
     else:
         row_indexer = slice(None)
         col_indexer = indexer
-        has_col_indexer = True
 
-    return row_indexer, col_indexer, has_col_indexer
+    return row_indexer, col_indexer, col_indexer is not None
 
 
 def _get_from_indices(
