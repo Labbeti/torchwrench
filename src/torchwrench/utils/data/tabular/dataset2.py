@@ -243,7 +243,8 @@ class TensorOrArrayWrapper(TabularDatasetInterface[int, int]):
         return dict(zip(self.column_names, map(list, self._data.transpose(0, 1))))
 
     def to_dynamic_item_dataset(self, id_column_name: int = 0) -> DynamicItemDataset:
-        data_ids = self._data[id_column_name]
+        del id_column_name
+        data_ids = list(range(len(self._data)))
         data = {id_: self._data[i] for i, id_ in enumerate(data_ids)}
         dset = DynamicItemDataset(data)
         return dset
