@@ -21,7 +21,7 @@ class TestTabularDataset(TestCase):
         assert len(ds) == 5
         assert ds.shape == (5, 2)
         assert ds.column_names == ds.keys() == ("a", "b")
-        assert ds.values() == [list(range(5)), list(range(5, 10))]
+        assert list(ds.values()) == [list(range(5)), list(range(5, 10))]
         assert ds.to_dict_list() == data
         assert ds.to_list_dict() == pw.dict_list_to_list_dict(data)
 
@@ -86,7 +86,7 @@ class TestTabularDataset(TestCase):
         assert tabular[:3] == [{"string": i} for i in range(3)]
         assert tabular[3, "string"] == 3
         assert tabular[:3, "string"] == list(range(3))
-        assert tabular[:3, ["string"]] == [list(range(3))]
+        assert tabular[:3, ["string"]] == [[0], [1], [2]]
 
     def stest_dynamic_column(self) -> None:
         data = {"a": list(range(5)), "b": list(range(5, 10))}

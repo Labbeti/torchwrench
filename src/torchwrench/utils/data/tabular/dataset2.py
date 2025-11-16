@@ -6,6 +6,7 @@ from typing import (
     Any,
     Callable,
     Dict,
+    Generator,
     Generic,
     Iterable,
     List,
@@ -24,9 +25,23 @@ from torch import Tensor
 from typing_extensions import TypeVar
 
 from torchwrench.nn.functional.multilabel import multihot_to_multi_indices
+from torchwrench.types import IntegralTensor0D
 
 T_RowIndex = TypeVar("T_RowIndex", bound=int, covariant=False, default=int)
 T_ColIndex = TypeVar("T_ColIndex", bound=Union[int, str], covariant=False, default=str)
+
+
+class SizedGenerator:
+    def __init__(self, generator: Generator, size: int) -> None:
+        super().__init__()
+        self._generator = generator
+        self._size = size
+
+    def __iter__(self):
+        yield from self._generator
+
+    def __len__(self) -> int:
+        return self._size
 
 
 class TabularDatasetInterface(Generic[T_RowIndex, T_ColIndex]):
@@ -49,11 +64,11 @@ class TabularDatasetInterface(Generic[T_RowIndex, T_ColIndex]):
     def keys(self) -> pw.SupportsGetitemIterLen[T_ColIndex]:
         return self.column_names
 
-    def values(self) -> list:
-        return [self[k] for k in self.keys()]
+    def values(self) -> SizedGenerator:
+        return SizedGenerator((self[k] for k in self.keys()), self.num_columns)
 
     def __iter__(self):
-        for row_index in range(self.num_rows):
+        for row_index in self.row_names:
             yield self[row_index]
 
     def __len__(self) -> int:
@@ -98,7 +113,9 @@ class TabularDatasetInterface(Generic[T_RowIndex, T_ColIndex]):
     ) -> List[Dict[T_ColIndex, Any]]: ...
 
     @overload
-    def __getitem__(self, indexer: T_ColIndex, /) -> List[Any]: ...
+    def __getitem__(
+        self, indexer: T_ColIndex, /
+    ) -> Union[List[Any], np.ndarray, Tensor]: ...
 
     @overload
     def __getitem__(self, indexer: Tuple[T_RowIndex, T_ColIndex], /) -> Any: ...
@@ -141,50 +158,27 @@ class DictListWrapper(Generic[T_ColIndex], TabularDatasetInterface[int, T_ColInd
     def to_numpy(self) -> np.ndarray:
         return np.array(list(self._data.values())).T
 
-    def __getitem__(self, indexer, /):
-        row_indexer, col_indexer, has_col_indexer = _get_row_col_indexer(indexer)
-        del indexer
+    def __getitem__(self, indexer_, /):  # type: ignore
+        indexer = _IndexerWrapper(indexer_, self)
+        del indexer_
 
-        if col_indexer is None:
-            col_indexer = self.column_names
+        if indexer.single_col:
+            result = self._data[indexer.col]  # type: ignore
+            result = _get_from_idx_indices_slice_mask(result, indexer.row)
+            return result
 
-        single_col = False
-        if isinstance(col_indexer, (int, str)):
-            col_indexer = [col_indexer]
-            single_col = True
+        result_dict = {
+            col: _get_from_idx_indices_slice_mask(self._data[col], indexer.row)
+            for col in indexer.col  # type: ignore
+        }
 
-        single_row = False
-        if isinstance(row_indexer, int):
-            result_dict = {col: self._data[col][row_indexer] for col in col_indexer}
-            single_row = True
-        elif isinstance(row_indexer, slice):
-            result_dict = {col: self._data[col][row_indexer] for col in col_indexer}
-        elif pw.isinstance_generic(row_indexer, Iterable[int]):
-            result_dict = {
-                col: _get_from_indices(self._data[col], row_indexer)
-                for col in col_indexer
-            }
-        elif pw.isinstance_generic(row_indexer, Iterable[bool]):
-            result_dict = {
-                col: _get_from_mask(self._data[col], row_indexer) for col in col_indexer
-            }
+        if indexer.has_col_indexer:
+            return list(result_dict.values())
+        elif indexer.single_row:
+            return result_dict
         else:
-            msg = f"Invalid argument type {type(row_indexer)}."
-            raise TypeError(msg)
-
-        if has_col_indexer:
-            if single_col:
-                return next(iter(result_dict.values()))
-            else:
-                return list(result_dict.values())
-        else:
-            if single_col:
-                return next(iter(result_dict.values()))
-            elif single_row:
-                return result_dict
-            else:
-                result_list = pw.dict_list_to_list_dict(result_dict, "same")
-                return result_list
+            result_list = pw.dict_list_to_list_dict(result_dict, "same")
+            return result_list
 
 
 class DataFrameWrapper(TabularDatasetInterface[int, str]):
@@ -258,7 +252,7 @@ class TensorOrArrayWrapper(TabularDatasetInterface[int, int]):
             data = data.numpy(force=True)
         return data
 
-    def __getitem__(self, indexer, /):
+    def __getitem__(self, indexer, /):  # type: ignore
         return self._data[indexer]
 
     @property
@@ -276,8 +270,8 @@ class DynamicDatasetWrapper(TabularDatasetInterface[int, str]):
         return range(len(self._data))
 
     @property
-    def column_names(self) -> tuple:
-        return tuple(self._data.pipeline.output_mapping)
+    def column_names(self) -> Tuple[str, ...]:
+        return tuple(self._data.pipeline.output_mapping.keys())
 
     def to_dataframe(self) -> pd.DataFrame:
         return pd.DataFrame(self[:])
@@ -294,64 +288,69 @@ class DynamicDatasetWrapper(TabularDatasetInterface[int, str]):
         datalist = self[:]
         return np.array([list(item.values()) for item in datalist])  # type: ignore
 
-    def __getitem__(self, indexer, /):
-        row_indexer, col_indexer, _ = _get_row_col_indexer(indexer)
-        del indexer
+    def __getitem__(self, indexer_, /):  # type: ignore
+        indexer = _IndexerWrapper(indexer_, self)
+        del indexer_
 
-        single_row = False
-        single_col = False
-
-        if isinstance(col_indexer, (int, str)):
-            col_indexer = [col_indexer]
-            single_col = True
-
-        if col_indexer is None:
-            output_keys = list(self._data.pipeline.output_mapping.keys())
-        else:
-            output_keys = col_indexer
-
+        output_keys = [indexer.col] if indexer.single_col else indexer.col
         with self._data.output_keys_as(output_keys):
-            if isinstance(row_indexer, int):
-                result = self._data[row_indexer]
-                single_row = True
+            result = _get_from_idx_indices_slice_mask(self._data, indexer.row)
 
-            elif isinstance(row_indexer, slice):
-                result = [self._data[idx] for idx in range(len(self))[row_indexer]]
+        # TODO: rm
+        # print(f"{indexer.row=}")
+        # print(f"{indexer.col=}")
+        # breakpoint()
 
-            elif pw.isinstance_generic(row_indexer, Iterable[int]):
-                result = [self._data[idx] for idx in row_indexer]
-
-            elif pw.isinstance_generic(row_indexer, Iterable[bool]):
-                indices = multihot_to_multi_indices(row_indexer)
-                result = [self._data[idx] for idx in indices]
-
-            else:
-                raise TypeError
-
-        if col_indexer is None:
+        if indexer.single_col and indexer.single_row:
+            result = result[indexer.col]
             return result
-        elif single_row and single_col:
-            return result[col_indexer[0]]  # type: ignore
-        elif single_row and not single_col:
-            return {col: result[col] for col in col_indexer}  # type: ignore
-        elif not single_row and single_col:
-            return [result_i[col_indexer[0]] for result_i in result]
+        elif indexer.single_col and not indexer.single_row:
+            result = [result_i[indexer.col] for result_i in result]
+            return result
+        elif indexer.has_col_indexer and indexer.single_row:
+            result = list(result.values())
+            return result
+        elif indexer.has_col_indexer and not indexer.single_row:
+            result = [list(result_i.values()) for result_i in result]
+            return result
+        elif not indexer.single_col:
+            return result
         else:
-            return [[result_i[col] for result_i in result] for col in col_indexer]
+            msg = f"Invalid state {indexer.single_row=}, {indexer.single_col=}, {indexer.has_col_indexer=}."
+            raise TypeError(msg)
 
 
 class FunctionWrapper(
-    Generic[T_RowIndex, T_ColIndex], TabularDatasetInterface[T_RowIndex, T_ColIndex]
+    Generic[T_RowIndex, T_ColIndex],
+    TabularDatasetInterface[T_RowIndex, T_ColIndex],
 ):
     def __init__(
         self,
         ds: TabularDatasetInterface[T_RowIndex, T_ColIndex],
-        fns_list: Iterable[Tuple[Tuple[str, ...], Tuple[str, ...], Callable]],
+        fns_list: Iterable[
+            Tuple[
+                Union[Tuple[T_ColIndex, ...], T_ColIndex],
+                Union[Tuple[T_ColIndex, ...], T_ColIndex],
+                Callable,
+            ]
+        ],
     ) -> None:
-        fns = {
-            tuple(provides): (tuple(requires), fn)
-            for requires, provides, fn in fns_list
-        }
+        fns: Dict[
+            T_ColIndex,
+            Tuple[
+                Union[Tuple[T_ColIndex, ...], T_ColIndex],
+                Union[Tuple[T_ColIndex, ...], T_ColIndex],
+                Callable,
+            ],
+        ] = {}
+        for requires, provides, fn in fns_list:
+            if isinstance(provides, (int, str)):
+                fns[provides] = (requires, provides, fn)  # type: ignore
+                continue
+
+            for provide in provides:
+                fns[provide] = (requires, provides, fn)
+
         super().__init__()
         self._ds = ds
         self._fns = fns
@@ -362,7 +361,7 @@ class FunctionWrapper(
 
     @property
     def column_names(self) -> tuple:
-        return tuple(col for provides in self._fns.keys() for col in provides)
+        return tuple(self._ds.column_names) + tuple(self._fns.keys())
 
     def to_dataframe(self) -> pd.DataFrame:
         return pd.DataFrame(self[:])
@@ -379,138 +378,176 @@ class FunctionWrapper(
         datalist = self[:]
         return np.array([list(item.values()) for item in datalist])  # type: ignore
 
-    def __getitem__(self, indexer, /) -> Any:
-        row_indexer, col_indexer, _ = _get_row_col_indexer(indexer)
-        del indexer
+    def __getitem__(self, indexer_, /) -> Any:
+        indexer = _IndexerWrapper(indexer_, self)
+        del indexer_
 
-        if col_indexer is None:
-            outputs_keys = self.column_names
-        else:
-            outputs_keys = col_indexer
-
-        if isinstance(row_indexer, int):
-            result = self._get_values(row_indexer, outputs_keys)
-        elif isinstance(row_indexer, slice):
-            row_indexer = range(len(self))[row_indexer]
+        outputs_keys: Iterable[T_ColIndex] = (
+            [indexer.col] if indexer.single_col else indexer.col
+        )  # type: ignore
+        if isinstance(indexer.row, int):
+            result = self._get_values(indexer.row, outputs_keys)
+        elif isinstance(indexer.row, slice):
+            row_indexer = range(len(self))[indexer.row]
             result = [self._get_values(idx, outputs_keys) for idx in row_indexer]
-        elif pw.isinstance_generic(row_indexer, Iterable[int]):
-            result = [self._get_values(idx, outputs_keys) for idx in row_indexer]
-        elif pw.isinstance_generic(row_indexer, Iterable[bool]):
-            row_indexer = multihot_to_multi_indices(row_indexer)
+        elif pw.isinstance_generic(indexer.row, Iterable[int]):
+            result = [self._get_values(idx, outputs_keys) for idx in indexer.row]
+        elif pw.isinstance_generic(indexer.row, Iterable[bool]):
+            row_indexer = multihot_to_multi_indices(indexer.row)
             result = [self._get_values(idx, outputs_keys) for idx in row_indexer]
         else:
             raise TypeError
 
-        if col_indexer is None:
+        if not indexer.has_col_indexer:
             return result
-        elif isinstance(row_indexer, int):
-            return [result[col] for col in col_indexer]
-        elif isinstance(col_indexer, (int, str)):
-            return [result_i[col_indexer] for result_i in result]  # type: ignore
+        elif indexer.single_row:
+            return [result[col] for col in indexer.col]  # type: ignore
+        elif indexer.single_col:
+            return [result_i[indexer.col] for result_i in result]  # type: ignore
         else:
-            return [[result_i[col] for col in col_indexer] for result_i in result]
+            return [[result_i[col] for col in indexer.col] for result_i in result]  # type: ignore
 
-    def _get_values(self, idx: int, columns: Iterable[str]) -> Dict[str, Any]:
+    def _get_values(
+        self,
+        idx: int,
+        columns: Iterable[T_ColIndex],
+    ) -> Dict[T_ColIndex, Any]:
         result = {}
         for col in columns:
             if col in result:
                 continue
 
             if col in self._ds.column_names:
-                result |= {col: self._ds[idx, col]}
+                result |= {col: self._ds[idx, col]}  # type: ignore
                 continue
 
-            for provides, (requires, fn) in self._fns.items():
-                if col not in provides:
-                    continue
+            if col not in self._fns.keys():
+                raise KeyError
 
-                fn_inputs_dict = self._get_values(idx, requires)
-                if not isinstance(requires, (tuple, list)):
-                    fn_inputs = [fn_inputs_dict[requires]]
-                else:
-                    fn_inputs = [fn_inputs_dict[k] for k in requires]
+            requires, provides, fn = self._fns[col]
+            if isinstance(requires, (int, str)):
+                requires = [requires]
 
-                fn_output = fn(*fn_inputs)
+            required_values_dict = self._get_values(idx, requires)  # type: ignore
+            required_values_list = [required_values_dict[k] for k in requires]
+            provided_values_list = fn(*required_values_list)
 
-                if not isinstance(provides, (tuple, list)):
-                    fn_output_dict = {provides: fn_output}
-                else:
-                    fn_output_dict = dict(zip(provides, fn_output))
+            if isinstance(provides, (int, str)):
+                provided_values_dict = {provides: provided_values_list}
+            else:
+                provided_values_dict = dict(zip(provides, provided_values_list))
 
-                result |= fn_inputs_dict | fn_output_dict
-                break
+            result |= required_values_dict | provided_values_dict
+
         return result
 
 
 class ColumnConcatWrapper(
-    Generic[T_RowIndex, T_ColIndex], TabularDatasetInterface[T_RowIndex, T_ColIndex]
+    Generic[T_RowIndex, T_ColIndex],
+    TabularDatasetInterface[T_RowIndex, T_ColIndex],
 ):
     def __init__(
-        self, tabulars: Iterable[TabularDatasetInterface[T_RowIndex, T_ColIndex]]
+        self,
+        tabulars: Iterable[TabularDatasetInterface[T_RowIndex, T_ColIndex]],
     ) -> None:
         tabulars = list(tabulars)
+
         super().__init__()
-        self._tabulars = tabulars
+        self._dss = tabulars
 
     @property
     def row_names(self) -> SupportsGetitemIterLen:
-        if len(self._tabulars) == 0:
+        if len(self._dss) == 0:
             return []
-        return self._tabulars[0].row_names
+        return self._dss[0].row_names
 
     @property
     def column_names(self) -> SupportsGetitemIterLen:
-        return [col for tabular in self._tabulars for col in tabular.column_names]
+        return [col for tabular in self._dss for col in tabular.column_names]
 
     def to_dataframe(self) -> pd.DataFrame:
         return pd.concat(
-            [tabular.to_dataframe() for tabular in self._tabulars], axis="columns"
+            [tabular.to_dataframe() for tabular in self._dss], axis="columns"
         )
 
     def to_dict_list(self) -> Dict[Any, List]:
-        return pw.reduce_or(
-            [tabular.to_dict_list() for tabular in self._tabulars], start={}
-        )
+        return pw.reduce_or([tabular.to_dict_list() for tabular in self._dss], start={})
 
     def to_list_dict(self) -> List[Dict]:
         return pw.dict_list_to_list_dict(self.to_dict_list())
 
     def to_numpy(self) -> np.ndarray:
-        return np.concat([tabular.to_numpy() for tabular in self._tabulars], axis=0)
+        return np.concat([tabular.to_numpy() for tabular in self._dss], axis=0)
 
-    def __getitem__(self, indexer, /) -> Any:
-        row_indexer, col_indexer, _ = _get_row_col_indexer(indexer)
-        del indexer
+    def __getitem__(self, indexer_, /) -> Any:
+        indexer = _IndexerWrapper(indexer_, self)
+        del indexer_
 
-        if col_indexer is None:
-            result = [tabular[row_indexer] for tabular in self._tabulars]
-        elif isinstance(col_indexer, str):
-            result = [
-                tabular[row_indexer, col_indexer]
-                for tabular in self._tabulars
-                if col_indexer in tabular.column_names
-            ]
-            result = result[0]
-            return result
-        elif pw.isinstance_generic(col_indexer, Iterable[str]):
-            result = []
-            for tabular in self._tabulars:
-                included = [col for col in col_indexer if col in tabular.column_names]
-                if len(included) == 0:
-                    continue
-                result_i = tabular[row_indexer, included]
-                result.append(result_i)
+        if indexer.single_col:
+            for ds in self._dss:
+                if indexer.col in ds.column_names:  # type: ignore
+                    return ds[indexer.row, indexer.col]  # type: ignore
+            raise TypeError
 
-            if isinstance(row_indexer, int):
-                return pw.reduce_or(result, start={})
+        result = []
+        for ds in self._dss:
+            ds_cols = [col for col in indexer.col if col in ds.column_names]  # type: ignore
+            if len(ds_cols) == 0:
+                continue
+
+            result_i = ds[indexer.row, ds_cols]  # type: ignore
+            result.append(result_i)
+
+        if indexer.single_row:
+            result = pw.reduce_or(result, start={})
+            if indexer.has_col_indexer:
+                return list(result.values())
             else:
-                result_2: list[dict] = []
-                for i, result_lst_dic in enumerate(result):
-                    item = pw.reduce_or(
-                        [result[i][j] for j in range(len(result_lst_dic))], start={}
-                    )
-                    result_2.append(item)
-                return result_2
+                return result
+
+        else:
+            result_size = len(result[0]) if len(result) > 0 else 0
+            result = [
+                pw.reduce_or((result_i[j] for result_i in result), start={})
+                for j in range(result_size)
+            ]
+            if indexer.has_col_indexer:
+                return [list(result_i.values()) for result_i in result]
+            else:
+                return result
+
+        # TODO: rm
+        # if not indexer.has_col_indexer:
+        #     result = [tabular[indexer.row] for tabular in self._dss]
+
+        # elif isinstance(col_indexer, str):
+        #     result = [
+        #         tabular[row_indexer, col_indexer]
+        #         for tabular in self._dss
+        #         if col_indexer in tabular.column_names
+        #     ]
+        #     result = result[0]
+        #     return result
+
+        # elif pw.isinstance_generic(col_indexer, Iterable[str]):
+        #     result = []
+        #     for tabular in self._dss:
+        #         included = [col for col in col_indexer if col in tabular.column_names]
+        #         if len(included) == 0:
+        #             continue
+        #         result_i = tabular[row_indexer, included]
+        #         result.append(result_i)
+
+        #     if isinstance(row_indexer, int):
+        #         return pw.reduce_or(result, start={})
+        #     else:
+        #         result_2: list[dict] = []
+        #         for i, result_lst_dic in enumerate(result):
+        #             item = pw.reduce_or(
+        #                 [result[i][j] for j in range(len(result_lst_dic))], start={}
+        #             )
+        #             result_2.append(item)
+        #         return result_2
 
 
 class TabularDataset(
@@ -526,8 +563,8 @@ class TabularDataset(
             np.ndarray,
             DynamicItemDataset,
         ],
-        row_mapper: Union[SupportsGetitemIterLen, None] = None,
-        col_mapper: Union[SupportsGetitemIterLen, None] = None,
+        row_mapper: Union[SupportsGetitemIterLen[Any, Any], None] = None,
+        col_mapper: Union[SupportsGetitemIterLen[Any, Any], None] = None,
     ) -> None:
         if pw.isinstance_generic(data, Mapping[Any, pw.SupportsGetitemIterLen]):
             wrapper = DictListWrapper(data)
@@ -556,7 +593,7 @@ class TabularDataset(
         provides: Tuple[str, ...],
     ) -> None:
         self._wrapper = FunctionWrapper(
-            self._wrapper,
+            self._wrapper,  # type: ignore
             [(requires, provides, fn)],
         )
 
@@ -586,80 +623,123 @@ class TabularDataset(
     def to_numpy(self) -> np.ndarray:
         return self._wrapper.to_numpy()
 
-    def __getitem__(self, indexer, /) -> Any:
-        row_indexer, col_indexer, _ = _get_row_col_indexer(indexer)
-        del indexer
+    def __getitem__(self, indexer_, /) -> Any:
+        indexer = _IndexerWrapper(indexer_, self)
+        del indexer_
 
-        if self._row_mapper is not None:
-            if isinstance(row_indexer, int):
-                row_indexer = self._row_mapper[row_indexer]
-            elif isinstance(row_indexer, slice):
-                row_indexer = self._row_mapper[row_indexer]
-            elif pw.isinstance_generic(row_indexer, Iterable[int]):
-                row_indexer = _get_from_indices(self._row_mapper, row_indexer)
-            elif pw.isinstance_generic(row_indexer, Iterable[bool]):
-                row_indexer = _get_from_mask(self._row_mapper, row_indexer)
-            else:
-                raise TypeError
+        if self._row_mapper is None:
+            row_indexer = indexer.row
+        else:
+            row_indexer = _get_from_idx_indices_slice_mask(
+                self._row_mapper, indexer.row
+            )
 
-        if col_indexer is None:
+        if not indexer.has_col_indexer:
             result = self._wrapper[row_indexer]
         else:
             if self._col_mapper is None:
-                pass
-            elif isinstance(col_indexer, (int, str)):
-                col_indexer = self._col_mapper[col_indexer]
+                col_indexer = indexer.col
+            elif indexer.single_col:
+                col_indexer = self._col_mapper[indexer.col]
             else:
-                col_indexer = [self._col_mapper[col] for col in col_indexer]
+                col_indexer = [self._col_mapper[col] for col in indexer.col]  # type: ignore
 
             result = self._wrapper[row_indexer, col_indexer]
 
         return result
 
 
-def _get_row_col_indexer(
-    indexer: Any,
-) -> Tuple[
-    Union[int, slice, Iterable[int], Iterable[bool]],
-    Union[int, str, Iterable[int], Iterable[str], None],
-    bool,
-]:
-    if pw.isinstance_generic(indexer, (int, slice, Iterable[int], Iterable[bool])):
-        row_indexer = indexer
-        col_indexer = None
-    elif isinstance(indexer, tuple) and len(indexer) == 2:
-        row_indexer, col_indexer = indexer
-    else:
-        row_indexer = slice(None)
-        col_indexer = indexer
+class _IndexerWrapper:
+    def __init__(
+        self, indexer: Any, dataset: TabularDatasetInterface[Any, Any]
+    ) -> None:
+        super().__init__()
 
-    return row_indexer, col_indexer, col_indexer is not None
+        if pw.isinstance_generic(indexer, (int, slice, Iterable[int], Iterable[bool])):
+            row_indexer = indexer
+            col_indexer = None
+        elif isinstance(indexer, tuple) and len(indexer) == 2:
+            row_indexer, col_indexer = indexer
+        else:
+            row_indexer = slice(None)
+            col_indexer = indexer
+
+        has_col_indexer = col_indexer is not None
+
+        if col_indexer is None:
+            col_indexer = dataset.column_names
+
+        self._row_indexer = row_indexer
+        self._col_indexer = col_indexer
+        self._has_col_indexer = has_col_indexer
+
+    @property
+    def row(self) -> Union[int, slice, Iterable[int], Iterable[bool]]:
+        return self._row_indexer
+
+    @property
+    def col(self) -> Union[int, str, Iterable[int], Iterable[str]]:
+        return self._col_indexer
+
+    @property
+    def single_row(self) -> bool:
+        return isinstance(self._row_indexer, (int,))
+
+    @property
+    def single_col(self) -> bool:
+        return isinstance(self._col_indexer, (int, str))
+
+    @property
+    def has_col_indexer(self) -> bool:
+        return self._has_col_indexer
+
+
+def _get_from_idx_indices_slice_mask(
+    x: Union[Tensor, np.ndarray, pw.SupportsGetitemLen],
+    row_indexer: Union[int, Tensor, np.ndarray, slice, Iterable[int], Iterable[bool]],
+) -> Any:
+    if isinstance(x, DynamicItemDataset) and isinstance(row_indexer, slice):
+        indices = range(len(x))[row_indexer]
+        return [x[idx] for idx in indices]
+    elif isinstance(row_indexer, (int, slice)):
+        return x[row_indexer]  # type: ignore
+    elif isinstance(row_indexer, (IntegralTensor0D, np.integer)):
+        return x[row_indexer.item()]  # type: ignore
+    elif pw.isinstance_generic(row_indexer, Iterable[int]):
+        return _get_from_indices(x, row_indexer)
+    elif pw.isinstance_generic(row_indexer, Iterable[bool]):
+        return _get_from_mask(x, row_indexer)
+    else:
+        msg = f"Invalid argument type {type(row_indexer)=}."
+        raise TypeError(msg)
 
 
 def _get_from_indices(
-    x: Union[Tensor, np.ndarray, Iterable],
+    x: Union[Tensor, np.ndarray, pw.SupportsGetitemLen],
     indices: Union[Tensor, np.ndarray, Iterable],
 ) -> Union[Tensor, np.ndarray, list]:
     if isinstance(x, Tensor) and isinstance(indices, Tensor):
         return x[indices]
-    if isinstance(x, np.ndarray) and isinstance(indices, np.ndarray):
+    elif isinstance(x, np.ndarray) and isinstance(indices, np.ndarray):
         return x[indices]
-    if isinstance(x, list):
-        return [x[idx] for idx in indices]
-
-    raise TypeError
+    elif isinstance(x, pw.SupportsGetitemLen):
+        return [x[idx] for idx in indices]  # type: ignore
+    else:
+        msg = f"Invalid argument type {type(indices)=}."
+        raise TypeError(msg)
 
 
 def _get_from_mask(
-    x: Union[Tensor, np.ndarray, Iterable],
+    x: Union[Tensor, np.ndarray, pw.SupportsGetitemLen],
     mask: Union[Tensor, np.ndarray, Iterable],
 ) -> Union[Tensor, np.ndarray, list]:
     if isinstance(x, Tensor) and isinstance(mask, Tensor):
         return x[mask]
-    if isinstance(x, np.ndarray) and isinstance(mask, np.ndarray):
+    elif isinstance(x, np.ndarray) and isinstance(mask, np.ndarray):
         return x[mask]
-    if isinstance(x, list):
+    elif isinstance(x, pw.SupportsGetitemLen):
         indices = multihot_to_multi_indices(mask)
         return [x[idx] for idx in indices]
-
-    raise TypeError
+    else:
+        msg = f"Invalid argument type {type(mask)=}."
+        raise TypeError(msg)
