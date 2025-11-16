@@ -382,21 +382,24 @@ class FunctionWrapper(
         indexer = _IndexerWrapper(indexer_, self)
         del indexer_
 
-        outputs_keys: Iterable[T_ColIndex] = (
+        row_indexer = indexer.row
+        col_indexer: Iterable[T_ColIndex] = (
             [indexer.col] if indexer.single_col else indexer.col
         )  # type: ignore
-        if isinstance(indexer.row, int):
-            result = self._get_values(indexer.row, outputs_keys)
-        elif isinstance(indexer.row, slice):
-            row_indexer = range(len(self))[indexer.row]
-            result = [self._get_values(idx, outputs_keys) for idx in row_indexer]
-        elif pw.isinstance_generic(indexer.row, Iterable[int]):
-            result = [self._get_values(idx, outputs_keys) for idx in indexer.row]
-        elif pw.isinstance_generic(indexer.row, Iterable[bool]):
-            row_indexer = multihot_to_multi_indices(indexer.row)
-            result = [self._get_values(idx, outputs_keys) for idx in row_indexer]
+
+        if isinstance(row_indexer, int):
+            result = self._get_values(row_indexer, col_indexer)  # type: ignore
+        elif isinstance(row_indexer, slice):
+            row_indexer = range(len(self))[row_indexer]
+            result = [self._get_values(idx, col_indexer) for idx in row_indexer]  # type: ignore
+        elif pw.isinstance_generic(row_indexer, Iterable[bool]):
+            row_indexer = multihot_to_multi_indices(row_indexer)
+            result = [self._get_values(idx, col_indexer) for idx in row_indexer]  # type: ignore
+        elif pw.isinstance_generic(row_indexer, Iterable[int]):
+            result = [self._get_values(idx, col_indexer) for idx in row_indexer]  # type: ignore
         else:
-            raise TypeError
+            msg = f"Invalid argument type {type(row_indexer)=}."
+            raise TypeError(msg)
 
         if not indexer.has_col_indexer:
             return result
@@ -409,37 +412,46 @@ class FunctionWrapper(
 
     def _get_values(
         self,
-        idx: int,
+        idx: T_RowIndex,
         columns: Iterable[T_ColIndex],
     ) -> Dict[T_ColIndex, Any]:
-        result = {}
-        for col in columns:
-            if col in result:
-                continue
+        return _recursive_get_values(idx, columns, self._ds, self._fns)
 
-            if col in self._ds.column_names:
-                result |= {col: self._ds[idx, col]}  # type: ignore
-                continue
 
-            if col not in self._fns.keys():
-                raise KeyError
+def _recursive_get_values(
+    idx: T_RowIndex,
+    columns: Iterable[T_ColIndex],
+    ds: TabularDatasetInterface[T_RowIndex, T_ColIndex],
+    fns: Dict[T_ColIndex, Tuple],
+) -> Dict[T_ColIndex, Any]:
+    result = {}
+    for col in columns:
+        if col in result:
+            continue
 
-            requires, provides, fn = self._fns[col]
-            if isinstance(requires, (int, str)):
-                requires = [requires]
+        if col in ds.column_names:
+            result |= {col: ds[idx, col]}  # type: ignore
+            continue
 
-            required_values_dict = self._get_values(idx, requires)  # type: ignore
-            required_values_list = [required_values_dict[k] for k in requires]
-            provided_values_list = fn(*required_values_list)
+        if col not in fns.keys():
+            raise KeyError
 
-            if isinstance(provides, (int, str)):
-                provided_values_dict = {provides: provided_values_list}
-            else:
-                provided_values_dict = dict(zip(provides, provided_values_list))
+        requires, provides, fn = fns[col]
+        if isinstance(requires, (int, str)):
+            requires = [requires]
 
-            result |= required_values_dict | provided_values_dict
+        required_values_dict = _recursive_get_values(idx, requires, ds, fns)  # type: ignore
+        required_values_list = [required_values_dict[k] for k in requires]
+        provided_values_list = fn(*required_values_list)
 
-        return result
+        if isinstance(provides, (int, str)):
+            provided_values_dict = {provides: provided_values_list}
+        else:
+            provided_values_dict = dict(zip(provides, provided_values_list))
+
+        result |= required_values_dict | provided_values_dict
+
+    return result
 
 
 class ColumnConcatWrapper(
@@ -515,39 +527,6 @@ class ColumnConcatWrapper(
                 return [list(result_i.values()) for result_i in result]
             else:
                 return result
-
-        # TODO: rm
-        # if not indexer.has_col_indexer:
-        #     result = [tabular[indexer.row] for tabular in self._dss]
-
-        # elif isinstance(col_indexer, str):
-        #     result = [
-        #         tabular[row_indexer, col_indexer]
-        #         for tabular in self._dss
-        #         if col_indexer in tabular.column_names
-        #     ]
-        #     result = result[0]
-        #     return result
-
-        # elif pw.isinstance_generic(col_indexer, Iterable[str]):
-        #     result = []
-        #     for tabular in self._dss:
-        #         included = [col for col in col_indexer if col in tabular.column_names]
-        #         if len(included) == 0:
-        #             continue
-        #         result_i = tabular[row_indexer, included]
-        #         result.append(result_i)
-
-        #     if isinstance(row_indexer, int):
-        #         return pw.reduce_or(result, start={})
-        #     else:
-        #         result_2: list[dict] = []
-        #         for i, result_lst_dic in enumerate(result):
-        #             item = pw.reduce_or(
-        #                 [result[i][j] for j in range(len(result_lst_dic))], start={}
-        #             )
-        #             result_2.append(item)
-        #         return result_2
 
 
 class TabularDataset(
