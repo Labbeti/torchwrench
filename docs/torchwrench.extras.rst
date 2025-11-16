@@ -14,6 +14,8 @@ Subpackages
 
    torchwrench.extras.hdf
    torchwrench.extras.numpy
+   torchwrench.extras.pandas
+   torchwrench.extras.speechbrain
    torchwrench.extras.yaml
 
 Submodules

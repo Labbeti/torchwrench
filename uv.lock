@@ -3003,7 +3003,7 @@ dependencies = [
     { name = "typing-extensions", version = "4.13.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
     { name = "typing-extensions", version = "4.14.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4a/50/9e3e9459c85d722f475fcbc6bd7b98992e535d9a899d32df278cf25c940b/pythonwrench-0.4.2.tar.gz", hash = "sha256:06db65d243387bf4bd07cc42b43c804ee798c19673524e57af9ccd477771a1f7", size = 54720, upload-time = "2025-10-16T14:23:59.629Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/50/a5/04fcbae34f93c5c533ff60bb37ac006099cdf38ad63aeac6f6912422420c/pythonwrench-0.4.0.tar.gz", hash = "sha256:e4213f0aae1285b3aea006b8788c592d470ec4481a92d6592556f60bfc4b59a7", size = 53477 }
 
 [[package]]
 name = "pytz"
