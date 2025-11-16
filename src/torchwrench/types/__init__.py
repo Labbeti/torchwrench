@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from pythonwrench.typing import *
+from pythonwrench.typing import *  # type: ignore
 from torch.types import *  # type: ignore
 
 from torchwrench.core.dtype_enum import DTypeEnum
@@ -69,6 +69,11 @@ from .tensor_subclasses import (
     HalfTensor1D,
     HalfTensor2D,
     HalfTensor3D,
+    IntegralTensor,
+    IntegralTensor0D,
+    IntegralTensor1D,
+    IntegralTensor2D,
+    IntegralTensor3D,
     IntTensor,
     IntTensor0D,
     IntTensor1D,
