@@ -7,9 +7,9 @@ from io import BufferedWriter
 from pathlib import Path
 from typing import BinaryIO, Optional, Tuple, Union
 
+from pythonwrench._core import _setup_output_fpath
 from pythonwrench.functools import function_alias
 from pythonwrench.importlib import Placeholder
-from pythonwrench.io import _setup_output_fpath
 from torch import Tensor
 
 from torchwrench.core.packaging import _TORCHAUDIO_AVAILABLE

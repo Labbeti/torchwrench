@@ -6,8 +6,8 @@ from io import BytesIO
 from pathlib import Path
 from typing import Literal, Optional, Union, get_args
 
+from pythonwrench._core import _setup_output_fpath
 from pythonwrench.functools import function_alias
-from pythonwrench.io import _setup_output_fpath
 from pythonwrench.warnings import deprecated_alias
 
 from .definitions import np

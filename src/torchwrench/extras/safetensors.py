@@ -4,8 +4,8 @@
 from pathlib import Path
 from typing import Any, Dict, Literal, Optional, Tuple, Union, overload
 
+from pythonwrench._core import _setup_output_fpath
 from pythonwrench.inspect import get_fullname
-from pythonwrench.io import _setup_output_fpath
 from pythonwrench.typing.checks import isinstance_generic
 from safetensors import safe_open
 from safetensors.torch import save
