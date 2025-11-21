@@ -296,11 +296,6 @@ class DynamicDatasetWrapper(TabularDatasetInterface[int, str]):
         with self._data.output_keys_as(output_keys):
             result = _get_from_idx_indices_slice_mask(self._data, indexer.row)
 
-        # TODO: rm
-        # print(f"{indexer.row=}")
-        # print(f"{indexer.col=}")
-        # breakpoint()
-
         if indexer.single_col and indexer.single_row:
             result = result[indexer.col]
             return result
@@ -531,7 +526,9 @@ class ColumnConcatWrapper(
 
 class IndexerWrapper:
     def __init__(
-        self, indexer: Any, dataset: TabularDatasetInterface[Any, Any]
+        self,
+        indexer: Any,
+        dataset: TabularDatasetInterface[Any, Any],
     ) -> None:
         super().__init__()
 

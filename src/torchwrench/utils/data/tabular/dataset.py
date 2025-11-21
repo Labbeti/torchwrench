@@ -32,6 +32,12 @@ from ._core import (
     _get_from_idx_indices_slice_mask,
 )
 
+__all__ = [
+    "TabularDataset",
+    "T_RowIndex",
+    "T_ColIndex",
+]
+
 
 class TabularDataset(
     Generic[T_RowIndex, T_ColIndex],
