@@ -3,6 +3,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.7] UNRELEASED
+### Modified
+- `move_to` function now supports dataclasses.
+
 ## [0.7.6] 2025-10-16
 ### Added
 - Option `dims` in `pad_dims` now accepts `None` or `"auto"` value.

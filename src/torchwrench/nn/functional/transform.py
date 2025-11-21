@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import math
+from dataclasses import asdict
 from numbers import Real
 from typing import (
     Any,
@@ -35,6 +36,7 @@ from pythonwrench.typing import (
     SupportsIterLen,
     T_BuiltinScalar,
     is_builtin_scalar,
+    is_dataclass_instance,
 )
 from torch import Tensor, nn
 from typing_extensions import Never
@@ -598,29 +600,32 @@ def move_to(
     predicate: Optional[Callable[[Union[Tensor, nn.Module]], bool]] = None,
     **kwargs,
 ) -> Any:
-    """Move all modules and tensors recursively to a specific dtype or device."""
+    """Move all modules and tensors recursively to a specific dtype or device.
+
+    Works recursively on Iterables, Mappings or dataclasses.
+    """
     if "device" in kwargs:
         kwargs["device"] = as_device(kwargs["device"])
+    if "dtype" in kwargs:
+        kwargs["dtype"] = as_dtype(kwargs["dtype"])
 
-    if is_builtin_scalar(x, strict=True):
-        return x
-    elif isinstance(x, (Tensor, nn.Module)):
+    if isinstance(x, (Tensor, nn.Module)):
         if predicate is None or predicate(x):
             return x.to(**kwargs)
         else:
             return x
+    elif is_builtin_scalar(x, strict=True):
+        return x
+    elif is_dataclass_instance(x):
+        return type(x)(**move_to(asdict(x)))
     elif isinstance(x, Mapping):
         return {k: move_to(v, predicate=predicate, **kwargs) for k, v in x.items()}
     elif isinstance(x, Iterable):
         generator = (move_to(xi, predicate=predicate, **kwargs) for xi in x)
         if isinstance(x, PythonGenerator):
             return generator
-        elif isinstance(x, tuple):
-            return tuple(generator)
-        elif isinstance(x, set):
-            return set(generator)
-        elif isinstance(x, frozenset):
-            return frozenset(generator)
+        elif isinstance(x, (tuple, set, frozenset)):
+            return type(x)(generator)
         else:
             return list(generator)
     else:
