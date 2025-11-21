@@ -3,34 +3,41 @@
 
 import itertools
 import random
-from typing import Iterable, Iterator, List, Optional, Sequence, Sized, Union
+from typing import Iterable, Iterator, List, Optional, Sequence, Union
 
+import torch
 from torch import Tensor
 from torch.utils.data.sampler import Sampler
+
+from torchwrench.nn.functional.transform import GeneratorLike, as_generator, as_tensor
 
 
 class SubsetSampler(Sampler):
     """
-    A subset sampler without shuffle.
+    A sampler to loader a subset of a dataset from indices.
     """
 
-    def __init__(self, indexes: List[int], data_source: Optional[Sized] = None) -> None:
-        super().__init__(data_source)
-        self._indexes = indexes
+    def __init__(self, indices: Union[List[int], Tensor]) -> None:
+        if not isinstance(indices, Tensor):
+            indices = as_tensor(indices)
+
+        super().__init__()
+        self._indices = indices
 
     def __iter__(self) -> Iterator[int]:
-        return iter(self._indexes)
+        return iter(self._indices.tolist())
 
     def __len__(self) -> int:
-        return len(self._indexes)
+        return len(self._indices)
 
 
 class SubsetCycleSampler(Sampler):
     def __init__(
         self,
-        indexes: Union[Iterable[int], Tensor],
+        indices: Union[Iterable[int], Tensor],
         n_max_iterations: Optional[int] = None,
         shuffle: bool = True,
+        seed: GeneratorLike = None,
     ) -> None:
         """
         SubsetRandomSampler that cycle on indexes until a number max of iterations is reached.
@@ -42,35 +49,38 @@ class SubsetCycleSampler(Sampler):
         :param shuffle: If True, shuffle the indexes at every len(indexes).
                 (default: True)
         """
-        if isinstance(indexes, Tensor):
-            indexes = indexes.tolist()
-        else:
-            indexes = list(indexes)
+        if not isinstance(indices, Tensor):
+            indices = as_tensor(indices)
 
-        super().__init__(None)
-        self.indexes = indexes
-        self.n_max_iterations = (
-            n_max_iterations if n_max_iterations is not None else len(indexes)
-        )
-        self.shuffle = shuffle
-        self._shuffle()
+        if n_max_iterations is None:
+            n_max_iterations = len(indices)
+        generator = as_generator(seed)
+
+        super().__init__()
+        self._indices = indices
+        self._n_max_iterations = n_max_iterations
+        self._shuffle = shuffle
+        self._generator = generator
+
+        self._shuffle_indices()
 
     def __iter__(self) -> Iterator[int]:
-        for i, idx in enumerate(itertools.cycle(self.indexes)):
-            if i % len(self.indexes) == len(self.indexes) - 1:
-                self._shuffle()
+        for i, idx in enumerate(itertools.cycle(self._indices)):
+            if i % len(self._indices) == len(self._indices) - 1:
+                self._shuffle_indices()
 
-            if i >= self.n_max_iterations:
+            if i >= self._n_max_iterations:
                 break
 
             yield idx
 
     def __len__(self) -> int:
-        return self.n_max_iterations
+        return self._n_max_iterations
 
-    def _shuffle(self):
-        if self.shuffle:
-            random.shuffle(self.indexes)
+    def _shuffle_indices(self):
+        if self._shuffle:
+            perm = torch.randperm(len(self._indices), generator=self._generator)
+            self._indices = self._indices[perm]
 
 
 class SubsetInfiniteCycleSampler(Sampler):
@@ -79,7 +89,7 @@ class SubsetInfiniteCycleSampler(Sampler):
     """
 
     def __init__(self, indexes: List[int], shuffle: bool = True) -> None:
-        super().__init__(None)
+        super().__init__()
         self.indexes = indexes
         self.shuffle = shuffle
         self._shuffle()
@@ -108,11 +118,10 @@ class BalancedSampler(Sampler):
     ) -> None:
         for cls_idx, indexes in enumerate(indexes_per_class):
             if len(indexes) == 0:
-                raise RuntimeError(
-                    f"Found a class index {cls_idx} without any indexes."
-                )
+                msg = f"Found a class index {cls_idx} without any indexes."
+                raise RuntimeError(msg)
 
-        super().__init__(None)
+        super().__init__()
         self.indexes_per_class = indexes_per_class
         self.n_max_samples = n_max_samples
         self.shuffle = shuffle
