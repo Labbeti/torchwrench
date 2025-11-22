@@ -276,10 +276,10 @@ def pad_and_crop_dim(
 
 
 def shuffled(
-    x: Tensor,
+    x: T_Tensor,
     dims: Union[int, Iterable[int]] = -1,
     generator: GeneratorLike = None,
-) -> Tensor:
+) -> T_Tensor:
     """Returns a shuffled version of the input tensor along specific dimension(s)."""
     if isinstance(dims, int):
         dims = [dims]
@@ -291,7 +291,8 @@ def shuffled(
     for dim in dims:
         indices = torch.randperm(x.shape[dim], generator=generator)
         slices[dim] = indices
-    x = x[slices]
+
+    x = x[slices]  # type: ignore
     return x
 
 
