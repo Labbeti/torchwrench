@@ -39,8 +39,7 @@ class SubsetCycleSampler(Sampler):
         shuffle: bool = True,
         seed: GeneratorLike = None,
     ) -> None:
-        """
-        SubsetRandomSampler that cycle on indexes until a number max of iterations is reached.
+        """SubsetRandomSampler that cycle on indexes until a number max of iterations is reached.
 
         :param indexes: The list of indexes of the items.
         :param n_max_iterations: The maximal number of iterations. If None, it will be set to the length of indexes
@@ -50,7 +49,7 @@ class SubsetCycleSampler(Sampler):
                 (default: True)
         """
         if not isinstance(indices, Tensor):
-            indices = as_tensor(indices)
+            indices = as_tensor(indices, dtype="long")
 
         if n_max_iterations is None:
             n_max_iterations = len(indices)
@@ -72,14 +71,18 @@ class SubsetCycleSampler(Sampler):
             if i >= self._n_max_iterations:
                 break
 
-            yield idx
+            yield idx.item()  # type: ignore
 
     def __len__(self) -> int:
         return self._n_max_iterations
 
     def _shuffle_indices(self):
         if self._shuffle:
-            perm = torch.randperm(len(self._indices), generator=self._generator)
+            perm = torch.randperm(
+                len(self._indices),
+                device=self._indices.device,
+                generator=self._generator,
+            )
             self._indices = self._indices[perm]
 
 
