@@ -15,12 +15,14 @@ from torchwrench.nn.functional.transform import (
 )
 
 
-class SubsetSampler(Sampler):
-    """
-    A sampler to loader a subset of a dataset from indices.
-    """
-
+class SubsetSampler(Sampler[int]):
     def __init__(self, indices: Union[List[int], Tensor]) -> None:
+        """
+        A sampler to load a subset of a dataset from indices.
+
+        Args:
+            indices: List of indices to return.
+        """
         indices = as_tensor(indices, dtype="long")
 
         super().__init__()
@@ -33,7 +35,7 @@ class SubsetSampler(Sampler):
         return len(self._indices)
 
 
-class SubsetCycleSampler(Sampler):
+class SubsetCycleSampler(Sampler[int]):
     def __init__(
         self,
         indices: Union[Tensor, Iterable[int]],
@@ -41,15 +43,17 @@ class SubsetCycleSampler(Sampler):
         shuffle: bool = True,
         seed: GeneratorLike = None,
     ) -> None:
-        """SubsetRandomSampler that cycle on indices until a number max of iterations is reached.
+        """SubsetCycleSampler that cycle on indices indifinitely or until a number max of iterations is reached.
 
         Args:
             indices: The list of indices of the items.
-            n_max_iterations: The maximal number of iterations. If None, it will be set to the length of indices
-                and the sampler will have the same behaviour than a SubsetRandomSampler.
-                (default: None)
+            n_max_iterations: The maximal number of iterations.
+                If "inf", any call to __len__ will raises a NotImplementedError exception.
+                defaults to "inf".
             shuffle: If True, shuffle the indices at every len(indices).
-                (default: True)
+                defaults to True.
+            seed: Optional seed or generator used to shuffle indices.
+                defaults to None.
         """
         indices = as_tensor(indices, dtype="long")
         generator = as_generator(seed)
@@ -96,6 +100,18 @@ class BalancedSampler(Sampler):
         shuffle: bool = True,
         seed: GeneratorLike = None,
     ) -> None:
+        """BalancedSampler class.
+
+        Args:
+            indices_per_class: List of indices per class index.
+            n_max_iterations: The maximal number of iterations.
+                If "inf", any call to __len__ will raises a NotImplementedError exception.
+                defaults to "inf".
+            shuffle: If True, shuffle the indices at every len(indices).
+                defaults to True.
+            seed: Optional seed or generator used to shuffle indices.
+                defaults to None.
+        """
         for cls_idx, indices in enumerate(indices_per_class):
             if len(indices) == 0:
                 msg = f"Found a class index {cls_idx} without any indices."
