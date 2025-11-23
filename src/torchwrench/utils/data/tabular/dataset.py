@@ -55,6 +55,7 @@ class TabularDataset(
             Tensor,
             np.ndarray,
             DynamicItemDataset,
+            TabularDatasetInterface[T_RowIndex, T_ColIndex],
         ],
         row_mapper: Union[SupportsGetitemIterLen, None] = None,
         col_mapper: Union[SupportsGetitemIterLen, None] = None,
@@ -66,7 +67,9 @@ class TabularDataset(
             ]
         ] = (),
     ) -> None:
-        if pw.isinstance_generic(data, Mapping[Any, pw.SupportsGetitemIterLen]):
+        if isinstance(data, TabularDatasetInterface):
+            wrapper = data
+        elif pw.isinstance_generic(data, Mapping[Any, pw.SupportsGetitemIterLen]):
             wrapper = DictListWrapper(data)
         elif pw.isinstance_generic(data, pw.SupportsGetitemIterLen[Dict]):
             datadict = pw.list_dict_to_dict_list(data, "same")
@@ -151,7 +154,7 @@ class TabularDataset(
             )
 
         if not indexer.has_col_indexer:
-            result = self._wrapper[row_indexer]
+            result = self._wrapper[row_indexer]  # type: ignore
         else:
             if self._col_mapper is None:
                 col_indexer = indexer.col
@@ -160,6 +163,6 @@ class TabularDataset(
             else:
                 col_indexer = [self._col_mapper[col] for col in indexer.col]  # type: ignore
 
-            result = self._wrapper[row_indexer, col_indexer]
+            result = self._wrapper[row_indexer, col_indexer]  # type: ignore
 
         return result

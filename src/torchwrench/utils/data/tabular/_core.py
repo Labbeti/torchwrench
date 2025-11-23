@@ -562,22 +562,29 @@ class IndexerWrapper:
         indexer: Any,
         dataset: TabularDatasetInterface[Any, Any],
     ) -> None:
-        super().__init__()
+        if isinstance(indexer, IndexerWrapper):
+            row_indexer = indexer._row_indexer
+            col_indexer = indexer._col_indexer
+            has_col_indexer = indexer._has_col_indexer
 
-        if pw.isinstance_generic(indexer, (int, slice, Iterable[int], Iterable[bool])):
-            row_indexer = indexer
-            col_indexer = None
-        elif isinstance(indexer, tuple) and len(indexer) == 2:
-            row_indexer, col_indexer = indexer
         else:
-            row_indexer = slice(None)
-            col_indexer = indexer
+            if pw.isinstance_generic(
+                indexer, (int, slice, Iterable[int], Iterable[bool])
+            ):
+                row_indexer = indexer
+                col_indexer = None
+            elif isinstance(indexer, tuple) and len(indexer) == 2:
+                row_indexer, col_indexer = indexer
+            else:
+                row_indexer = slice(None)
+                col_indexer = indexer
 
-        has_col_indexer = col_indexer is not None
+            has_col_indexer = col_indexer is not None
 
         if col_indexer is None:
             col_indexer = dataset.column_names
 
+        super().__init__()
         self._row_indexer = row_indexer
         self._col_indexer = col_indexer
         self._has_col_indexer = has_col_indexer
