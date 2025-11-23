@@ -28,7 +28,7 @@ maintainers = [
 ]
 dynamic = ["version"]
 dependencies = [
-    "pythonwrench>=0.4.2,<0.5.0",
+    "pythonwrench>=0.4.1,<0.5.0",
     "torch>=1.10.0",
     "typing-extensions>=4.10.0",
 ]
@@ -109,7 +109,7 @@ extras = [
     "scipy",
     "speechbrain>=1.0.3",
     "tensorboard",
-    "torchaudio",
+    "torchaudio<2.9",
     "torchvision",
     "tqdm",
 ]

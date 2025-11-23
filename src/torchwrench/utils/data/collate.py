@@ -42,7 +42,7 @@ class AdvancedCollateDict:
     .. code-block:: python
         :caption:  Example
 
-        >>> collate = AdvancedCollate({"audio": 0.0})
+        >>> collate = AdvancedCollateDict({"audio": 0.0})
         >>> loader = DataLoader(..., collate_fn=collate)
         >>> next(iter(loader))
         ... {"audio": tensor([[...]]), ...}

@@ -21,7 +21,12 @@ T = TypeVar("T", covariant=True)
 U = TypeVar("U", covariant=True)
 
 Indices: TypeAlias = Union[
-    Iterable[bool], Iterable[int], None, slice, Tensor1D, np.ndarray
+    Iterable[bool],
+    Iterable[int],
+    None,
+    slice,
+    Tensor1D,
+    np.ndarray,
 ]
 
 

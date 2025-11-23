@@ -13,5 +13,6 @@ from .dataset import (
     TransformWrapper,
     Wrapper,
 )
+from .sampler import BalancedSampler, SubsetCycleSampler, SubsetSampler
 from .slicer import DatasetSlicer, DatasetSlicerWrapper
 from .split import balanced_monolabel_split, random_split
