@@ -6,6 +6,7 @@ from typing import (
     Callable,
     Dict,
     Generic,
+    Iterable,
     List,
     Mapping,
     Tuple,
@@ -20,6 +21,7 @@ from speechbrain.dataio.dataset import DynamicItemDataset
 from torch import Tensor
 
 from ._core import (
+    ColumnConcatWrapper,
     DataFrameWrapper,
     DictListWrapper,
     DynamicDatasetWrapper,
@@ -53,12 +55,19 @@ class TabularDataset(
             np.ndarray,
             DynamicItemDataset,
         ],
-        row_mapper: Union[SupportsGetitemIterLen[Any, Any], None] = None,
-        col_mapper: Union[SupportsGetitemIterLen[Any, Any], None] = None,
+        row_mapper: Union[SupportsGetitemIterLen, None] = None,
+        col_mapper: Union[SupportsGetitemIterLen, None] = None,
+        fns_list: Iterable[
+            Tuple[
+                Union[Tuple[T_ColIndex, ...], T_ColIndex],
+                Union[Tuple[T_ColIndex, ...], T_ColIndex],
+                Callable,
+            ]
+        ] = (),
     ) -> None:
         if pw.isinstance_generic(data, Mapping[Any, pw.SupportsGetitemIterLen]):
             wrapper = DictListWrapper(data)
-        elif pw.isinstance_generic(data, List[Dict]):
+        elif pw.isinstance_generic(data, pw.SupportsGetitemIterLen[Dict]):
             datadict = pw.list_dict_to_dict_list(data, "same")
             wrapper = DictListWrapper(datadict)
         elif isinstance(data, pd.DataFrame):
@@ -71,21 +80,37 @@ class TabularDataset(
             msg = f"Invalid argument type {type(data)}."
             raise TypeError(msg)
 
+        fns_list = list(fns_list)
+        if len(fns_list) > 0:
+            wrapper = FunctionWrapper(
+                self._wrapper,  # type: ignore
+                fns_list,
+            )
+
         super().__init__()
         self._wrapper = wrapper
         self._row_mapper = row_mapper
         self._col_mapper = col_mapper
 
+    def concat_columns_with(
+        self,
+        other: TabularDatasetInterface[T_RowIndex, T_ColIndex],
+    ) -> ColumnConcatWrapper[T_RowIndex, T_ColIndex]:
+        return ColumnConcatWrapper([self, other])
+
     def add_dynamic_column(
         self,
         fn: Callable,
-        requires: Tuple[str, ...],
-        provides: Tuple[str, ...],
+        requires: Tuple[T_ColIndex, ...],
+        provides: Tuple[T_ColIndex, ...],
     ) -> None:
-        self._wrapper = FunctionWrapper(
-            self._wrapper,  # type: ignore
-            [(requires, provides, fn)],
-        )
+        if isinstance(self._wrapper, FunctionWrapper):
+            self._wrapper.add_dynamic_column(fn, requires, provides)
+        else:
+            self._wrapper = FunctionWrapper(
+                self._wrapper,  # type: ignore
+                [(requires, provides, fn)],
+            )
 
     @property
     def row_names(self) -> pw.SupportsGetitemIterLen:
@@ -130,7 +155,7 @@ class TabularDataset(
             if self._col_mapper is None:
                 col_indexer = indexer.col
             elif indexer.single_col:
-                col_indexer = self._col_mapper[indexer.col]
+                col_indexer = self._col_mapper[indexer.col]  # type: ignore
             else:
                 col_indexer = [self._col_mapper[col] for col in indexer.col]  # type: ignore
 

@@ -330,25 +330,25 @@ class FunctionWrapper(
             ]
         ],
     ) -> None:
-        fns: Dict[
-            T_ColIndex,
-            Tuple[
-                Union[Tuple[T_ColIndex, ...], T_ColIndex],
-                Union[Tuple[T_ColIndex, ...], T_ColIndex],
-                Callable,
-            ],
-        ] = {}
-        for requires, provides, fn in fns_list:
-            if isinstance(provides, (int, str)):
-                fns[provides] = (requires, provides, fn)  # type: ignore
-                continue
-
-            for provide in provides:
-                fns[provide] = (requires, provides, fn)
+        fns = _get_fns_dict(fns_list)
 
         super().__init__()
         self._ds = ds
         self._fns = fns
+
+    def add_dynamic_column(
+        self,
+        fn: Callable,
+        requires: Tuple[T_ColIndex, ...],
+        provides: Tuple[T_ColIndex, ...],
+    ) -> None:
+        invalid = [provide for provide in provides if provide in self._fns]
+        if len(invalid) > 0:
+            msg = f"Found values already provided. (with {invalid=})"
+            raise ValueError(msg)
+
+        for provide in provides:
+            self._fns[provide] = (requires, provides, fn)
 
     @property
     def row_names(self) -> range:
@@ -411,6 +411,34 @@ class FunctionWrapper(
         columns: Iterable[T_ColIndex],
     ) -> Dict[T_ColIndex, Any]:
         return _recursive_get_values(idx, columns, self._ds, self._fns)
+
+
+def _get_fns_dict(
+    fns_list: Iterable[
+        Tuple[
+            Union[Tuple[T_ColIndex, ...], T_ColIndex],
+            Union[Tuple[T_ColIndex, ...], T_ColIndex],
+            Callable,
+        ]
+    ],
+) -> Dict[
+    T_ColIndex,
+    Tuple[
+        Union[Tuple[T_ColIndex, ...], T_ColIndex],
+        Union[Tuple[T_ColIndex, ...], T_ColIndex],
+        Callable,
+    ],
+]:
+    fns = {}
+    for requires, provides, fn in fns_list:
+        if isinstance(provides, (int, str)):
+            fns[provides] = (requires, provides, fn)  # type: ignore
+            continue
+
+        for provide in provides:
+            fns[provide] = (requires, provides, fn)
+
+    return fns
 
 
 def _recursive_get_values(
