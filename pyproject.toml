@@ -109,7 +109,7 @@ extras = [
     "scipy",
     "speechbrain>=1.0.3",
     "tensorboard",
-    "torchaudio",
+    "torchaudio<2.9",
     "torchvision",
     "tqdm",
 ]
