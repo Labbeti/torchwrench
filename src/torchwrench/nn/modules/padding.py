@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from typing import Iterable, Union
+from typing import Iterable, Literal, Union
 
 from pythonwrench.collections import dump_dict
 from torch import Tensor
@@ -78,17 +78,17 @@ class PadDims(Module):
         self,
         target_lengths: Iterable[int],
         *,
-        dims: Iterable[int] = (-1,),
-        aligns: Iterable[PadAlign] = ("left",),
+        dims: Union[Iterable[int], None, Literal["auto"]] = None,
+        aligns: Union[PadAlign, Iterable[PadAlign]] = "left",
         pad_value: PadValue = 0.0,
         mode: PadMode = "constant",
         generator: GeneratorLike = None,
     ) -> None:
         super().__init__()
         self.target_lengths = target_lengths
-        self.aligns = aligns
+        self.dims: Union[Iterable[int], None, Literal["auto"]] = dims
+        self.aligns: Union[PadAlign, Iterable[PadAlign]] = aligns
         self.pad_value = pad_value
-        self.dims = dims
         self.mode: PadMode = mode
         self.generator: GeneratorLike = generator
 

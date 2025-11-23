@@ -114,6 +114,7 @@ from .transform import (  # noqa: F811
     move_to,
     move_to_rec,
     pad_and_crop_dim,
+    recursive_to,
     repeat_interleave_nd,
     resample_nearest_freqs,
     resample_nearest_rates,

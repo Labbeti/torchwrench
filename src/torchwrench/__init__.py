@@ -9,7 +9,7 @@ __author_email__ = "labbeti.pub@gmail.com"
 __license__ = "MIT"
 __maintainer__ = "Étienne Labbé (Labbeti)"
 __status__ = "Development"
-__version__ = "0.7.5"
+__version__ = "0.7.6"
 
 # Import global functions and classes from torch
 # Imports from pythonwrench

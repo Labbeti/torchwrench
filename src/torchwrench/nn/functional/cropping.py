@@ -45,7 +45,7 @@ def crop_dims(
     x: Tensor,
     target_lengths: Iterable[int],
     *,
-    dims: Union[Iterable[int], Literal["auto"]] = "auto",
+    dims: Union[Iterable[int], Literal["auto"], None] = "auto",
     aligns: Union[CropAlign, Iterable[CropAlign]] = "left",
     generator: GeneratorLike = None,
 ) -> Tensor:
@@ -70,7 +70,7 @@ def crop_dims(
         aligns_lst = list(aligns)
     del aligns
 
-    if dims == "auto":
+    if dims == "auto" or dims is None:
         dims = list(range(-len(target_lengths), 0))
     else:
         dims = list(dims)
