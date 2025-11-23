@@ -18,7 +18,6 @@ import pythonwrench as pw
 from pythonwrench.typing import SupportsGetitemIterLen
 from speechbrain.dataio.dataset import DynamicItemDataset
 from torch import Tensor
-from typing_extensions import Self
 
 from torchwrench.extras.pandas import pd
 
@@ -131,10 +130,10 @@ class TabularDataset(
     def to_dataframe(self) -> pd.DataFrame:
         return self._wrapper.to_dataframe()
 
-    def to_dict_list(self) -> Dict[Any, List]:
+    def to_dict_list(self) -> Dict[T_ColIndex, List]:
         return self._wrapper.to_dict_list()
 
-    def to_list_dict(self) -> List[Dict]:
+    def to_list_dict(self) -> List[Dict[T_ColIndex, Any]]:
         return self._wrapper.to_list_dict()
 
     def to_numpy(self) -> np.ndarray:
