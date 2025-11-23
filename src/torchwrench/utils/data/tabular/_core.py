@@ -17,13 +17,14 @@ from typing import (
 )
 
 import numpy as np
-import pandas as pd
 import pythonwrench as pw
 from pythonwrench.typing import SupportsGetitemIterLen
 from speechbrain.dataio.dataset import DynamicItemDataset
 from torch import Tensor
+from torch.utils.data.dataset import Dataset
 from typing_extensions import TypeVar
 
+from torchwrench.extras.pandas import pd
 from torchwrench.nn.functional.multilabel import multihot_to_multi_indices
 from torchwrench.types import IntegralTensor0D
 
@@ -44,7 +45,10 @@ class SizedGenerator:
         return self._size
 
 
-class TabularDatasetInterface(Generic[T_RowIndex, T_ColIndex]):
+class TabularDatasetInterface(Dataset, Generic[T_RowIndex, T_ColIndex]):
+    def __init__(self) -> None:
+        super().__init__()
+
     @property
     def num_rows(self) -> int:
         return len(self.row_names)
@@ -121,7 +125,7 @@ class TabularDatasetInterface(Generic[T_RowIndex, T_ColIndex]):
     def __getitem__(self, indexer: Tuple[T_RowIndex, T_ColIndex], /) -> Any: ...
 
     @abstractmethod
-    def __getitem__(self, indexer, /) -> Any:
+    def __getitem__(self, indexer) -> Any:
         raise NotImplementedError
 
 

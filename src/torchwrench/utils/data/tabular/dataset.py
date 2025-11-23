@@ -14,11 +14,13 @@ from typing import (
 )
 
 import numpy as np
-import pandas as pd
 import pythonwrench as pw
 from pythonwrench.typing import SupportsGetitemIterLen
 from speechbrain.dataio.dataset import DynamicItemDataset
 from torch import Tensor
+from typing_extensions import Self
+
+from torchwrench.extras.pandas import pd
 
 from ._core import (
     ColumnConcatWrapper,
