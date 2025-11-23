@@ -16,10 +16,10 @@ from typing import (
 import numpy as np
 import pythonwrench as pw
 from pythonwrench.typing import SupportsGetitemIterLen
-from speechbrain.dataio.dataset import DynamicItemDataset
 from torch import Tensor
 
 from torchwrench.extras.pandas import pd
+from torchwrench.extras.speechbrain import DynamicItemDataset
 
 from ._core import (
     ColumnConcatWrapper,
