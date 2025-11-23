@@ -7,7 +7,6 @@ from typing import Iterable, Iterator, List, Literal, Sequence, Union
 from torch import Tensor
 from torch.utils.data.sampler import Sampler
 
-from torchwrench.nn.functional.new import arange
 from torchwrench.nn.functional.transform import (
     GeneratorLike,
     as_generator,
@@ -44,11 +43,12 @@ class SubsetCycleSampler(Sampler):
     ) -> None:
         """SubsetRandomSampler that cycle on indices until a number max of iterations is reached.
 
-        :param indices: The list of indices of the items.
-        :param n_max_iterations: The maximal number of iterations. If None, it will be set to the length of indices
+        Args:
+            indices: The list of indices of the items.
+            n_max_iterations: The maximal number of iterations. If None, it will be set to the length of indices
                 and the sampler will have the same behaviour than a SubsetRandomSampler.
                 (default: None)
-        :param shuffle: If True, shuffle the indices at every len(indices).
+            shuffle: If True, shuffle the indices at every len(indices).
                 (default: True)
         """
         indices = as_tensor(indices, dtype="long")
@@ -83,42 +83,9 @@ class SubsetCycleSampler(Sampler):
             raise ValueError(msg)
 
     def _shuffle_indices(self) -> None:
-        if self._shuffle:
-            self._indices = shuffled(self._indices, generator=self._generator)
-
-
-class SubsetInfiniteCycleSampler(Sampler[int]):
-    """SubsetRandomSampler that cycle indefinitely on indices."""
-
-    def __init__(
-        self,
-        indices: Union[Tensor, List[int]],
-        shuffle: bool = True,
-        seed: GeneratorLike = None,
-    ) -> None:
-        indices = as_tensor(indices, dtype="long")
-        generator = as_generator(seed)
-
-        super().__init__()
-        self._indices = indices
-        self._shuffle = shuffle
-        self._generator = generator
-
-        self._shuffle_indices()
-
-    def __iter__(self) -> Iterator[int]:
-        for i, idx in enumerate(itertools.cycle(self._indices)):
-            if i % len(self._indices) == len(self._indices) - 1:
-                self._shuffle_indices()
-
-            yield idx.item()  # type: ignore
-
-    def __len__(self) -> int:
-        raise NotImplementedError("Infinite sampler does not have __len__() method.")
-
-    def _shuffle_indices(self) -> None:
-        if self._shuffle:
-            self._indices = shuffled(self._indices, generator=self._generator)
+        if not self._shuffle:
+            return None
+        self._indices = shuffled(self._indices, generator=self._generator)
 
 
 class BalancedSampler(Sampler):
@@ -157,8 +124,6 @@ class BalancedSampler(Sampler):
         global_idx = 0
         n_classes = len(self._indices_per_class)
         for cls_idx in itertools.cycle(range(n_classes)):
-            cls_idx: int
-
             if global_idx % self._max_idx == self._max_idx - 1:
                 self._shuffle_indices()
 
@@ -180,8 +145,10 @@ class BalancedSampler(Sampler):
         return self._n_max_iterations
 
     def _shuffle_indices(self) -> None:
-        if self._shuffle:
-            for i, pointers in enumerate(self._pointers_per_class):
-                pointers_pt = as_tensor(pointers)
-                pointers_pt = shuffled(pointers_pt, generator=self._generator)
-                self._pointers_per_class[i] = pointers_pt.tolist()
+        if not self._shuffle:
+            return None
+
+        for i, pointers in enumerate(self._pointers_per_class):
+            pointers_pt = as_tensor(pointers)
+            pointers_pt = shuffled(pointers_pt, generator=self._generator)
+            self._pointers_per_class[i] = pointers_pt.tolist()
