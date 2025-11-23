@@ -4,6 +4,10 @@
 All notable changes to this project will be documented in this file.
 
 ## [0.7.7] UNRELEASED
+### Added
+- Re-introduce `TabularDataset` class.
+- `SubsetSampler`, `BalancedSampler` and `SubsetCycleSampler` classes.
+
 ### Modified
 - `move_to` function now supports dataclasses.
 
