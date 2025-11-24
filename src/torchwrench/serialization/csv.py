@@ -39,7 +39,7 @@ def dump_csv(
     make_parents: bool = True,
     backend: CSVBackend = "auto",
     header: Union[bool, Literal["auto"]] = "auto",
-    **backend_kwds,
+    **csv_backend_kwds,
 ) -> str:
     """Dump content to csv format."""
     if backend == "auto":
@@ -56,7 +56,7 @@ def dump_csv(
             make_parents=make_parents,
             to_builtins=to_builtins,
             header=header,
-            **backend_kwds,
+            **csv_backend_kwds,
         )
 
     elif backend == "pandas":
@@ -73,7 +73,7 @@ def dump_csv(
             overwrite=overwrite,
             make_parents=make_parents,
             header=header,
-            **backend_kwds,
+            **csv_backend_kwds,
         )
 
     else:
@@ -101,7 +101,7 @@ def load_csv(
     backend: CSVBackend = "auto",
     # CSV reader kwargs
     delimiter: Optional[str] = None,
-    **backend_kwds,
+    **csv_backend_kwds,
 ) -> List[Dict[str, Any]]: ...
 
 
@@ -117,7 +117,7 @@ def load_csv(
     backend: CSVBackend = "auto",
     # CSV reader kwargs
     delimiter: Optional[str] = None,
-    **backend_kwds,
+    **csv_backend_kwds,
 ) -> Dict[str, List[Any]]: ...
 
 
@@ -133,7 +133,7 @@ def load_csv(
     backend: CSVBackend = "auto",
     # CSV reader kwargs
     delimiter: Optional[str] = None,
-    **backend_kwds,
+    **csv_backend_kwds,
 ) -> pd.DataFrame: ...
 
 
@@ -148,7 +148,7 @@ def load_csv(
     backend: CSVBackend = "auto",
     # CSV reader kwargs
     delimiter: Optional[str] = None,
-    **backend_kwds,
+    **csv_backend_kwds,
 ) -> Union[List[Dict[str, Any]], Dict[str, List[Any]], pd.DataFrame]:
     """Load CSV file using CSV or pandas backend."""
     if backend == "auto":
@@ -179,7 +179,7 @@ def load_csv(
             comment_start=comment_start,
             strip_content=strip_content,
             delimiter=delimiter,
-            **backend_kwds,
+            **csv_backend_kwds,
         )
 
         if orient == "dataframe":
@@ -193,7 +193,7 @@ def load_csv(
             comment_start=comment_start,
             strip_content=strip_content,
             delimiter=delimiter,
-            **backend_kwds,
+            **csv_backend_kwds,
         )
 
     else:
@@ -251,7 +251,7 @@ def _load_csv_with_pandas(
     strip_content: bool = False,
     # Backend kwargs
     delimiter: Optional[str] = None,
-    **backend_kwds,
+    **csv_backend_kwds,
 ) -> Union[List[Dict[str, Any]], Dict[str, List[Any]], pd.DataFrame]:
     backend = "pandas"
 
@@ -267,8 +267,8 @@ def _load_csv_with_pandas(
         msg = f"Invalid argument {comment_start=} with {backend=}."
         raise ValueError(msg)
 
-    if len(backend_kwds) > 0:
-        msg = f"Invalid arguments {backend_kwds=} with {backend=}."
+    if len(csv_backend_kwds) > 0:
+        msg = f"Invalid arguments {csv_backend_kwds=} with {backend=}."
         raise ValueError(msg)
 
     df = pd.read_csv(fpath, delimiter=delimiter)

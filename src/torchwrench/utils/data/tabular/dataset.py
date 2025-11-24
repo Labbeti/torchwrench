@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from pathlib import Path
 from typing import (
     Any,
     Callable,
@@ -15,11 +16,14 @@ from typing import (
 
 import numpy as np
 import pythonwrench as pw
+import torch
 from pythonwrench.typing import SupportsGetitemIterLen
 from torch import Tensor
 
-from torchwrench.extras.pandas import pd
+from torchwrench.extras.pandas import _PANDAS_AVAILABLE, pd
 from torchwrench.extras.speechbrain import DynamicItemDataset
+from torchwrench.serialization.csv import save_csv
+from torchwrench.serialization.json import save_json
 
 from ._core import (
     ColumnConcatWrapper,
@@ -131,16 +135,35 @@ class TabularDataset(
             return self._col_mapper
 
     def to_dataframe(self) -> pd.DataFrame:
-        return self._wrapper.to_dataframe()
+        list_dict = self.to_list_dict()
+        return pd.DataFrame(list_dict)
 
     def to_dict_list(self) -> Dict[T_ColIndex, List]:
-        return self._wrapper.to_dict_list()
+        list_dict = self.to_list_dict()
+        return pw.list_dict_to_dict_list(list_dict, "same")
 
     def to_list_dict(self) -> List[Dict[T_ColIndex, Any]]:
-        return self._wrapper.to_list_dict()
+        return self[:]
 
     def to_numpy(self) -> np.ndarray:
-        return self._wrapper.to_numpy()
+        datalist = self.to_list_dict()
+        return np.array([list(item.values()) for item in datalist])
+
+    def to_tensor(self) -> Tensor:
+        datalist = self.to_list_dict()
+        return torch.as_tensor([list(item.values()) for item in datalist])
+
+    def to_csv(self, fpath: Union[str, Path], *args, **kwargs) -> None:
+        if _PANDAS_AVAILABLE:
+            data = self.to_dataframe()
+        else:
+            data = self.to_dict_list()
+
+        save_csv(data, fpath, *args, **kwargs)
+
+    def to_json(self, fpath: Union[str, Path], *args, **kwargs) -> None:
+        data = self.to_dict_list()
+        save_json(data, fpath, *args, **kwargs)
 
     def __getitem__(self, indexer_, /) -> Any:
         indexer = IndexerWrapper(indexer_, self)

@@ -18,6 +18,7 @@ from typing import (
 
 import numpy as np
 import pythonwrench as pw
+import torch
 from pythonwrench.typing import SupportsGetitemIterLen
 from torch import Tensor
 from torch.utils.data.dataset import Dataset
@@ -104,6 +105,10 @@ class TabularDatasetInterface(Dataset, Generic[T_RowIndex, T_ColIndex]):
     def to_numpy(self) -> np.ndarray:
         raise NotImplementedError
 
+    @abstractmethod
+    def to_tensor(self) -> Tensor:
+        raise NotImplementedError
+
     @overload
     def __getitem__(self, indexer: T_RowIndex, /) -> Dict[T_ColIndex, Any]: ...
 
@@ -162,6 +167,9 @@ class DictListWrapper(Generic[T_ColIndex], TabularDatasetInterface[int, T_ColInd
     def to_numpy(self) -> np.ndarray:
         return np.array(list(self._data.values())).T
 
+    def to_tensor(self) -> Tensor:
+        return torch.as_tensor(list(self._data.values())).T
+
     def __getitem__(self, indexer_, /):  # type: ignore
         indexer = IndexerWrapper(indexer_, self)
         del indexer_
@@ -210,6 +218,9 @@ class DataFrameWrapper(TabularDatasetInterface[int, str]):
     def to_numpy(self) -> np.ndarray:
         return self._data.to_numpy()
 
+    def to_tensor(self) -> Tensor:
+        return torch.from_numpy(self._data.to_numpy())
+
     def __getitem__(self, indexer, /):
         return self._data[indexer]
 
@@ -256,6 +267,12 @@ class TensorOrArrayWrapper(TabularDatasetInterface[int, int]):
             data = data.numpy(force=True)
         return data
 
+    def to_tensor(self) -> Tensor:
+        data = self._data
+        if isinstance(data, np.ndarray):
+            data = torch.from_numpy(data)
+        return data
+
     def __getitem__(self, indexer, /):  # type: ignore
         return self._data[indexer]
 
@@ -291,6 +308,10 @@ class DynamicDatasetWrapper(TabularDatasetInterface[int, str]):
     def to_numpy(self) -> np.ndarray:
         datalist = self[:]
         return np.array([list(item.values()) for item in datalist])  # type: ignore
+
+    def to_tensor(self) -> Tensor:
+        datalist = self[:]
+        return torch.as_tensor([list(item.values()) for item in datalist])  # type: ignore
 
     def __getitem__(self, indexer_, /):  # type: ignore
         indexer = IndexerWrapper(indexer_, self)
@@ -376,6 +397,10 @@ class FunctionWrapper(
     def to_numpy(self) -> np.ndarray:
         datalist = self[:]
         return np.array([list(item.values()) for item in datalist])  # type: ignore
+
+    def to_tensor(self) -> Tensor:
+        datalist = self[:]
+        return torch.as_tensor([list(item.values()) for item in datalist])  # type: ignore
 
     def __getitem__(self, indexer_, /) -> Any:
         indexer = IndexerWrapper(indexer_, self)
@@ -517,6 +542,9 @@ class ColumnConcatWrapper(
 
     def to_numpy(self) -> np.ndarray:
         return np.concat([tabular.to_numpy() for tabular in self._dss], axis=0)
+
+    def to_tensor(self) -> Tensor:
+        return torch.cat([tabular.to_tensor() for tabular in self._dss], dim=0)
 
     def __getitem__(self, indexer_, /) -> Any:
         indexer = IndexerWrapper(indexer_, self)
