@@ -18,7 +18,6 @@ from torchwrench.nn.functional.transform import (
     resample_nearest_rates,
     shuffled,
     top_p,
-    unsqueeze,
     view_as_complex,
 )
 from torchwrench.utils import return_types
