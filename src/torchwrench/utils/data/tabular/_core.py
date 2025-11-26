@@ -365,14 +365,15 @@ class FunctionWrapper(
         self,
         fn: Callable,
         requires: Tuple[T_ColIndex, ...],
-        provides: Tuple[T_ColIndex, ...],
+        provides: Union[T_ColIndex, Tuple[T_ColIndex, ...]],
     ) -> None:
-        invalid = [provide for provide in provides if provide in self._fns]
+        provides_list = [provides] if isinstance(provides, (int, str)) else provides
+        invalid = [provide for provide in provides_list if provide in self._fns]
         if len(invalid) > 0:
             msg = f"Found values already provided. (with {invalid=})"
             raise ValueError(msg)
 
-        for provide in provides:
+        for provide in provides_list:
             self._fns[provide] = (requires, provides, fn)
 
     @property
@@ -427,6 +428,8 @@ class FunctionWrapper(
 
         if not indexer.has_col_indexer:
             return result
+        elif indexer.single_row and indexer.single_col:
+            return result[indexer.col]  # type: ignore
         elif indexer.single_row:
             return [result[col] for col in indexer.col]  # type: ignore
         elif indexer.single_col:
@@ -500,7 +503,6 @@ def _recursive_get_values(
             provided_values_dict = {provides: provided_values_list}
         else:
             provided_values_dict = dict(zip(provides, provided_values_list))
-
         result |= required_values_dict | provided_values_dict
 
     return result
@@ -616,6 +618,9 @@ class IndexerWrapper:
         self._row_indexer = row_indexer
         self._col_indexer = col_indexer
         self._has_col_indexer = has_col_indexer
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self._row_indexer}, {self._col_indexer}, {self._has_col_indexer})"
 
     @property
     def row(self) -> Union[int, slice, Iterable[int], Iterable[bool]]:

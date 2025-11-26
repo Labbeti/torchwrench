@@ -66,6 +66,14 @@ class TestTabularDataset(TestCase):
         data: np.ndarray = np.random.rand(10, 3, 2)
         ds = TabularDataset(data)
 
+        result_list_dict = ds.to_list_dict()
+        expected_list_dict = [
+            {j: data_ij for j, data_ij in enumerate(data_i)} for data_i in data
+        ]
+        assert tw.deep_equal(result_list_dict, expected_list_dict), (
+            f"{result_list_dict=}; {expected_list_dict=}"
+        )
+
         assert tw.deep_equal(ds.to_numpy(), data)
         assert tw.deep_equal(ds[0], data[0])
         assert tw.deep_equal(ds[:2], data[:2])
@@ -88,18 +96,21 @@ class TestTabularDataset(TestCase):
         assert tabular[:3, "string"] == list(range(3))
         assert tabular[:3, ["string"]] == [[0], [1], [2]]
 
-    def stest_dynamic_column(self) -> None:
+    def test_dynamic_column(self) -> None:
         data = {"a": list(range(5)), "b": list(range(5, 10))}
         ds = TabularDataset(data)
 
         def double(x):
             return x * 2
 
-        ds.add_dynamic_column(double, requires=("a",), provides=("c",))
+        ds.add_dynamic_column(double, requires=("a",), provides="c")
         # ds.add_output_keys(("c",))
 
-        assert ds[3] == {"a": 3, "b": 8, "c": 6}
-        assert tw.deep_equal(ds[4, "c"], data["a"][4] * 2)
+        # assert ds[3] == {"a": 3, "b": 8, "c": 6}
+
+        result = ds[4, "c"]
+        expected = double(data["a"][4])
+        assert result == expected, f"{result=}; {expected=}"
 
 
 if __name__ == "__main__":

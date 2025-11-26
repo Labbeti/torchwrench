@@ -110,7 +110,7 @@ class TabularDataset(
         self,
         fn: Callable,
         requires: Tuple[T_ColIndex, ...],
-        provides: Tuple[T_ColIndex, ...],
+        provides: Union[T_ColIndex, Tuple[T_ColIndex, ...]],
     ) -> None:
         if isinstance(self._wrapper, FunctionWrapper):
             self._wrapper.add_dynamic_column(fn, requires, provides)
@@ -143,7 +143,12 @@ class TabularDataset(
         return pw.list_dict_to_dict_list(list_dict, "same")
 
     def to_list_dict(self) -> List[Dict[T_ColIndex, Any]]:
-        return self[:]
+        datalist = self._wrapper.to_list_dict()
+        datalist = [
+            {col: datalist[row][col] for col in self.column_names}
+            for row in self.row_names
+        ]
+        return datalist
 
     def to_numpy(self) -> np.ndarray:
         datalist = self.to_list_dict()
