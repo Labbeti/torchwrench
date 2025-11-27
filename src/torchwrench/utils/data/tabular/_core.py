@@ -72,6 +72,12 @@ class TabularDatasetInterface(Dataset, Generic[T_RowIndex, T_ColIndex]):
     def values(self) -> SizedGenerator:
         return SizedGenerator((self[k] for k in self.keys()), self.num_columns)
 
+    def concat_columns_with(
+        self,
+        other: "TabularDatasetInterface[T_RowIndex, T_ColIndex]",
+    ) -> "ColumnConcatWrapper[T_RowIndex, T_ColIndex]":
+        return ColumnConcatWrapper([self, other])
+
     def __iter__(self):
         for row_index in self.row_names:
             yield self[row_index]
@@ -381,17 +387,17 @@ class FunctionWrapper(
         return range(len(self._ds))
 
     @property
-    def column_names(self) -> tuple:
+    def column_names(self) -> Tuple[T_ColIndex, ...]:
         return tuple(self._ds.column_names) + tuple(self._fns.keys())
 
     def to_dataframe(self) -> pd.DataFrame:
         return pd.DataFrame(self.to_dict_list())
 
-    def to_dict_list(self) -> Dict[Any, List]:
+    def to_dict_list(self) -> Dict[T_ColIndex, List]:
         datalist = self.to_list_dict()
         return pw.list_dict_to_dict_list(datalist)
 
-    def to_list_dict(self) -> List[Dict]:
+    def to_list_dict(self) -> List[Dict[T_ColIndex, Any]]:
         datalist = self[:]
         return datalist  # type: ignore
 

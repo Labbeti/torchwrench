@@ -100,12 +100,6 @@ class TabularDataset(
         self._row_mapper = row_mapper
         self._col_mapper = col_mapper
 
-    def concat_columns_with(
-        self,
-        other: TabularDatasetInterface[T_RowIndex, T_ColIndex],
-    ) -> ColumnConcatWrapper[T_RowIndex, T_ColIndex]:
-        return ColumnConcatWrapper([self, other])
-
     def add_dynamic_column(
         self,
         fn: Callable,
