@@ -248,6 +248,10 @@ class TensorOrArrayWrapper(TabularDatasetInterface[int, int]):
     def column_names(self) -> range:
         return range(self._data.shape[1])
 
+    @property
+    def shape(self) -> Tuple[int, ...]:
+        return self._data.shape
+
     def to_dataframe(self) -> pd.DataFrame:
         data = self._data
         if isinstance(data, Tensor):
@@ -281,10 +285,6 @@ class TensorOrArrayWrapper(TabularDatasetInterface[int, int]):
 
     def __getitem__(self, indexer, /):  # type: ignore
         return self._data[indexer]
-
-    @property
-    def shape(self) -> Tuple[int, ...]:
-        return self._data.shape
 
 
 class DynamicDatasetWrapper(TabularDatasetInterface[int, str]):
