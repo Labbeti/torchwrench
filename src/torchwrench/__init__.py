@@ -51,6 +51,7 @@ from . import hub as hub
 from . import nn as nn
 from . import optim as optim
 from . import serialization as serialization
+from . import special as special
 from . import types as types
 from . import utils as utils
 
