@@ -11,6 +11,7 @@ from torchwrench.core.make import (
     DTypeLike,
     GeneratorLike,
     as_device,
+    as_dtype,
     as_generator,
 )
 from torchwrench.nn import functional as F
@@ -58,7 +59,7 @@ def randperm_diff(
     generator: GeneratorLike = None,
     device: DeviceLike = None,
     *,
-    dtype: DTypeLike = None,
+    dtype: DTypeLike = torch.long,
 ) -> LongTensor1D:
     """This function ensure that every value i cannot be the element at index i.
     The output will be a tensor of shape (size,).
@@ -79,8 +80,9 @@ def randperm_diff(
     if size < 2:
         raise ValueError(f"Invalid argument {size=} < 2 for randperm_diff.")
 
-    device = as_device(device)
     generator = as_generator(generator)
+    device = as_device(device)
+    dtype = as_dtype(dtype)
 
     perm_kws: Dict[str, Any] = dict(generator=generator, device=device, dtype=dtype)
     arange = F.arange(size, device=device, dtype=dtype)
