@@ -385,23 +385,23 @@ class FunctionWrapper(
         return tuple(self._ds.column_names) + tuple(self._fns.keys())
 
     def to_dataframe(self) -> pd.DataFrame:
-        return pd.DataFrame(self[:])
+        return pd.DataFrame(self.to_dict_list())
 
     def to_dict_list(self) -> Dict[Any, List]:
-        datalist = self[:]
-        return pw.list_dict_to_dict_list(datalist)  # type: ignore
+        datalist = self.to_list_dict()
+        return pw.list_dict_to_dict_list(datalist)
 
     def to_list_dict(self) -> List[Dict]:
         datalist = self[:]
         return datalist  # type: ignore
 
     def to_numpy(self) -> np.ndarray:
-        datalist = self[:]
-        return np.array([list(item.values()) for item in datalist])  # type: ignore
+        datalist = self.to_list_dict()
+        return np.array([list(item.values()) for item in datalist])
 
     def to_tensor(self) -> Tensor:
-        datalist = self[:]
-        return torch.as_tensor([list(item.values()) for item in datalist])  # type: ignore
+        datalist = self.to_list_dict()
+        return torch.as_tensor([list(item.values()) for item in datalist])
 
     def __getitem__(self, indexer_, /) -> Any:
         indexer = IndexerWrapper(indexer_, self)
