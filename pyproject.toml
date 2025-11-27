@@ -90,7 +90,6 @@ dev = [
     "pytest",
     "ruff>=0.12.0",
     "setuptools",
-    "soundfile",
     "sphinx",
     "twine",
     "typing-extensions>=4.10.0",
@@ -112,4 +111,5 @@ extras = [
     "torchaudio<2.9",
     "torchvision",
     "tqdm",
+    "soundfile",
 ]
