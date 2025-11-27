@@ -149,7 +149,7 @@ def load_yaml(
     Loader: YamlLoaders = SafeLoader,
     on_error: Literal["raise", "ignore"] = "raise",
 ) -> Any:
-    """Load content from yaml filepath."""
+    """Load YAML from filepath or opened file."""
     if not _YAML_AVAILABLE:
         msg = f"Cannot use python module {__file__} since pyyaml package is not installed. Please install it with `pip install torchwrench[extras]`."
         raise ImportError(msg)
@@ -170,6 +170,7 @@ def loads_yaml(
     Loader: YamlLoaders = SafeLoader,
     on_error: Literal["raise", "ignore"] = "raise",
 ) -> Any:
+    """Load YAML from string and text-io stream."""
     if isinstance(content, str):
         with io.StringIO(content) as buffer:
             return loads_yaml(buffer, Loader=Loader, on_error=on_error)
