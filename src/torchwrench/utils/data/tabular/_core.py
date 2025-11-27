@@ -485,7 +485,7 @@ def _recursive_get_values(
             continue
 
         if col in ds.column_names:
-            result |= {col: ds[idx, col]}  # type: ignore
+            result[col] = ds[idx, col]
             continue
 
         if col not in fns.keys():
@@ -503,7 +503,9 @@ def _recursive_get_values(
             provided_values_dict = {provides: provided_values_list}
         else:
             provided_values_dict = dict(zip(provides, provided_values_list))
-        result |= required_values_dict | provided_values_dict
+
+        result.update(required_values_dict)
+        result.update(provided_values_dict)
 
     return result
 
