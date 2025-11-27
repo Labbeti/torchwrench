@@ -26,7 +26,6 @@ from torchwrench.serialization.csv import save_csv
 from torchwrench.serialization.json import save_json
 
 from ._core import (
-    ColumnConcatWrapper,
     DataFrameWrapper,
     DictListWrapper,
     DynamicDatasetWrapper,
