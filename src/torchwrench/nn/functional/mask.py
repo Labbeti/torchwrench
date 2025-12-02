@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from typing import Iterable, List, Optional, Union
+from typing import Iterable, List, Optional, Tuple, Union
 
 import torch
 from torch import Tensor
@@ -340,12 +340,13 @@ def tensor_to_pad_mask(
 
 
 def tensor_to_tensors_list(
-    tensor: Tensor,
+    x: Tensor,
     *,
     pad_value: Optional[float] = None,
     end_value: Optional[float] = None,
     non_pad_mask: Optional[Tensor] = None,
-    lengths: Optional[Tensor] = None,
+    lengths: Union[None, Tensor, List[int]] = None,
+    dim: int = -1,
 ) -> List[Tensor]:
     """Convert padded tensor to tensor list.
 
@@ -359,31 +360,46 @@ def tensor_to_tensors_list(
         `end_value`: End value index. defaults to None.
         `non_pad_mask`: Optional non-padded boolean mask. defaults to None.
         `lengths`: Length of each sequence in padded batch.
+        `dim`: Dimension to get lengths. defaults to -1.
     """
     if pad_value is not None:
-        lengths = tensor_to_lengths(tensor, pad_value=pad_value)
-        return tensor_to_tensors_list(tensor, lengths=lengths)
+        lengths = tensor_to_lengths(x, pad_value=pad_value, dim=dim)
+        return tensor_to_tensors_list(x, lengths=lengths, dim=dim)
 
     elif end_value is not None:
-        lengths = tensor_to_lengths(tensor, end_value=end_value)
-        return tensor_to_tensors_list(tensor, lengths=lengths)
+        lengths = tensor_to_lengths(x, end_value=end_value, dim=dim)
+        return tensor_to_tensors_list(x, lengths=lengths, dim=dim)
 
     elif non_pad_mask is not None:
-        lengths = non_pad_mask_to_lengths(non_pad_mask)
-        return tensor_to_tensors_list(tensor, lengths=lengths)
+        lengths = non_pad_mask_to_lengths(non_pad_mask, dim=dim)
+        return tensor_to_tensors_list(x, lengths=lengths, dim=dim)
 
     elif lengths is not None:
-        slices_lst = [
-            [slice(None) for _ in range(tensor.ndim)] + [slice(0, len_)]
-            for len_ in lengths
-        ]
-        tensors = [tensor[slices] for slices in slices_lst]
+        if isinstance(lengths, Tensor):
+            lengths = lengths.tolist()
+
+        if x.ndim > 2:
+            dim = dim % x.ndim
+            return [
+                tensor_to_tensors_list(xi, lengths=length_i, dim=dim - 1)
+                for xi, length_i in zip(x, lengths)
+            ]  # type: ignore
+
+        if x.ndim != 2:
+            msg = f"Invalid argument {x.ndim=}. (expected >=2)"
+            raise ValueError(msg)
+
+        slices_lst: List[Tuple[slice, ...]] = []
+        for i, length in enumerate(lengths):
+            slices: list = [i] * x.ndim
+            slices[dim] = slice(0, length)
+            slices_lst.append(tuple(slices))
+        result = [x[slices] for slices in slices_lst]
+        return result
 
     else:
         msg = "Invalid arguments. Please provide only one of the arguments : end_value, pad_value, non_pad_mask or lengths."
         raise ValueError(msg)
-
-    return tensors
 
 
 def tensors_list_to_lengths(tensors: List[Tensor], dim: int = -1) -> LongTensor1D:

@@ -29,10 +29,10 @@ from torchwrench.core.make import (
     as_generator,
 )
 from torchwrench.nn import functional as F
-from torchwrench.types import is_number_like
+from torchwrench.types import Tensor0D, is_number_like
 
 PadAlign: TypeAlias = Literal["left", "right", "center", "random"]
-PadValue: TypeAlias = Union[Number, Callable[[Tensor], Number]]
+PadValue: TypeAlias = Union[Number, Tensor0D, Callable[[Tensor], Number]]
 PadMode: TypeAlias = Literal["constant", "reflect", "replicate", "circular"]
 
 
@@ -59,6 +59,7 @@ def pad_dim(
         dims: Axis/dim to pad. defaults to -1.
         align: Alignement for pad.
         pad_value: Pad value used to fill tensor. defaults to 0.0.
+            Note: Complex values is currently not supported.
         mode: Pad mode used. defaults to "constant".
         generator: Random generator when align is "random".
 
@@ -95,6 +96,7 @@ def pad_dims(
         dims: Dimensions for each length. Must be of size M. If "auto", creates a list of the M last dimensions.
         aligns: Alignement or list of alignements for each dimension of size M.
         pad_value: Pad value used to fill tensor. defaults to 0.0.
+            Note: Complex values is currently not supported.
         mode: Pad mode used. defaults to "constant".
         generator: Random generator when aligns is "random".
 
@@ -132,7 +134,7 @@ def pad_dims(
         aligns=aligns_lst,  # type: ignore
         generator=generator,
     )
-    x = F.pad(x, pad_seq, mode=mode, value=pad_value)
+    x = F.pad(x, pad_seq, mode=mode, value=pad_value)  # type: ignore
     return x
 
 
@@ -149,6 +151,7 @@ def pad_and_stack_rec(
     Args:
         sequence: The sequence to pad. Must be convertable to tensor by having the correct number of dims in all sublists.
         pad_value: The pad value used. defaults to 0.
+            Note: Complex values is currently not supported.
         align: Alignement used for padding. defaults to "left".
         device: The device of the output Tensor. defaults to None.
         dtype: The dtype of the output Tensor. defaults to None.
@@ -275,7 +278,7 @@ def cat_padded_batch(
     if max_size_12 < sum_size_12:
         slices = [slice(None) for _ in range(ndim)]
         slices[seq_dim] = slice(max_size_12)
-        x12 = x12[slices]
+        x12 = x12[tuple(slices)]
 
     return x12, x12_lens
 

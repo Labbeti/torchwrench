@@ -7,7 +7,7 @@ from unittest import TestCase
 
 import torch
 
-from torchwrench import as_tensor
+from torchwrench import as_tensor, deep_equal
 from torchwrench.nn.functional.mask import (
     generate_square_subsequent_mask,
     lengths_to_non_pad_mask,
@@ -19,6 +19,8 @@ from torchwrench.nn.functional.mask import (
     pad_mask_to_lengths,
     tensor_to_non_pad_mask,
     tensor_to_pad_mask,
+    tensor_to_tensors_list,
+    tensors_list_to_lengths,
 )
 
 
@@ -264,6 +266,23 @@ class TestMaskLengths(TestCase):
             torch.equal(pad_mask, expected_mask),
             f"{include_end=}; {pad_mask=}; {expected_mask=}",
         )
+
+    def test_tensor_to_tensors_list_example_1(self) -> None:
+        x = torch.as_tensor([[1, 1, 0], [1, 0, 0], [1, 1, 1], [0, 0, 0]])
+        expected = [
+            torch.as_tensor([1, 1]),
+            torch.as_tensor([1]),
+            torch.as_tensor([1, 1, 1]),
+            torch.as_tensor([], dtype=x.dtype),
+        ]
+        result = tensor_to_tensors_list(x, pad_value=0)
+        assert deep_equal(result, expected), f"\n{result=};\n{expected=}"
+
+    def test_tensors_list_to_lengths_example_1(self) -> None:
+        x = [torch.as_tensor([1, 2]), torch.as_tensor([3])]
+        expected = [2, 1]
+        result = tensors_list_to_lengths(x)
+        assert deep_equal(result, expected), f"{result=}; {expected=}"
 
 
 class TestGenerateSqMask(TestCase):
