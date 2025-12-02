@@ -6,9 +6,9 @@
 Note: torchwrench.FloatTensor != torch.FloatTensor but issubclass(torchwrench.FloatTensor, torch.FloatTensor) is False because torch.FloatTensor cannot be subclassed
 
 Here is an overview of the valid tensor subclasses tree:
-                                                                            Tensor
-                                                                              |
-                  +---------------------------------------+-------------------+------------------------------------+
+                                                                        Tensor
+                                                                          |
+                  +---------------------------------------+---------------+----------------------------------------+
                   |                                       |                                                        |
         ComplexFloatingTensor                       FloatingTensor                                           IntegralTensor
                   |                                       |                                                        |
@@ -714,6 +714,14 @@ class _TensorNDBase(
     tolist = torch.Tensor.tolist  # noqa: F811  # type: ignore
     unsqueeze = torch.Tensor.unsqueeze  # noqa: F811  # type: ignore
     view = torch.Tensor.view  # noqa: F811  # type: ignore
+
+
+# # TODO: rm
+# class TTensor(
+#     Generic[T_DType, T_NDim, T_BuiltinNumber, T_Floating, T_Complex, T_Signed],
+#     _TensorNDBase[T_DType, T_NDim, T_BuiltinNumber, T_Floating, T_Complex, T_Signed],
+#     metaclass=_TensorNDMeta,
+# ): ...
 
 
 class Tensor(
