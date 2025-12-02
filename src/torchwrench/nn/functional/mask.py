@@ -381,9 +381,9 @@ def tensor_to_tensors_list(
         if x.ndim > 2:
             dim = dim % x.ndim
             return [
-                tensor_to_tensors_list(xi, lengths=length_i, dim=dim - 1)
+                tensor_to_tensors_list(xi, lengths=length_i, dim=dim - 1)  # type: ignore
                 for xi, length_i in zip(x, lengths)
-            ]  # type: ignore
+            ]
 
         if x.ndim != 2:
             msg = f"Invalid argument {x.ndim=}. (expected >=2)"
