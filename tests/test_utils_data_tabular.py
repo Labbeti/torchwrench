@@ -104,9 +104,8 @@ class TestTabularDataset(TestCase):
             return x * 2
 
         ds.add_dynamic_column(double, requires=("a",), provides="c")
-        # ds.add_output_keys(("c",))
 
-        # assert ds[3] == {"a": 3, "b": 8, "c": 6}
+        assert ds[3] == {"a": 3, "b": 8, "c": 6}
 
         result = ds[4, "c"]
         expected = double(data["a"][4])
