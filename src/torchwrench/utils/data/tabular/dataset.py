@@ -17,11 +17,11 @@ from typing import (
 
 import numpy as np
 import pythonwrench as pw
-import torch
 from pythonwrench.typing import SupportsGetitemIterLen
 from torch import Tensor
 from typing_extensions import Self
 
+import torchwrench as tw
 from torchwrench.extras.pandas import pd
 from torchwrench.extras.speechbrain import DynamicItemDataset
 from torchwrench.serialization.csv import read_csv, save_csv
@@ -161,7 +161,7 @@ class TabularDataset(
 
     def to_tensor(self) -> Tensor:
         datalist = self.to_list_dict()
-        return torch.as_tensor([list(item.values()) for item in datalist])
+        return tw.as_tensor([list(item.values()) for item in datalist])
 
     def to_csv(self, fpath: Union[str, Path], *args, **kwargs) -> None:
         data = self.to_dict_list()

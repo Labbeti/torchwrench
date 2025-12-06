@@ -111,6 +111,14 @@ class TestTabularDataset(TestCase):
         expected = double(data["a"][4])
         assert result == expected, f"{result=}; {expected=}"
 
+    def test_tensor(self) -> None:
+        data = tw.rand(10, 2, 3)
+        ds = TabularDataset(data)
+        mask = tw.rand(data.shape[0]) > 0.5
+
+        assert tw.deep_equal(ds.to_tensor(), data)
+        assert tw.deep_equal(ds[mask], data[mask])
+
 
 if __name__ == "__main__":
     unittest.main()

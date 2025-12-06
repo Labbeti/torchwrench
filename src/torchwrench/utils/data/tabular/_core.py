@@ -27,7 +27,7 @@ from typing_extensions import TypeVar
 from torchwrench.extras.pandas import pd
 from torchwrench.extras.speechbrain import DynamicItemDataset
 from torchwrench.nn.functional.multilabel import multihot_to_multi_indices
-from torchwrench.types import IntegralTensor0D
+from torchwrench.types import IntegralTensor, SignedIntegerTensor0D
 
 T_RowIndex = TypeVar("T_RowIndex", bound=int, covariant=False, default=int)
 T_ColIndex = TypeVar("T_ColIndex", bound=Union[int, str], covariant=False, default=str)
@@ -607,7 +607,7 @@ class IndexerWrapper:
 
         else:
             if pw.isinstance_generic(
-                indexer, (int, slice, Iterable[int], Iterable[bool])
+                indexer, (int, slice, Iterable[int], Iterable[bool], IntegralTensor)
             ):
                 row_indexer = indexer
                 col_indexer = None
@@ -631,7 +631,7 @@ class IndexerWrapper:
         return f"{self.__class__.__name__}({self._row_indexer}, {self._col_indexer}, {self._has_col_indexer})"
 
     @property
-    def row(self) -> Union[int, slice, Iterable[int], Iterable[bool]]:
+    def row(self) -> Union[int, slice, Iterable[int], Iterable[bool], IntegralTensor]:
         return self._row_indexer
 
     @property
@@ -660,7 +660,7 @@ def _get_from_idx_indices_slice_mask(
         return [x[idx] for idx in indices]
     elif isinstance(row_indexer, (int, slice)):
         return x[row_indexer]  # type: ignore
-    elif isinstance(row_indexer, (IntegralTensor0D, np.integer)):
+    elif isinstance(row_indexer, (SignedIntegerTensor0D, np.integer)):
         return x[row_indexer.item()]  # type: ignore
     elif pw.isinstance_generic(row_indexer, Iterable[int]):
         return _get_from_indices(x, row_indexer)
