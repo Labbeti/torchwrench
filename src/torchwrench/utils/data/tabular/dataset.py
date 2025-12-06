@@ -182,9 +182,7 @@ class TabularDataset(
                 self._row_mapper, indexer.row
             )
 
-        if not indexer.has_col_indexer:
-            result = self._wrapper[row_indexer]  # type: ignore
-        else:
+        if indexer.has_col_indexer:
             if self._col_mapper is None:
                 col_indexer = indexer.col
             elif indexer.single_col:
@@ -193,5 +191,7 @@ class TabularDataset(
                 col_indexer = [self._col_mapper[col] for col in indexer.col]  # type: ignore
 
             result = self._wrapper[row_indexer, col_indexer]  # type: ignore
+        else:
+            result = self._wrapper[row_indexer]  # type: ignore
 
         return result

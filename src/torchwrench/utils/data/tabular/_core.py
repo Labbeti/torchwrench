@@ -27,7 +27,12 @@ from typing_extensions import TypeVar
 from torchwrench.extras.pandas import pd
 from torchwrench.extras.speechbrain import DynamicItemDataset
 from torchwrench.nn.functional.multilabel import multihot_to_multi_indices
-from torchwrench.types import IntegralTensor, SignedIntegerTensor0D
+from torchwrench.types import (
+    BoolTensor1D,
+    IntegralTensor,
+    SignedIntegerTensor0D,
+    SignedIntegerTensor1D,
+)
 
 T_RowIndex = TypeVar("T_RowIndex", bound=int, covariant=False, default=int)
 T_ColIndex = TypeVar("T_ColIndex", bound=Union[int, str], covariant=False, default=str)
@@ -662,9 +667,9 @@ def _get_from_idx_indices_slice_mask(
         return x[row_indexer]  # type: ignore
     elif isinstance(row_indexer, (SignedIntegerTensor0D, np.integer)):
         return x[row_indexer.item()]  # type: ignore
-    elif pw.isinstance_generic(row_indexer, Iterable[int]):
+    elif pw.isinstance_generic(row_indexer, (Iterable[int], SignedIntegerTensor1D)):
         return _get_from_indices(x, row_indexer)
-    elif pw.isinstance_generic(row_indexer, Iterable[bool]):
+    elif pw.isinstance_generic(row_indexer, (Iterable[bool], BoolTensor1D)):
         return _get_from_mask(x, row_indexer)
     else:
         msg = f"Invalid argument type {type(row_indexer)=}."
