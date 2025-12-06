@@ -216,7 +216,7 @@ def all_eq(
             slices: List[Union[slice, int, None]] = [slice(None) for _ in range(x.ndim)]
             slices[dim] = 0
             slices.insert(dim + 1, None)
-            return (x == x[slices]).all(dim)  # type: ignore
+            return (x == x[tuple(slices)]).all(dim)  # type: ignore
 
     elif isinstance(x, (np.ndarray, np.generic)):
         return numpy_all_eq(x, dim=dim)  # type: ignore

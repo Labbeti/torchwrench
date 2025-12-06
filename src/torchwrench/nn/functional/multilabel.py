@@ -427,6 +427,7 @@ def probs_to_multihot(
 
     dim = dim % probs.ndim
     slices = [(slice(None) if i == dim else None) for i in range(probs.ndim)]
+    slices = tuple(slices)
     threshold = threshold[slices]
 
     multihot = probs >= threshold

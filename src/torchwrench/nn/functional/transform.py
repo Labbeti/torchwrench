@@ -213,7 +213,7 @@ def resample_nearest_steps(
         indexes = round_fn(indexes).long().clamp(min=0, max=length - 1)
         slices[dim] = indexes
 
-    x = x[slices]
+    x = x[tuple(slices)]
     return x
 
 
@@ -294,7 +294,7 @@ def shuffled(
         indices = torch.randperm(x.shape[dim], generator=generator)
         slices[dim] = indices
 
-    x = x[slices]  # type: ignore
+    x = x[tuple(slices)]  # type: ignore
     return x
 
 
