@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import copy
 from typing import Callable, Dict, Generic, Iterable, List, Mapping, Optional, overload
 
 from torch import nn
@@ -149,7 +150,9 @@ class EModulePartial(
         self.kwargs = kwargs
 
     def forward(self, x: InType, **kwargs: P.kwargs) -> OutType:  # type: ignore
-        return self.fn(x, *self.args, **(self.kwargs | kwargs))  # type: ignore
+        kwds = copy.copy(self.kwargs)
+        kwds.update(kwargs)
+        return self.fn(x, *self.args, **kwds)  # type: ignore
 
     def extra_repr(self) -> str:
         return f"{self.fn.__name__}, {ConfigModule.extra_repr(self)}"
