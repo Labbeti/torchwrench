@@ -17,7 +17,6 @@ from ._mixins import (
     InType,
     OutType,
     OutType3,
-    TypedModule,
     TypedModuleLike,
 )
 

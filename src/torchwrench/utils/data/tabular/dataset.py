@@ -22,7 +22,7 @@ from pythonwrench.typing import SupportsGetitemIterLen
 from torch import Tensor
 from typing_extensions import Self
 
-from torchwrench.extras.pandas import _PANDAS_AVAILABLE, pd
+from torchwrench.extras.pandas import pd
 from torchwrench.extras.speechbrain import DynamicItemDataset
 from torchwrench.serialization.csv import read_csv, save_csv
 from torchwrench.serialization.json import read_json, save_json

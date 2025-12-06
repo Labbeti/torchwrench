@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Re-introduce `TabularDataset` class.
 - `SubsetSampler`, `BalancedSampler` and `SubsetCycleSampler` classes.
+- `RealTensor` typing class.
 
 ### Modified
 - `move_to` function now supports dataclasses.
