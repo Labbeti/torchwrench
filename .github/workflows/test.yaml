@@ -80,19 +80,19 @@ jobs:
     # --- TESTS ---
     - name: Print install info
       run: |
-        uv run torchwrench-info
+        uv run --no-sync torchwrench-info
 
     - name: Check format with Ruff
       run: |
-        uv run ruff check
+        uv run --no-sync ruff check
 
     - name: Test with pytest
       run: |
-        uv run coverage run -m pytest -v
+        uv run --no-sync coverage run -m pytest -v
 
     - name: Show coverage results
       run: |
-        uv run coverage report -m
+        uv run --no-sync coverage report -m
 
   build-minimal:
     runs-on: ${{ matrix.os }}
@@ -196,16 +196,16 @@ jobs:
     # --- TESTS ---
     - name: Print install info
       run: |
-        uv run torchwrench-info
+        uv run --no-sync torchwrench-info
 
     - name: Check format with Ruff
       run: |
-        uv run ruff check
+        uv run --no-sync ruff check
 
     - name: Test with coverage + pytest
       run: |
-        uv run coverage run -m pytest -v '--ignore-glob=tests/**test_extras*.py'
+        uv run --no-sync coverage run -m pytest -v '--ignore-glob=tests/**test_extras*.py'
 
     - name: Show coverage results
       run: |
-        uv run coverage report -m
+        uv run --no-sync coverage report -m
