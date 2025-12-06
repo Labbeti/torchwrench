@@ -26,6 +26,7 @@ from torchwrench.nn.modules import (
     PadDim,
     PadDims,
     Permute,
+    RepeatInterleave,
     RepeatInterleaveNd,
     ResampleNearestRates,
     SoftmaxMultidim,
@@ -66,6 +67,7 @@ class TestSequential(TestCase):
             Transpose(0, 1),
             LogSoftmaxMultidim(dims=(0, 1)),
             SoftmaxMultidim(dims=(1,)),
+            RepeatInterleave(1, -1),
         )
 
         x = torch.rand(16, 10)
