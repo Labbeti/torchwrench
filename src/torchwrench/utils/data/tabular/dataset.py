@@ -179,8 +179,8 @@ class TabularDataset(
             row_indexer = indexer.row
         else:
             row_indexer = _get_from_idx_indices_slice_mask(
-                self._row_mapper,
-                indexer.row,  # type: ignore
+                self._row_mapper,  # type: ignore
+                indexer.row,
             )
 
         if indexer.has_col_indexer:
@@ -197,11 +197,11 @@ class TabularDataset(
 
         if self._col_mapper is None or indexer.has_col_indexer:
             pass
-        elif isinstance(result, dict):
-            result = {tgt: result[src] for tgt, src in self._col_mapper.items()}
-        elif pw.isinstance_generic(result, List[Dict]):
+        elif indexer.single_row:
+            result = {tgt: result[src] for tgt, src in self._col_mapper.items()}  # type: ignore
+        else:
             result = [
-                {tgt: result_i[src] for tgt, src in self._col_mapper.items()}
+                {tgt: result_i[src] for tgt, src in self._col_mapper.items()}  # type: ignore
                 for result_i in result
             ]
 
