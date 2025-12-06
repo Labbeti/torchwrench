@@ -119,6 +119,27 @@ class TestTabularDataset(TestCase):
         assert tw.deep_equal(ds.to_tensor(), data)
         assert tw.deep_equal(ds[mask], data[mask])
 
+    def test_mapping(self) -> None:
+        def triple(x):
+            return x * 3
+
+        data = {
+            "a": ["a1", "a2", "a3"],
+            "b": [1, 2, 3],
+            "c": tw.arange(1, 4),
+        }
+        ds = TabularDataset(
+            data,
+            row_mapper={0: 1},
+            col_mapper={"e": "a", "c": "c", "d": "d"},
+            fns_list=[(("b",), "d", triple)],
+        )
+        assert ds.column_names == ("e", "c", "d")
+
+        sample = ds[0]
+        expected = {"e": "a2", "c": tw.as_tensor(2), "d": 6}
+        assert tw.deep_equal(sample, expected), f"{sample=}; {expected=}"
+
 
 if __name__ == "__main__":
     unittest.main()

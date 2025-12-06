@@ -660,13 +660,24 @@ def _get_from_idx_indices_slice_mask(
     x: Union[Tensor, np.ndarray, pw.SupportsGetitemLen],
     row_indexer: Union[int, Tensor, np.ndarray, slice, Iterable[int], Iterable[bool]],
 ) -> Any:
-    if isinstance(x, DynamicItemDataset) and isinstance(row_indexer, slice):
-        indices = range(len(x))[row_indexer]
-        return [x[idx] for idx in indices]
-    elif isinstance(row_indexer, (int, slice)):
-        return x[row_indexer]  # type: ignore
+    if isinstance(row_indexer, int):
+        return x[row_indexer]
     elif isinstance(row_indexer, (SignedIntegerTensor0D, np.integer)):
-        return x[row_indexer.item()]  # type: ignore
+        return x[row_indexer.item()]
+
+    elif isinstance(row_indexer, slice):
+        if isinstance(x, DynamicItemDataset):
+            indices = range(len(x))[row_indexer]
+            return [x[idx] for idx in indices]
+        elif isinstance(x, Mapping):
+            keys = list(x.keys())[row_indexer]
+            return {k: x[k] for k in keys}
+        elif isinstance(x, (Tensor, np.ndarray, tuple, list)):
+            return x[row_indexer]
+        else:
+            msg = f"Invalid argument type {type(x)=} with {type(row_indexer)=}."
+            raise TypeError(msg)
+
     elif pw.isinstance_generic(row_indexer, (Iterable[int], SignedIntegerTensor1D)):
         return _get_from_indices(x, row_indexer)
     elif pw.isinstance_generic(row_indexer, (Iterable[bool], BoolTensor1D)):

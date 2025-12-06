@@ -62,8 +62,8 @@ class TabularDataset(
             DynamicItemDataset,
             TabularDatasetInterface[T_RowIndex, T_ColIndex],
         ],
-        row_mapper: Union[SupportsGetitemIterLen, None] = None,
-        col_mapper: Union[SupportsGetitemIterLen, None] = None,
+        row_mapper: Union[Mapping[T_RowIndex, T_RowIndex], None] = None,
+        col_mapper: Union[Mapping[T_ColIndex, T_ColIndex], None] = None,
         fns_list: Iterable[
             Tuple[
                 Union[Tuple[T_ColIndex, ...], T_ColIndex],
@@ -92,7 +92,7 @@ class TabularDataset(
         fns_list = list(fns_list)
         if len(fns_list) > 0:
             wrapper = FunctionWrapper(
-                self._wrapper,  # type: ignore
+                wrapper,  # type: ignore
                 fns_list,
             )
 
@@ -130,14 +130,14 @@ class TabularDataset(
         if self._row_mapper is None:
             return self._wrapper.row_names
         else:
-            return range(len(self._row_mapper))
+            return tuple(self._row_mapper.keys())
 
     @property
     def column_names(self) -> SupportsGetitemIterLen:
         if self._col_mapper is None:
             return self._wrapper.column_names
         else:
-            return self._col_mapper
+            return tuple(self._col_mapper.keys())
 
     def to_dataframe(self) -> pd.DataFrame:
         list_dict = self.to_list_dict()
@@ -179,7 +179,8 @@ class TabularDataset(
             row_indexer = indexer.row
         else:
             row_indexer = _get_from_idx_indices_slice_mask(
-                self._row_mapper, indexer.row
+                self._row_mapper,
+                indexer.row,  # type: ignore
             )
 
         if indexer.has_col_indexer:
@@ -193,5 +194,15 @@ class TabularDataset(
             result = self._wrapper[row_indexer, col_indexer]  # type: ignore
         else:
             result = self._wrapper[row_indexer]  # type: ignore
+
+        if self._col_mapper is None or indexer.has_col_indexer:
+            pass
+        elif isinstance(result, dict):
+            result = {tgt: result[src] for tgt, src in self._col_mapper.items()}
+        elif pw.isinstance_generic(result, List[Dict]):
+            result = [
+                {tgt: result_i[src] for tgt, src in self._col_mapper.items()}
+                for result_i in result
+            ]
 
         return result
