@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import io
+from io import StringIO, TextIOBase
 from pathlib import Path
 from typing import (
     Any,
@@ -91,7 +91,7 @@ def save_csv(*args, **kwargs): ...
 
 @overload
 def load_csv(
-    fpath: Union[str, Path],
+    fpath: Union[str, Path, TextIOBase],
     /,
     *,
     orient: Literal["list"] = "list",
@@ -107,7 +107,7 @@ def load_csv(
 
 @overload
 def load_csv(
-    fpath: Union[str, Path],
+    fpath: Union[str, Path, TextIOBase],
     /,
     *,
     orient: Literal["dict"],
@@ -123,7 +123,7 @@ def load_csv(
 
 @overload
 def load_csv(
-    fpath: Union[str, Path],
+    fpath: Union[str, Path, TextIOBase],
     /,
     *,
     orient: Literal["dataframe"],
@@ -138,7 +138,7 @@ def load_csv(
 
 
 def load_csv(
-    fpath: Union[str, Path],
+    fpath: Union[str, Path, TextIOBase],
     /,
     *,
     orient: OrientExtended = "list",
@@ -229,7 +229,7 @@ def _dump_csv_with_pandas(
     # set index to False by default
     kwargs.setdefault("index", False)
 
-    file = io.StringIO()
+    file = StringIO()
     df.to_csv(file, **kwargs)
     content = file.getvalue()
     file.close()
@@ -242,7 +242,7 @@ def _dump_csv_with_pandas(
 
 
 def _load_csv_with_pandas(
-    fpath: Union[str, Path],
+    fpath: Union[str, Path, TextIOBase],
     /,
     *,
     orient: OrientExtended = "list",

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from io import TextIOBase
 from pathlib import Path
 from typing import (
     Any,
@@ -19,11 +20,12 @@ import pythonwrench as pw
 import torch
 from pythonwrench.typing import SupportsGetitemIterLen
 from torch import Tensor
+from typing_extensions import Self
 
 from torchwrench.extras.pandas import _PANDAS_AVAILABLE, pd
 from torchwrench.extras.speechbrain import DynamicItemDataset
-from torchwrench.serialization.csv import save_csv
-from torchwrench.serialization.json import save_json
+from torchwrench.serialization.csv import read_csv, save_csv
+from torchwrench.serialization.json import read_json, save_json
 
 from ._core import (
     DataFrameWrapper,
@@ -99,6 +101,16 @@ class TabularDataset(
         self._row_mapper = row_mapper
         self._col_mapper = col_mapper
 
+    @classmethod
+    def from_csv(cls, fpath: Union[str, Path, TextIOBase], **kwds) -> Self:
+        data = read_csv(fpath, **kwds)
+        return cls(data)
+
+    @classmethod
+    def from_json(cls, fpath: Union[str, Path, TextIOBase], **kwds) -> Self:
+        data = read_json(fpath, **kwds)
+        return cls(data)
+
     def add_dynamic_column(
         self,
         fn: Callable,
@@ -152,11 +164,7 @@ class TabularDataset(
         return torch.as_tensor([list(item.values()) for item in datalist])
 
     def to_csv(self, fpath: Union[str, Path], *args, **kwargs) -> None:
-        if _PANDAS_AVAILABLE:
-            data = self.to_dataframe()
-        else:
-            data = self.to_dict_list()
-
+        data = self.to_dict_list()
         save_csv(data, fpath, *args, **kwargs)
 
     def to_json(self, fpath: Union[str, Path], *args, **kwargs) -> None:
