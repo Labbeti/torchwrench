@@ -130,15 +130,25 @@ class TestTabularDataset(TestCase):
         }
         ds = TabularDataset(
             data,
-            row_mapper={0: 1},
+            row_mapper={0: 1, 1: 1},
             col_mapper={"e": "a", "c": "c", "d": "d"},
             fns_list=[(("b",), "d", triple)],
         )
+
+        assert len(ds) == 2
         assert ds.column_names == ("e", "c", "d")
 
         sample = ds[0]
         expected = {"e": "a2", "c": tw.as_tensor(2), "d": 6}
         assert tw.deep_equal(sample, expected), f"{sample=}; {expected=}"
+
+        datadict = ds.to_dict_list()
+        expected = {
+            "e": ["a2", "a2"],
+            "c": [tw.as_tensor(2), tw.as_tensor(2)],
+            "d": [6, 6],
+        }
+        assert tw.deep_equal(datadict, expected)
 
 
 if __name__ == "__main__":

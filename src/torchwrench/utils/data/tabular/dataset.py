@@ -101,6 +101,22 @@ class TabularDataset(
         self._row_mapper = row_mapper
         self._col_mapper = col_mapper
 
+    @property
+    def _row_mapper_dict(self) -> Mapping[T_RowIndex, T_RowIndex]:
+        if self._row_mapper is None:
+            row_names = self._wrapper.row_names
+            return dict(zip(row_names, row_names))  # type: ignore
+        else:
+            return self._row_mapper
+
+    @property
+    def _col_mapper_dict(self) -> Mapping[T_ColIndex, T_ColIndex]:
+        if self._col_mapper is None:
+            col_names = self._wrapper.column_names
+            return dict(zip(col_names, col_names))
+        else:
+            return self._col_mapper
+
     @classmethod
     def from_csv(cls, fpath: Union[str, Path, TextIOBase], **kwds) -> Self:
         data = read_csv(fpath, **kwds)
@@ -150,8 +166,11 @@ class TabularDataset(
     def to_list_dict(self) -> List[Dict[T_ColIndex, Any]]:
         datalist = self._wrapper.to_list_dict()
         datalist = [
-            {col: datalist[row][col] for col in self.column_names}
-            for row in self.row_names
+            {
+                tgt_col: datalist[src_row][src_col]
+                for tgt_col, src_col in self._col_mapper_dict.items()
+            }
+            for tgt_row, src_row in self._row_mapper_dict.items()
         ]
         return datalist
 
