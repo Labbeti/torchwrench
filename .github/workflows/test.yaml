@@ -38,7 +38,7 @@ jobs:
             torch-version: "torch-latest"
           - os: macos-15
             python-version: "3.9"
-            torch-version: "1.10"
+            torch-version: "1.11"
           - os: macos-latest
             python-version: "3.13"
             torch-version: "torch-latest"
