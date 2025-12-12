@@ -11,6 +11,7 @@ from typing import (
     Iterable,
     List,
     Mapping,
+    MutableMapping,
     Tuple,
     Union,
 )
@@ -63,7 +64,7 @@ class TabularDataset(
             TabularDatasetInterface[T_RowIndex, T_ColIndex],
         ],
         row_mapper: Union[Mapping[T_RowIndex, T_RowIndex], None] = None,
-        col_mapper: Union[Mapping[T_ColIndex, T_ColIndex], None] = None,
+        col_mapper: Union[MutableMapping[T_ColIndex, T_ColIndex], None] = None,
         fns_list: Iterable[
             Tuple[
                 Union[Tuple[T_ColIndex, ...], T_ColIndex],
@@ -110,7 +111,7 @@ class TabularDataset(
             return self._row_mapper
 
     @property
-    def _col_mapper_dict(self) -> Mapping[T_ColIndex, T_ColIndex]:
+    def _col_mapper_dict(self) -> MutableMapping[T_ColIndex, T_ColIndex]:
         if self._col_mapper is None:
             col_names = self._wrapper.column_names
             return dict(zip(col_names, col_names))
@@ -132,7 +133,9 @@ class TabularDataset(
         fn: Callable,
         requires: Tuple[T_ColIndex, ...],
         provides: Union[T_ColIndex, Tuple[T_ColIndex, ...]],
+        add_to_output_keys: bool = True,
     ) -> None:
+        col_mapper_before = self._col_mapper_dict
         if isinstance(self._wrapper, FunctionWrapper):
             self._wrapper.add_dynamic_column(fn, requires, provides)
         else:
@@ -140,6 +143,14 @@ class TabularDataset(
                 self._wrapper,  # type: ignore
                 [(requires, provides, fn)],
             )
+
+        if add_to_output_keys and self._col_mapper is not None:
+            if isinstance(provides, (str, int)):
+                provides = [provides]  # type: ignore
+            for provide in provides:  # type: ignore
+                self._col_mapper[provide] = provide
+        elif not add_to_output_keys and self._col_mapper is None:
+            self._col_mapper = col_mapper_before
 
     @property
     def row_names(self) -> pw.SupportsGetitemIterLen:
