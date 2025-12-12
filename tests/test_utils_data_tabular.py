@@ -111,6 +111,13 @@ class TestTabularDataset(TestCase):
         expected = double(data["a"][4])
         assert result == expected, f"{result=}; {expected=}"
 
+        mask = (
+            tw.full((len(ds),), True)
+            if not _NUMPY_AVAILABLE
+            else np.full((len(ds),), True)
+        )
+        assert ds[mask] == ds.to_list_dict()
+
     def test_tensor(self) -> None:
         data = tw.rand(10, 2, 3)
         ds = TabularDataset(data)
@@ -149,6 +156,10 @@ class TestTabularDataset(TestCase):
             "d": [6, 6],
         }
         assert tw.deep_equal(datadict, expected)
+
+        mask = [False] * len(ds)
+        sample = ds[mask]
+        assert sample == [], f"{sample=}"
 
 
 if __name__ == "__main__":

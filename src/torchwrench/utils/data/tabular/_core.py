@@ -24,6 +24,7 @@ from torch import Tensor
 from torch.utils.data.dataset import Dataset
 from typing_extensions import TypeVar
 
+from torchwrench.extras.numpy import is_numpy_bool_array, is_numpy_integral_array
 from torchwrench.extras.pandas import pd
 from torchwrench.extras.speechbrain import DynamicItemDataset
 from torchwrench.nn.functional.multilabel import multihot_to_multi_indices
@@ -428,10 +429,15 @@ class FunctionWrapper(
         elif isinstance(row_indexer, slice):
             row_indexer = range(len(self))[row_indexer]
             result = [self._get_values(idx, col_indexer) for idx in row_indexer]  # type: ignore
-        elif pw.isinstance_generic(row_indexer, Iterable[bool]):
+        elif pw.isinstance_generic(
+            row_indexer, (Iterable[bool], BoolTensor1D)
+        ) or is_numpy_bool_array(row_indexer):
+            row_indexer = torch.as_tensor(row_indexer)
             row_indexer = multihot_to_multi_indices(row_indexer)
             result = [self._get_values(idx, col_indexer) for idx in row_indexer]  # type: ignore
-        elif pw.isinstance_generic(row_indexer, Iterable[int]):
+        elif pw.isinstance_generic(
+            row_indexer, (Iterable[int], SignedIntegerTensor1D)
+        ) or is_numpy_integral_array(row_indexer):
             result = [self._get_values(idx, col_indexer) for idx in row_indexer]  # type: ignore
         else:
             msg = f"Invalid argument type {type(row_indexer)=}."
@@ -500,7 +506,8 @@ def _recursive_get_values(
             continue
 
         if col not in fns.keys():
-            raise KeyError
+            msg = f"Invalid argument {col=}. (expected one of {tuple(fns.keys())})"
+            raise KeyError(msg)
 
         requires, provides, fn = fns[col]
         if isinstance(requires, (int, str)):
@@ -612,7 +619,8 @@ class IndexerWrapper:
 
         else:
             if pw.isinstance_generic(
-                indexer, (int, slice, Iterable[int], Iterable[bool], IntegralTensor)
+                indexer,
+                (int, slice, Iterable[int], Iterable[bool], IntegralTensor, np.ndarray),
             ):
                 row_indexer = indexer
                 col_indexer = None
@@ -678,10 +686,14 @@ def _get_from_idx_indices_slice_mask(
             msg = f"Invalid argument type {type(x)=} with {type(row_indexer)=}."
             raise TypeError(msg)
 
-    elif pw.isinstance_generic(row_indexer, (Iterable[int], SignedIntegerTensor1D)):
-        return _get_from_indices(x, row_indexer)
-    elif pw.isinstance_generic(row_indexer, (Iterable[bool], BoolTensor1D)):
-        return _get_from_mask(x, row_indexer)
+    elif pw.isinstance_generic(
+        row_indexer, (Iterable[bool], BoolTensor1D)
+    ) or is_numpy_bool_array(row_indexer):
+        return _get_from_mask(x, row_indexer)  # type: ignore
+    elif pw.isinstance_generic(
+        row_indexer, (Iterable[int], SignedIntegerTensor1D)
+    ) or is_numpy_integral_array(row_indexer):
+        return _get_from_indices(x, row_indexer)  # type: ignore
     else:
         msg = f"Invalid argument type {type(row_indexer)=}."
         raise TypeError(msg)
