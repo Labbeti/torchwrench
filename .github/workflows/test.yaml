@@ -38,7 +38,7 @@ jobs:
             torch-version: "torch-latest"
           - os: macos-15
             python-version: "3.9"
-            torch-version: "1.11"
+            torch-version: "1.10"
           - os: macos-latest
             python-version: "3.13"
             torch-version: "torch-latest"
@@ -65,7 +65,11 @@ jobs:
       if: matrix.torch-version != 'torch-latest'
       shell: bash
       run: |
-        uv pip install torch==${{ matrix.torch-version }} -e .[dev,extras]
+        extra_dep=""
+        if [ "${{ matrix.torch-version }}" = "1.10" ]; then
+          extra_dep="torchaudio==0.10.2"
+        fi
+        uv pip install torch==${{ matrix.torch-version }} ${extra_dep} -e .[dev,extras]
 
     - name: Additional install soundfile (Ubuntu)
       if: matrix.os == 'ubuntu-latest'
