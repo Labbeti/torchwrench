@@ -67,7 +67,7 @@ jobs:
       run: |
         extra_dep=""
         if [ "${{ matrix.torch-version }}" = "1.10" ]; then
-          extra_dep="torchaudio==0.10.2"
+          extra_dep="torchaudio==0.10"
         fi
         uv pip install torch==${{ matrix.torch-version }} ${extra_dep} -e .[dev,extras]
 
