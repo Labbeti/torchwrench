@@ -54,8 +54,6 @@ from . import serialization as serialization
 from . import special as special
 from . import types as types
 from . import utils as utils
-
-# Global imports
 from .core.dtype_enum import DTypeEnum
 from .core.dtype_enum import DTypeEnum as dtype_enum
 from .core.make import (
@@ -66,6 +64,9 @@ from .core.make import (
     Generator,
     GeneratorLike,
 )
+
+# Global imports
+from .core.version import get_githash_full, get_githash_short
 from .extras.numpy import ndarray_to_tensor, tensor_to_ndarray, to_ndarray
 from .extras.yaml.yaml import (
     dump_yaml,
