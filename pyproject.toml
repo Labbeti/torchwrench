@@ -77,6 +77,11 @@ source = ["src"]
 [tool.uv.sources]
 torchwrench = { workspace = true }
 
+[tool.uv]
+required-environments = [
+    "sys_platform == 'darwin' and platform_machine == 'x86_64'",
+]
+
 [dependency-groups]
 dev = [
     "torchwrench",
@@ -111,7 +116,7 @@ extras = [
     "scipy",
     "speechbrain>=1.0.3",
     "tensorboard",
-    "torchaudio<2.9",
+    "torchaudio<2.9,>=0.10.0",
     "torchvision",
     "tqdm",
     "soundfile",
