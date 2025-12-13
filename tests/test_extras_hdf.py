@@ -308,7 +308,7 @@ class TestHDF(TestCase):
             verbose=2,
         )
 
-        n_try = 10
+        n_try = 50
         duration_ds_vlen_lst = []
         duration_ds_bytes_lst = []
 
