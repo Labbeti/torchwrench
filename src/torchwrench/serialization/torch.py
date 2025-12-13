@@ -72,7 +72,7 @@ def load_torch(
     **pickle_load_args: Any,
 ) -> Any:
     kwds = {}
-    if Version(torch.__version__) >= Version("2.0.0"):
+    if Version(torch.__version__) >= Version("2.1.0"):
         kwds.update(
             weights_only=weights_only,
             mmap=mmap,
