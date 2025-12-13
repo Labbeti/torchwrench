@@ -6509,7 +6509,7 @@ requires-dist = [
     { name = "sphinx-immaterial", marker = "extra == 'dev'", specifier = ">=0.11.14" },
     { name = "tensorboard", marker = "extra == 'extras'" },
     { name = "torch", specifier = ">=1.10.0" },
-    { name = "torchaudio", marker = "extra == 'extras'", specifier = ">=0.10.0,<2.9" },
+    { name = "torchaudio", marker = "extra == 'extras'", specifier = ">=0.10.0,<2.10" },
     { name = "torchvision", marker = "extra == 'extras'" },
     { name = "tqdm", marker = "extra == 'extras'" },
     { name = "twine", marker = "extra == 'dev'" },

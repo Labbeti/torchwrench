@@ -116,7 +116,7 @@ extras = [
     "scipy",
     "speechbrain==1.0.3; python_version < '3.14'",
     "tensorboard",
-    "torchaudio<2.9,>=0.10.0",
+    "torchaudio<2.10,>=0.10.0",
     "torchvision",
     "tqdm",
     "soundfile",
