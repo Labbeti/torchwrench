@@ -114,7 +114,7 @@ extras = [
     "pyyaml",
     "safetensors",
     "scipy",
-    "speechbrain>=1.0.3; python_version < '3.14'",
+    "speechbrain==1.0.3; python_version < '3.14'",
     "tensorboard",
     "torchaudio<2.9,>=0.10.0",
     "torchvision",

@@ -6504,7 +6504,7 @@ requires-dist = [
     { name = "scipy", marker = "extra == 'extras'" },
     { name = "setuptools", marker = "extra == 'dev'" },
     { name = "soundfile", marker = "extra == 'extras'" },
-    { name = "speechbrain", marker = "python_full_version < '3.14' and extra == 'extras'", specifier = ">=1.0.3" },
+    { name = "speechbrain", marker = "python_full_version < '3.14' and extra == 'extras'", specifier = "==1.0.3" },
     { name = "sphinx", marker = "extra == 'dev'" },
     { name = "sphinx-immaterial", marker = "extra == 'dev'", specifier = ">=0.11.14" },
     { name = "tensorboard", marker = "extra == 'extras'" },
