@@ -38,11 +38,6 @@ else:
     import yaml
     from yaml import (
         BaseLoader,
-        CBaseLoader,
-        CFullLoader,
-        CLoader,
-        CSafeLoader,
-        CUnsafeLoader,
         FullLoader,
         Loader,
         MappingNode,
@@ -54,6 +49,23 @@ else:
     )
     from yaml.parser import ParserError
     from yaml.scanner import ScannerError
+
+    try:
+        from yaml import (
+            CBaseLoader,
+            CFullLoader,
+            CLoader,
+            CSafeLoader,
+            CUnsafeLoader,
+        )
+    except ImportError:
+        from torchwrench.extras.yaml._yaml_fallback import (
+            CBaseLoader,
+            CFullLoader,
+            CLoader,
+            CSafeLoader,
+            CUnsafeLoader,
+        )
 
 
 if _OMEGACONF_AVAILABLE:
