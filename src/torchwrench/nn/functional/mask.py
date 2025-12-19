@@ -422,7 +422,11 @@ def ratios_to_lengths(ratios: Tensor, max_len: int) -> Tensor:
 
 
 def ratios_to_non_pad_mask(
-    ratios: Tensor, max_len: int, include_end: bool = False, *, dtype: DTypeLike = None
+    ratios: Tensor,
+    max_len: int,
+    include_end: bool = False,
+    *,
+    dtype: DTypeLike = None,
 ) -> Tensor:
     lengths = ratios_to_lengths(ratios, max_len)
     non_pad_mask = lengths_to_non_pad_mask(lengths, max_len, include_end, dtype=dtype)
@@ -430,26 +434,41 @@ def ratios_to_non_pad_mask(
 
 
 def ratios_to_pad_mask(
-    ratios: Tensor, max_len: int, include_end: bool = True, *, dtype: DTypeLike = None
+    ratios: Tensor,
+    max_len: int,
+    include_end: bool = True,
+    *,
+    dtype: DTypeLike = None,
 ) -> Tensor:
     lengths = ratios_to_lengths(ratios, max_len)
     pad_mask = lengths_to_pad_mask(lengths, max_len, include_end, dtype=dtype)
     return pad_mask
 
 
-def lengths_to_ratios(lengths: Tensor, max_len: Optional[int] = None) -> Tensor:
+def lengths_to_ratios(
+    lengths: Tensor,
+    max_len: Optional[int] = None,
+) -> Tensor:
     if max_len is None:
         max_len = int(lengths.max().item())
     return lengths / max_len
 
 
-def non_pad_mask_to_ratios(non_pad_mask: Tensor, *, dim: int = -1) -> Tensor:
+def non_pad_mask_to_ratios(
+    non_pad_mask: Tensor,
+    *,
+    dim: int = -1,
+) -> Tensor:
     lengths = non_pad_mask_to_lengths(non_pad_mask, dim=dim)
     ratios = lengths_to_ratios(lengths, non_pad_mask.shape[dim])
     return ratios
 
 
-def pad_mask_to_ratios(pad_mask: Tensor, *, dim: int = -1) -> Tensor:
+def pad_mask_to_ratios(
+    pad_mask: Tensor,
+    *,
+    dim: int = -1,
+) -> Tensor:
     lengths = pad_mask_to_lengths(pad_mask, dim=dim)
     ratios = lengths_to_ratios(lengths, pad_mask.shape[dim])
     return ratios

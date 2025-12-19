@@ -17,6 +17,8 @@ from torchwrench.nn.functional.mask import (
     masked_sum,
     non_pad_mask_to_lengths,
     pad_mask_to_lengths,
+    pad_mask_to_ratios,
+    ratios_to_lengths,
     tensor_to_non_pad_mask,
     tensor_to_pad_mask,
     tensor_to_tensors_list,
@@ -349,6 +351,26 @@ class TestGenerateSqMask(TestCase):
         )
         assert output.shape == expected.shape
         assert torch.equal(output, expected)
+
+
+class TestRatios(TestCase):
+    def test_ratios_to_lengths_example_1(self) -> None:
+        ratios = torch.as_tensor([0.50, 0.25, 1.0])
+        expected = torch.as_tensor([50, 25, 100])
+        result = ratios_to_lengths(ratios, 100)
+        assert torch.equal(result, expected)
+
+    def test_pad_mask_to_ratios(self) -> None:
+        pad_mask = torch.as_tensor(
+            [
+                [False, False, True, True],
+                [False, True, True, True],
+                [False, False, False, False],
+            ]
+        )
+        expected = torch.as_tensor([0.50, 0.25, 1.0])
+        result = pad_mask_to_ratios(pad_mask)
+        assert torch.equal(result, expected), f"{result=}; {expected=}"
 
 
 if __name__ == "__main__":
