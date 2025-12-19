@@ -169,3 +169,7 @@ if _PANDAS_AVAILABLE:
     @register_as_builtin_fn(pd.DataFrame)
     def _dataframe_to_builtin(x: pd.DataFrame) -> Any:
         return as_builtin(x.to_dict("list"))
+
+    @register_as_builtin_fn(pd.Series)
+    def _series_to_builtin(x: pd.Series) -> Any:
+        return as_builtin(x.to_dict())
