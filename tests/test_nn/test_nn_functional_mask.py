@@ -360,7 +360,7 @@ class TestRatios(TestCase):
         result = ratios_to_lengths(ratios, 100)
         assert torch.equal(result, expected)
 
-    def test_pad_mask_to_ratios(self) -> None:
+    def test_pad_mask_to_ratios_example_1(self) -> None:
         pad_mask = torch.as_tensor(
             [
                 [False, False, True, True],

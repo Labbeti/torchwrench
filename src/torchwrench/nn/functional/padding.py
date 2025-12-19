@@ -66,7 +66,6 @@ def pad_dim(
     Returns:
         Padded tensor of N dims of (..., target_length, ...).
     """
-    # """Generic function for pad a single dimension."""
     return pad_dims(
         x,
         target_lengths=[target_length],
