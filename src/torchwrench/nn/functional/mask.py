@@ -417,8 +417,9 @@ def tensors_list_to_lengths(tensors: List[Tensor], dim: int = -1) -> LongTensor1
     return output  # type: ignore
 
 
-def ratios_to_lengths(ratios: Tensor, max_len: int) -> Tensor:
-    return (ratios * max_len).round()
+def ratios_to_lengths(ratios: Tensor, max_len: int, dtype: DTypeLike = None) -> Tensor:
+    dtype = as_dtype(dtype)
+    return (ratios * max_len).round().to(dtype=dtype)
 
 
 def ratios_to_non_pad_mask(
