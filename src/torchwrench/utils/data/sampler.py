@@ -117,11 +117,11 @@ class BalancedSampler(Sampler):
                 msg = f"Found a class index {cls_idx} without any indices."
                 raise RuntimeError(msg)
 
-        max_idx = max(len(indices) for indices in self._indices_per_class)
+        max_idx = max(len(indices) for indices in indices_per_class)
         pointers_per_class = [
-            list(range(len(indices))) for indices in self._indices_per_class
+            list(range(len(indices))) for indices in indices_per_class
         ]
-        local_idx_per_class = [0 for _ in range(len(self._indices_per_class))]
+        local_idx_per_class = [0 for _ in range(len(indices_per_class))]
         generator = as_generator(seed)
 
         super().__init__()
@@ -140,6 +140,8 @@ class BalancedSampler(Sampler):
         global_idx = 0
         n_classes = len(self._indices_per_class)
         for cls_idx in itertools.cycle(range(n_classes)):
+            if global_idx >= self._n_max_iterations:
+                break
             if global_idx % self._max_idx == self._max_idx - 1:
                 self._shuffle_indices()
 
