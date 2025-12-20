@@ -34,6 +34,7 @@ pylog = logging.getLogger(__name__)
 SavingBackend = Literal[
     "csv",
     "json",
+    "jsonl",
     "h5py",
     "numpy",
     "pickle",
@@ -48,6 +49,7 @@ PATTERN_TO_BACKEND: Dict[str, SavingBackend] = {
     r"^.+\.tsv$": "csv",
     r"^.+\.csv$": "csv",
     r"^.+\.json$": "json",
+    r"^.+\.jsonl$": "jsonl",
     r"^.+\.pkl$": "pickle",
     r"^.+\.pickle$": "pickle",
     r"^.+\.torch$": "torch",

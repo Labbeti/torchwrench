@@ -10,7 +10,7 @@ import torchwrench as tw
 from torchwrench.extras.numpy import _NUMPY_AVAILABLE, np
 from torchwrench.extras.pandas import _PANDAS_AVAILABLE, pd
 from torchwrench.extras.speechbrain import _SPEECHBRAIN_AVAILABLE, DynamicItemDataset
-from torchwrench.utils.data.tabular.dataset import TabularDataset
+from torchwrench.utils.data.dataset import TabularDataset
 
 
 class TestTabularDataset(TestCase):

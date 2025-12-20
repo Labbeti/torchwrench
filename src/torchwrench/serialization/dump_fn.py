@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, BinaryIO, Callable, Dict, Optional, Union, overload
 
 from pythonwrench.functools import function_alias
+from pythonwrench.jsonl import dump_jsonl
 from typing_extensions import TypeAlias
 
 from torchwrench.core.packaging import (
@@ -27,8 +28,9 @@ DumpFnLike: TypeAlias = Union[DumpFn, SavingBackend]
 
 
 DUMP_FNS: Dict[SavingBackend, DumpFn] = {
-    "csv": dump_csv,  # type: ignore
+    "csv": dump_csv,
     "json": dump_json,
+    "jsonl": dump_jsonl,
     "pickle": dump_pickle,
     "torch": dump_torch,
 }
