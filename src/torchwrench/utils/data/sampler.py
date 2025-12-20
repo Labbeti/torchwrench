@@ -25,7 +25,7 @@ class SubsetSampler(Sampler[int]):
         """
         indices = as_tensor(indices, dtype="long")
 
-        super().__init__()
+        super().__init__(None)
         self._indices = indices
 
     def __iter__(self) -> Iterator[int]:
@@ -58,7 +58,7 @@ class SubsetCycleSampler(Sampler[int]):
         indices = as_tensor(indices, dtype="long")
         generator = as_generator(seed)
 
-        super().__init__()
+        super().__init__(None)
         self._indices = indices
         self._n_max_iterations = n_max_iterations
         self._shuffle = shuffle
@@ -124,7 +124,7 @@ class BalancedSampler(Sampler):
         local_idx_per_class = [0 for _ in range(len(indices_per_class))]
         generator = as_generator(seed)
 
-        super().__init__()
+        super().__init__(None)
         self._indices_per_class = indices_per_class
         self._n_max_iterations = n_max_iterations
         self._shuffle = shuffle
