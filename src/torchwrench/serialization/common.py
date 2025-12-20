@@ -174,4 +174,4 @@ if _PANDAS_AVAILABLE:
 
     @register_as_builtin_fn(pd.Series)
     def _series_to_builtin(x: pd.Series) -> Any:
-        return as_builtin(x.to_dict())
+        return as_builtin(x.to_list())
