@@ -15,12 +15,12 @@ from torchwrench.extras.numpy.functional import is_numpy_bool_array
 from torchwrench.nn.functional.transform import as_tensor
 from torchwrench.types._typing import BoolTensor1D, Tensor1D, TensorOrArray
 from torchwrench.types.guards import is_number_like, is_tensor_or_array
-from torchwrench.utils.data.dataset import Wrapper
+from torchwrench.utils.data.dataset.wrapper import Wrapper
 
 T = TypeVar("T", covariant=True)
 U = TypeVar("U", covariant=True)
 
-Indices: TypeAlias = Union[
+MultiIndexer: TypeAlias = Union[
     Iterable[bool],
     Iterable[int],
     None,
@@ -58,7 +58,7 @@ class DatasetSlicer(Generic[T], ABC, Dataset[T]):
         ...
 
     @overload
-    def __getitem__(self, idx: Indices, /) -> List[T]:  # type: ignore
+    def __getitem__(self, idx: MultiIndexer, /) -> List[T]:  # type: ignore
         ...
 
     @overload

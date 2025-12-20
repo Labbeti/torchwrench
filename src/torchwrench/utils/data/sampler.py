@@ -152,9 +152,7 @@ class BalancedSampler(Sampler):
 
             yield sample_idx
 
-            self._local_idx_per_class[cls_idx] = (
-                self._local_idx_per_class[cls_idx] + 1
-            ) % len(pointers)
+            self._local_idx_per_class[cls_idx] = (pointer_idx + 1) % len(pointers)
             global_idx += 1
 
     def __len__(self) -> int:
