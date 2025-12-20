@@ -5,7 +5,11 @@ import unittest
 from typing import Iterator
 from unittest import TestCase
 
-from torchwrench.utils.data.dataset import IterableSubset, IterableTransformWrapper
+from torchwrench.utils.data.dataset.wrapper import (
+    IterableSubset,
+    IterableTransformWrapper,
+    TransformWrapper,
+)
 
 
 class TestDataset(TestCase):
@@ -25,6 +29,10 @@ class TestDataset(TestCase):
     def test_wrapper_example_1(self) -> None:
         wrapped = IterableTransformWrapper(list(range(10)), lambda x: x * 2)
         assert list(wrapped) == list(range(0, 20, 2))
+
+    def test_transform_wrapper(self) -> None:
+        wrapped = TransformWrapper(list(range(10)), lambda x: x * 2)
+        assert [wrapped[i] for i in range(len(wrapped))] == list(range(0, 20, 2))
 
 
 if __name__ == "__main__":
