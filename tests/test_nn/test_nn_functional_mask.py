@@ -357,7 +357,7 @@ class TestRatios(TestCase):
     def test_ratios_to_lengths_example_1(self) -> None:
         ratios = torch.as_tensor([0.50, 0.25, 1.0])
         expected = torch.as_tensor([50, 25, 100])
-        result = ratios_to_lengths(ratios, 100)
+        result = ratios_to_lengths(ratios, 100, dtype=expected.dtype)
         assert torch.equal(result, expected)
 
     def test_pad_mask_to_ratios_example_1(self) -> None:
