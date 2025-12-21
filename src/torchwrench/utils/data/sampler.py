@@ -162,7 +162,7 @@ class BalancedSampler(Sampler):
             self._local_idx_per_class[cls_idx] = (pointer_idx + 1) % len(pointers)
             global_idx += 1
 
-            if i == n_classes - 1:
+            if self._shuffle and i == n_classes - 1:
                 cls_indices = shuffled(cls_indices, generator=self._generator)
 
     def __len__(self) -> int:
