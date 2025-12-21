@@ -4,6 +4,7 @@
 import itertools
 from typing import Iterable, Iterator, List, Literal, Sequence, Union
 
+import torch
 from torch import Tensor
 from torch.utils.data.sampler import Sampler
 
@@ -112,6 +113,7 @@ class BalancedSampler(Sampler):
             seed: Optional seed or generator used to shuffle indices.
                 defaults to None.
         """
+        indices_per_class = [list(indices) for indices in indices_per_class]
         for cls_idx, indices in enumerate(indices_per_class):
             if len(indices) == 0:
                 msg = f"Found a class index {cls_idx} without any indices."
@@ -125,7 +127,7 @@ class BalancedSampler(Sampler):
         generator = as_generator(seed)
 
         super().__init__(None)
-        self._indices_per_class = indices_per_class
+        self._cls_to_sample_indices = indices_per_class
         self._n_max_iterations = n_max_iterations
         self._shuffle = shuffle
         self._generator = generator
@@ -138,24 +140,30 @@ class BalancedSampler(Sampler):
 
     def __iter__(self) -> Iterator[int]:
         global_idx = 0
-        n_classes = len(self._indices_per_class)
-        for cls_idx in itertools.cycle(range(n_classes)):
+        n_classes = len(self._cls_to_sample_indices)
+        cls_indices = torch.randperm(n_classes, generator=self._generator)
+
+        for i, cls_idx in enumerate(itertools.cycle(range(n_classes))):
+            cls_idx = int(cls_indices[cls_idx].item())
             if global_idx >= self._n_max_iterations:
                 break
             if global_idx % self._max_idx == self._max_idx - 1:
                 self._shuffle_indices()
 
-            class_indices = self._indices_per_class[cls_idx]
+            sample_indices = self._cls_to_sample_indices[cls_idx]
             pointers = self._pointers_per_class[cls_idx]
             pointer_idx = self._local_idx_per_class[cls_idx]
 
             pointer = pointers[pointer_idx]
-            sample_idx = class_indices[pointer]
+            sample_idx = sample_indices[pointer]
 
             yield sample_idx
 
             self._local_idx_per_class[cls_idx] = (pointer_idx + 1) % len(pointers)
             global_idx += 1
+
+            if i == n_classes - 1:
+                cls_indices = shuffled(cls_indices, generator=self._generator)
 
     def __len__(self) -> int:
         return self._n_max_iterations
