@@ -91,6 +91,17 @@ class DTypeEnum(StrEnum):
     cfloat = complex64
     cdouble = complex128
 
+    # Short Aliases
+    f16 = float16
+    f32 = float32
+    f64 = float64
+    i16 = int16
+    i32 = int32
+    i64 = int64
+    c32 = complex32
+    c64 = complex64
+    c128 = complex128
+
     # Others
     bfloat16 = auto()
     bool = auto()

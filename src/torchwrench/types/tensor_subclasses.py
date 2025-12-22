@@ -726,14 +726,6 @@ class _TensorNDBase(
     view = torch.Tensor.view  # noqa: F811  # type: ignore
 
 
-# # TODO: rm
-# class TTensor(
-#     Generic[T_DType, T_NDim, T_BuiltinNumber, T_Floating, T_Complex, T_Signed],
-#     _TensorNDBase[T_DType, T_NDim, T_BuiltinNumber, T_Floating, T_Complex, T_Signed],
-#     metaclass=_TensorNDMeta,
-# ): ...
-
-
 class Tensor(
     _TensorNDBase[Literal[None], _int, BuiltinNumber, _bool, _bool, _bool],
     metaclass=_TensorNDMeta[Literal[None], _int, BuiltinNumber, _bool, _bool, _bool],
