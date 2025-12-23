@@ -19,7 +19,7 @@ _3DShape = Tuple[int, int, int]
 _4DShape = Tuple[int, int, int, int]
 
 
-class DeviceGeneric(StrEnum):
+class DeviceEnum(StrEnum):
     unknown = auto()
     cuda = auto()
     cpu = auto()
@@ -27,7 +27,7 @@ class DeviceGeneric(StrEnum):
 
 _DefaultShape = Tuple[Any, ...]
 _DefaultDType = Any
-_DefaultDevice = Literal[DeviceGeneric.unknown]
+_DefaultDevice = Literal[DeviceEnum.unknown]
 
 
 T_Shape = TypeVar(
@@ -44,7 +44,7 @@ T_DType = TypeVar(
 )
 T_Device = TypeVar(
     "T_Device",
-    bound=DeviceGeneric,
+    bound=DeviceEnum,
     default=_DefaultDevice,
     covariant=True,
 )
@@ -95,5 +95,5 @@ class FloatTensor2D(
 
 
 class CudaFloatTensor2D(
-    TTensor[_2DShape, DTypeEnum.f32, DeviceGeneric.cuda],
+    TTensor[_2DShape, DTypeEnum.f32, DeviceEnum.cuda],
 ): ...
