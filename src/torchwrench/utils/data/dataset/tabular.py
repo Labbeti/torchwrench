@@ -16,13 +16,13 @@ from typing import (
     Union,
 )
 
-import numpy as np
 import pythonwrench as pw
 from pythonwrench.typing import SupportsGetitemIterLen
 from torch import Tensor
 from typing_extensions import Self
 
 import torchwrench as tw
+from torchwrench.extras.numpy import np
 from torchwrench.extras.pandas import pd
 from torchwrench.extras.speechbrain import DynamicItemDataset
 from torchwrench.serialization.csv import read_csv, save_csv

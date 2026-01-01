@@ -16,7 +16,6 @@ from typing import (
     overload,
 )
 
-import numpy as np
 import pythonwrench as pw
 import torch
 from pythonwrench.typing import SupportsGetitemIterLen
@@ -24,7 +23,7 @@ from torch import Tensor
 from torch.utils.data.dataset import Dataset
 from typing_extensions import TypeVar
 
-from torchwrench.extras.numpy import is_numpy_bool_array, is_numpy_integral_array
+from torchwrench.extras.numpy import is_numpy_bool_array, is_numpy_integral_array, np
 from torchwrench.extras.pandas import pd
 from torchwrench.extras.speechbrain import DynamicItemDataset
 from torchwrench.nn.functional.multilabel import multihot_to_multi_indices
