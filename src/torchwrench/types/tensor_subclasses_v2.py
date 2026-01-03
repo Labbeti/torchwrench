@@ -21,7 +21,7 @@ import torch
 from pythonwrench.enum import StrEnum
 from pythonwrench.typing.classes import BuiltinNumber
 from torch._C import _TensorMeta
-from typing_extensions import Type, TypeAlias, TypeVar
+from typing_extensions import Self, Type, TypeAlias, TypeVar
 
 from torchwrench.core.dtype_enum import DTypeEnum, _bool, _int
 from torchwrench.core.make import DeviceLike, DTypeLike, as_device, as_dtype
@@ -41,6 +41,7 @@ class DeviceEnum(StrEnum):
 _DefaultShape: TypeAlias = None
 _DefaultDType: TypeAlias = None
 _DefaultDevice: TypeAlias = None
+
 _DefaultNDim: TypeAlias = None
 
 _ShapeGenericType: TypeAlias = Union[Tuple[int, ...], _DefaultShape]
@@ -87,11 +88,23 @@ T_Device2 = TypeVar(
 )
 
 
+def get_typed_shape_to_shape(
+    typed_shape: _ShapeGenericType,
+) -> Optional[Tuple[Union[int, Type[int]], ...]]:
+    if typed_shape is None:
+        return None
+    else:
+        return tuple(
+            get_args(s)[0] if (get_origin(s) is Literal) else s
+            for s in get_args(typed_shape)
+        )
+
+
 @dataclass
 class _TTensorTypes:
-    shape: Union[Tuple[int, ...], _DefaultShape]
-    dtype: Union[DTypeEnum, _DefaultDType]
-    device: Union[DeviceEnum, _DefaultDevice]
+    shape: Union[Type[Tuple[int, ...]], _DefaultShape]
+    dtype: Union[Type[DTypeEnum], _DefaultDType]
+    device: Union[Type[DeviceEnum], _DefaultDevice]
 
     def is_compatible_with_tensor(self, x: torch.Tensor) -> _bool:
         return (
@@ -104,35 +117,39 @@ class _TTensorTypes:
         if self.shape is None:
             return True
 
-        if len(self.shape) != len(shape):
+        if len(get_args(self.shape)) != len(shape):
             return False
 
         valid = [
             (isinstance(s1, type) and issubclass(s1, int)) or s1 == s2
-            for s1, s2 in zip(self.shape, shape)
+            for s1, s2 in zip(get_args(self.shape), shape)
         ]
         return all(valid)
 
-    def is_compatible_with_dtype(self, dtype: torch.dtype) -> _bool:
+    def is_compatible_with_dtype(self, dtype: Union[torch.dtype, DTypeEnum]) -> _bool:
         """Check if the dtype is compatible with the generic dtype."""
-        if self.dtype is None:
+        if self.dtype is None or dtype is None:
             return True
 
-        dtype_enum = DTypeEnum.from_dtype(dtype)
-        if dtype_enum is None:
-            return False
+        if isinstance(dtype, torch.dtype):
+            dtype_enum = DTypeEnum.from_dtype(dtype)
+        else:
+            dtype_enum = dtype
 
-        if isinstance(self.dtype, DTypeEnum):
-            return self.dtype == dtype_enum
-
-        msg = f"Internal error: cannot check compatibility for {self.dtype=}."
-        raise NotImplementedError(msg)
+        return self.dtype == dtype_enum
 
     def is_compatible_with_device(self, device: Union[torch.device, str, int]) -> _bool:
         if self.device is None:
             return True
 
         return as_device(self.device) == as_device(device)
+
+    def is_compatible_with_tensor_type(self, x: Self) -> _bool:
+        return (
+            (x.shape is None or self.is_compatible_with_shape(x.shape))
+            and (x.dtype is None or self.is_compatible_with_dtype(x.dtype))
+            and (x.device is None or self.is_compatible_with_device(x.device))
+        )
 
     @property
     def ndim(self) -> Union[_int, _DefaultNDim]:
@@ -158,19 +175,38 @@ def _get_generics(cls_or_instance: Any) -> _TTensorTypes:
     return _get_generics_from_type(cls_or_instance)
 
 
-def _get_generics_from_type(cls_or_instance: type) -> _TTensorTypes:
+def _get_generics_from_type(cls: type) -> _TTensorTypes:
     """Get the generic parameters of a TTensor subclass."""
-    origin = get_origin(cls_or_instance)
-    if origin is None:
-        origin = cls_or_instance
 
-    if not issubclass(origin, TTensor):
-        msg = f"Expected a subclass or instance of TTensor, but got {cls_or_instance}."
+    if get_origin(cls) is TTensor:
+        args = get_args(cls)
+    elif hasattr(cls, "__orig_bases__"):
+        orig_bases = cls.__orig_bases__  # type: ignore
+        args = None
+        for base in orig_bases:
+            if get_origin(base) is TTensor:
+                args = get_args(base)
+                break
+        if args is None:
+            msg = f"Invalid argument {cls=}. (expected TTensor or subclass or TTensor)"
+            raise TypeError(msg)
+    else:
+        msg = f"Invalid argument {cls=}. (expected TTensor or subclass or TTensor)"
         raise TypeError(msg)
 
-    args = get_args(cls_or_instance)
+    # breakpoint()
+    # origin = get_origin(cls_or_instance)
+    # if origin is None:
+    #     origin = cls_or_instance
+
+    # if origin is not _TTensorMeta:
+    #     msg = f"Expected a subclass or instance of _TTensorMeta, but got {cls_or_instance}."
+    #     raise TypeError(msg)
+
     if len(args) != 3:
-        msg = f"Expected 3 generic parameters for TTensor, but got {len(args)} in {cls_or_instance}."
+        msg = (
+            f"Expected 3 generic parameters for TTensor, but got {len(args)} in {cls}."
+        )
         raise TypeError(msg)
 
     shape_arg, dtype_arg, device_arg = args
@@ -182,21 +218,35 @@ def _get_generics_from_type(cls_or_instance: type) -> _TTensorTypes:
 
 
 class _TTensorMeta(_TensorMeta):
+    # def __instancecheck__(self, instance: Any) -> _bool:
+    #     """Called method to check isinstance(instance, self)"""
+    #     if not isinstance(instance, torch.Tensor):
+    #         return False
+
+    #     orig_bases: tuple = self.__orig_bases__  # type: ignore
+    #     # breakpoint()
+    #     raise NotImplementedError
+
+    # def __subclasscheck__(self, subclass: Any) -> _bool:
+    #     """Called method to check issubclass(subclass, cls)"""
+    #     orig_bases: tuple = self.__orig_bases__  # type: ignore
+    #     gen = _get_generics_from_type(self)
+    #     breakpoint()
+    #     raise NotImplementedError
+
     def __instancecheck__(self, instance: Any) -> _bool:
-        """Called method to check isinstance(instance, self)"""
+        """Called method to check isinstance(instance, TTensor)"""
         if not isinstance(instance, torch.Tensor):
             return False
 
-        orig_bases: tuple = self.__orig_bases__  # type: ignore
-        # breakpoint()
-        raise NotImplementedError
+        gen = _get_generics_from_type(self)
+        return gen.is_compatible_with_tensor(instance)
 
     def __subclasscheck__(self, subclass: Any) -> _bool:
-        """Called method to check issubclass(subclass, cls)"""
-        orig_bases: tuple = self.__orig_bases__  # type: ignore
-        gen = _get_generics_from_type(self)
-        # breakpoint()
-        raise NotImplementedError
+        """Called method to check issubclass(subclass, TTensor)"""
+        self_generics = _get_generics_from_type(self)
+        other_generics = _get_generics_from_type(subclass)
+        return self_generics.is_compatible_with_tensor_type(other_generics)
 
 
 class _ndim_descriptor:
@@ -265,7 +315,7 @@ class TTensor(
         gen = _get_generics(cls)  # type: ignore
         cls_dtype = gen.dtype
         cls_ndim = gen.ndim
-        cls_shape = gen.shape  # TODO: use shape for new tensor & ndim
+        cls_shape = gen.shape
 
         # Sanity checks for dtype
         if dtype is None:
@@ -445,10 +495,10 @@ class TTensor(
     ) -> "BoolTensor": ...
 
     @overload
-    def any(
-        self, dim: Literal[None] = None
-    ) -> "TTensor[_0DShape, Literal[DTypeEnum.bool], T_Device]":  # type: ignore
-        ...
+    def any(  # type: ignore
+        self,
+        dim: Literal[None] = None,
+    ) -> "TTensor[_0DShape, Literal[DTypeEnum.bool], T_Device]": ...
 
     @overload
     def any(  # type: ignore
