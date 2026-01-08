@@ -169,6 +169,7 @@ def get_shape(
     *,
     output_type: Callable[[Tuple[int, ...]], T] = identity,
     return_valid: Literal[False] = False,
+    use_first_for_list_tuple: bool = False,
 ) -> T: ...
 
 
@@ -178,6 +179,7 @@ def get_shape(
     *,
     output_type: Callable[[Tuple[int, ...]], T] = identity,
     return_valid: Literal[True],
+    use_first_for_list_tuple: bool = False,
 ) -> return_types.shape[T]: ...
 
 
