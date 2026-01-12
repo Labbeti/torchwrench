@@ -170,6 +170,7 @@ def get_shape(
     output_type: Callable[[Tuple[int, ...]], T] = identity,
     return_valid: Literal[False] = False,
     use_first_for_list_tuple: bool = False,
+    invalid_shape: Tuple[int, ...] = (),
 ) -> T: ...
 
 
@@ -180,6 +181,7 @@ def get_shape(
     output_type: Callable[[Tuple[int, ...]], T] = identity,
     return_valid: Literal[True],
     use_first_for_list_tuple: bool = False,
+    invalid_shape: Tuple[int, ...] = (),
 ) -> return_types.shape[T]: ...
 
 
@@ -189,6 +191,7 @@ def get_shape(
     output_type: Callable[[Tuple[int, ...]], T] = identity,
     return_valid: bool = False,
     use_first_for_list_tuple: bool = False,
+    invalid_shape: Tuple[int, ...] = (),
 ) -> Union[T, return_types.shape[T]]:
     """Scan first argument to return its shape. Works recursively with Tensors, numpy arrays and builtins types instances.
 
@@ -199,6 +202,7 @@ def get_shape(
         output_type: Output shape type. defaults to identity, which returns a tuple of ints.
         return_valid: If True, returns a tuple containing a boolean indicator if the data has an homogeneous shape instead of raising a ValueError. defaults to False.
         use_first_for_list_tuple: If True, use first value to determine ndim for list and tuple argument. Otherwise it will scan each value in argument to determine its shape. defaults to False.
+        invalid_shape: Shape to return if input is a heterogeneous list/tuple and return_valid is True. This default value is passed to the output_type() callable argument. defaults to ().
 
     Raises:
         ValueError: if input has an heterogeneous shape.
@@ -225,7 +229,7 @@ def get_shape(
             ):
                 return True, (len(shapes),) + shapes[0]
             else:
-                return False, ()
+                return False, invalid_shape
         else:
             raise TypeError(f"Invalid argument type {type(x)}.")
 

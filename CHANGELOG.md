@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - `SubsetSampler`, `BalancedSampler` and `SubsetCycleSampler` classes.
 - `RealTensor` typing class.
 - Ratios conversions functions for masking.
+- `invalid_shape` argument to `get_shape` function.
 
 ### Modified
 - `move_to` function now supports dataclasses.
