@@ -167,10 +167,10 @@ def ndim(*args, **kwargs): ...
 def get_shape(
     x: Union[ScalarLike, Tensor, np.ndarray, Iterable],
     *,
-    output_type: Callable[[Tuple[int, ...]], T] = identity,
+    output_type: Callable[[Union[Tuple[int, ...], U]], T] = identity,
     return_valid: Literal[False] = False,
     use_first_for_list_tuple: bool = False,
-    invalid_shape: Tuple[int, ...] = (),
+    invalid_shape: U = (),
 ) -> T: ...
 
 
@@ -178,20 +178,20 @@ def get_shape(
 def get_shape(
     x: Union[ScalarLike, Tensor, np.ndarray, Iterable],
     *,
-    output_type: Callable[[Tuple[int, ...]], T] = identity,
+    output_type: Callable[[Union[Tuple[int, ...], U]], T] = identity,
     return_valid: Literal[True],
     use_first_for_list_tuple: bool = False,
-    invalid_shape: Tuple[int, ...] = (),
+    invalid_shape: U = (),
 ) -> return_types.shape[T]: ...
 
 
 def get_shape(
     x: Union[ScalarLike, Tensor, np.ndarray, Iterable],
     *,
-    output_type: Callable[[Tuple[int, ...]], T] = identity,
+    output_type: Callable[[Union[Tuple[int, ...], U]], T] = identity,
     return_valid: bool = False,
     use_first_for_list_tuple: bool = False,
-    invalid_shape: Tuple[int, ...] = (),
+    invalid_shape: U = (),
 ) -> Union[T, return_types.shape[T]]:
     """Scan first argument to return its shape. Works recursively with Tensors, numpy arrays and builtins types instances.
 
