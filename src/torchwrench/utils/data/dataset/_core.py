@@ -16,7 +16,7 @@ from typing import (
     overload,
 )
 
-import numpy as np
+from torchwrench.extras.numpy import np
 import pythonwrench as pw
 import torch
 from pythonwrench.typing import SupportsGetitemIterLen
