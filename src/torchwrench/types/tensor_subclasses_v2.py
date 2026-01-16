@@ -38,9 +38,9 @@ class DeviceEnum(StrEnum):
     cpu = auto()
 
 
-_DefaultShape: TypeAlias = None
-_DefaultDType: TypeAlias = None
-_DefaultDevice: TypeAlias = None
+_DefaultShape: TypeAlias = Any
+_DefaultDType: TypeAlias = Any
+_DefaultDevice: TypeAlias = Any
 
 _ShapeGenericType: TypeAlias = Union[Tuple[_int, ...], _DefaultShape]
 _DTypeGenericType: TypeAlias = Union[DTypeEnum, _DefaultDType]
@@ -151,7 +151,7 @@ class _TTensorGenerics:
 
         return as_device(self.device) == as_device(device)
 
-    def is_compatible_with_tensor_type(self, x: Self) -> _bool:
+    def is_compatible_with_tensor_generics(self, x: Self) -> _bool:
         return (
             (x.shape is None or self.is_compatible_with_shape(x.shape))
             and (x.dtype is None or self.is_compatible_with_dtype(x.dtype))
@@ -178,7 +178,7 @@ class _TTensorGenerics:
 def _generic_shape_to_shape(
     generic_shape: _ShapeGenericType,
 ) -> Optional[Tuple[Optional[_int], ...]]:
-    if isinstance(generic_shape, TypeVar):
+    if isinstance(generic_shape, TypeVar) or generic_shape is _DefaultShape:
         return None
 
     return tuple(
@@ -188,12 +188,8 @@ def _generic_shape_to_shape(
 
 
 def _generic_dtype_to_dtype(generic_dtype: _DTypeGenericType) -> Optional[torch.dtype]:
-    if isinstance(generic_dtype, TypeVar):
+    if isinstance(generic_dtype, TypeVar) or generic_dtype is _DefaultDType:
         return None
-
-    if generic_dtype is None:
-        msg = "Cannot convert None generic dtype to torch.dtype."
-        raise TypeError(msg)
 
     if isinstance(generic_dtype, DTypeEnum):
         return generic_dtype.dtype
@@ -205,14 +201,10 @@ def _generic_dtype_to_dtype(generic_dtype: _DTypeGenericType) -> Optional[torch.
 def _generic_device_to_device(
     generic_device: _DeviceGenericType,
 ) -> Optional[torch.device]:
-    if isinstance(generic_device, TypeVar):
+    if isinstance(generic_device, TypeVar) or generic_device is _DefaultDevice:
         return None
-
-    if generic_device is None:
-        msg = "Cannot convert None generic device to torch.device."
-        raise TypeError(msg)
-
-    return as_device(generic_device)
+    else:
+        return as_device(generic_device)
 
 
 def _cls_to_generics(cls: type) -> _TTensorGenerics:
@@ -281,7 +273,7 @@ class _TTensorMeta(_TensorMeta):
         """Called method to check issubclass(subclass, TTensor)"""
         self_generics = _cls_to_generics(self)
         other_generics = _cls_to_generics(subclass)
-        return self_generics.is_compatible_with_tensor_type(other_generics)
+        return self_generics.is_compatible_with_tensor_generics(other_generics)
 
 
 class _ndim_descriptor:
