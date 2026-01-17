@@ -7,7 +7,7 @@ if not _SPEECHBRAIN_AVAILABLE:
     from torchwrench.extras.speechbrain._speechbrain_fallback import DynamicItemDataset
 
 else:
-    from speechbrain.dataio.dataset import DynamicItemDataset
+    from speechbrain.dataio.dataset import DynamicItemDataset  # type: ignore
 
 
 __all__ = [

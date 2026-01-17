@@ -2,14 +2,13 @@
 # -*- coding: utf-8 -*-
 
 from builtins import bool as _bool
+from builtins import int as _int
 from dataclasses import dataclass
-from enum import auto
 from typing import (
     Any,
     Generic,
     Optional,
     Tuple,
-    Type,
     Union,
     get_args,
     get_origin,
@@ -23,7 +22,7 @@ from torch._C import _TensorMeta
 from typing_extensions import Self, Type, TypeAlias, TypeVar
 
 from torchwrench.core.device_enum import DeviceEnum
-from torchwrench.core.dtype_enum import DTypeEnum, _bool, _int
+from torchwrench.core.dtype_enum import DTypeEnum
 from torchwrench.core.make import DeviceLike, DTypeLike, as_device, as_dtype
 
 _0DShape = Tuple[()]
@@ -780,11 +779,11 @@ class TTensor(
     ) -> "Tensor3D[T_DType, T_Device]": ...
 
     @overload
-    def view(self, *size: _int) -> "TTensor":  # type: ignore
+    def view(self, *size: _int) -> "TTensor[_DefaultShape, T_DType, T_Device]":  # type: ignore
         ...
 
     @overload
-    def view(self, dtype: torch.dtype) -> "Tensor":  # type: ignore
+    def view(self, dtype: torch.dtype) -> "TTensor[T_Shape, _DefaultDType, T_Device]":  # type: ignore
         ...
 
     ndim: _ndim_descriptor  # type: ignore
