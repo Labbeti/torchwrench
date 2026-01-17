@@ -7,7 +7,6 @@ from enum import auto
 from typing import (
     Any,
     Generic,
-    Literal,
     Optional,
     Tuple,
     Type,
@@ -16,13 +15,14 @@ from typing import (
     get_origin,
     overload,
 )
+from typing import Literal as L
 
 import torch
-from pythonwrench.enum import StrEnum
 from pythonwrench.typing.classes import BuiltinNumber
 from torch._C import _TensorMeta
 from typing_extensions import Self, Type, TypeAlias, TypeVar
 
+from torchwrench.core.device_enum import DeviceEnum
 from torchwrench.core.dtype_enum import DTypeEnum, _bool, _int
 from torchwrench.core.make import DeviceLike, DTypeLike, as_device, as_dtype
 
@@ -31,11 +31,6 @@ _1DShape = Tuple[_int]
 _2DShape = Tuple[_int, _int]
 _3DShape = Tuple[_int, _int, _int]
 _4DShape = Tuple[_int, _int, _int, _int]
-
-
-class DeviceEnum(StrEnum):
-    cuda = auto()
-    cpu = auto()
 
 
 _DefaultShape: TypeAlias = Any
@@ -182,7 +177,7 @@ def _generic_shape_to_shape(
         return None
 
     return tuple(
-        get_args(s)[0] if (get_origin(s) is Literal) else None
+        get_args(s)[0] if (get_origin(s) is L) else None
         for s in get_args(generic_shape)
     )
 
@@ -273,31 +268,31 @@ class _ndim_descriptor:
         self,
         instance: "TTensor[_0DShape, Any, Any]",
         owner: Any,
-    ) -> Literal[0]: ...
+    ) -> L[0]: ...
     @overload
     def __get__(
         self,
         instance: "TTensor[_1DShape, Any, Any]",
         owner: Any,
-    ) -> Literal[1]: ...
+    ) -> L[1]: ...
     @overload
     def __get__(
         self,
         instance: "TTensor[_2DShape, Any, Any]",
         owner: Any,
-    ) -> Literal[2]: ...
+    ) -> L[2]: ...
     @overload
     def __get__(
         self,
         instance: "TTensor[_3DShape, Any, Any]",
         owner: Any,
-    ) -> Literal[3]: ...
+    ) -> L[3]: ...
     @overload
     def __get__(
         self,
         instance: "TTensor[_4DShape, Any, Any]",
         owner: Any,
-    ) -> Literal[4]: ...
+    ) -> L[4]: ...
     @overload
     def __get__(
         self,
@@ -482,14 +477,14 @@ class TTensor(
         self: "TTensor[Tuple[T_Axis0], T_DType, T_Device]",
         idx: None,
         /,
-    ) -> "TTensor[Tuple[Literal[1], T_Axis0], T_DType, T_Device]": ...
+    ) -> "TTensor[Tuple[L[1], T_Axis0], T_DType, T_Device]": ...
 
     @overload
     def __getitem__(  # type: ignore
         self: "TTensor[Tuple[T_Axis0, T_Axis1], T_DType, T_Device]",
         idx: None,
         /,
-    ) -> "TTensor[Tuple[Literal[1], T_Axis0, T_Axis1], T_DType, T_Device]": ...
+    ) -> "TTensor[Tuple[L[1], T_Axis0, T_Axis1], T_DType, T_Device]": ...
 
     @overload
     def __getitem__(  # type: ignore
@@ -507,29 +502,29 @@ class TTensor(
     @overload
     def __gt__(  # type: ignore
         self: "TTensor[T_Shape, T_DType, T_Device]", other: Any
-    ) -> "TTensor[_DefaultShape, Literal[DTypeEnum.bool], T_Device]": ...
+    ) -> "TTensor[_DefaultShape, L[DTypeEnum.bool], T_Device]": ...
 
     @overload
     def __le__(  # type: ignore
         self: "TTensor[T_Shape, T_DType, T_Device]", other: Any
-    ) -> "TTensor[_DefaultShape, Literal[DTypeEnum.bool], T_Device]": ...
+    ) -> "TTensor[_DefaultShape, L[DTypeEnum.bool], T_Device]": ...
 
     @overload
     def __lt__(  # type: ignore
         self: "TTensor[T_Shape, T_DType, T_Device]", other: Any
-    ) -> "TTensor[_DefaultShape, Literal[DTypeEnum.bool], T_Device]": ...
+    ) -> "TTensor[_DefaultShape, L[DTypeEnum.bool], T_Device]": ...
 
     @overload
     def __ne__(  # type: ignore
         self: "TTensor[T_Shape, Any, T_Device]",
         other: "TTensor[T_Shape, Any, T_Device]",
-    ) -> "TTensor[T_Shape, Literal[DTypeEnum.bool], T_Device]": ...
+    ) -> "TTensor[T_Shape, L[DTypeEnum.bool], T_Device]": ...
 
     @overload
     def __ne__(  # type: ignore
         self,
         other: Any,
-    ) -> "TTensor[_DefaultShape, Literal[DTypeEnum.bool], T_Device]": ...
+    ) -> "TTensor[_DefaultShape, L[DTypeEnum.bool], T_Device]": ...
 
     @overload
     def abs(  # type: ignore
@@ -547,7 +542,7 @@ class TTensor(
     ) -> "TTensor[T_Shape, T_DType, T_Device]": ...
 
     @overload
-    def all(self, dim: Literal[None] = None) -> "BoolTensor0D":  # type: ignore
+    def all(self, dim: L[None] = None) -> "BoolTensor0D":  # type: ignore
         ...
 
     @overload
@@ -560,8 +555,8 @@ class TTensor(
     @overload
     def any(  # type: ignore
         self,
-        dim: Literal[None] = None,
-    ) -> "TTensor[_0DShape, Literal[DTypeEnum.bool], T_Device]": ...
+        dim: L[None] = None,
+    ) -> "TTensor[_0DShape, L[DTypeEnum.bool], T_Device]": ...
 
     @overload
     def any(  # type: ignore
@@ -641,7 +636,7 @@ class TTensor(
         ...
 
     @overload
-    def mean(self, dim: Literal[None] = None) -> "Tensor0D[T_DType, T_Device]":  # type: ignore
+    def mean(self, dim: L[None] = None) -> "Tensor0D[T_DType, T_Device]":  # type: ignore
         ...
 
     @overload
@@ -704,7 +699,7 @@ class TTensor(
     ) -> "TTensor[_DefaultShape, T_DType, T_Device]": ...
 
     @overload
-    def sum(self, dim: Literal[None] = None) -> "Tensor0D[T_DType, T_Device]":  # type: ignore
+    def sum(self, dim: L[None] = None) -> "Tensor0D[T_DType, T_Device]":  # type: ignore
         ...
 
     @overload
