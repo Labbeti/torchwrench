@@ -226,15 +226,6 @@ def _cls_to_generics(cls: type) -> _TTensorGenerics:
         msg = f"Invalid argument {cls=}. (expected TTensor or subclass or TTensor)"
         raise TypeError(msg)
 
-    # breakpoint()
-    # origin = get_origin(cls_or_instance)
-    # if origin is None:
-    #     origin = cls_or_instance
-
-    # if origin is not _TTensorMeta:
-    #     msg = f"Expected a subclass or instance of _TTensorMeta, but got {cls_or_instance}."
-    #     raise TypeError(msg)
-
     if len(args) != 3:
         msg = (
             f"Expected 3 generic parameters for TTensor, but got {len(args)} in {cls}."
@@ -436,20 +427,27 @@ class TTensor(
 
     @overload
     def __eq__(  # type: ignore
-        self: "TTensor[T_Shape, T_DType, T_Device]",
-        other: "TTensor[T_Shape, T_DType, T_Device]",
-    ) -> "TTensor[T_Shape, Literal[DTypeEnum.bool], T_Device]": ...
+        self,
+        other: "TTensor[T_Shape, T_DType2, T_Device]",
+    ) -> "BoolTensor[T_Shape, T_Device]": ...
 
     @overload
     def __eq__(  # type: ignore
-        self: "TTensor[T_Shape, T_DType, T_Device]",
+        self,
+        other: BuiltinNumber,
+    ) -> "BoolTensor[T_Shape, T_Device]": ...
+
+    @overload
+    def __eq__(  # type: ignore
+        self,
         other: Any,
-    ) -> "TTensor[_DefaultShape, Literal[DTypeEnum.bool], T_Device]": ...
+    ) -> "BoolTensor[_DefaultShape, T_Device]": ...
 
     @overload
     def __ge__(  # type: ignore
-        self: "TTensor[T_Shape, T_DType, T_Device]", other: Any
-    ) -> "TTensor[_DefaultShape, Literal[DTypeEnum.bool], T_Device]": ...
+        self,
+        other: Any,
+    ) -> "BoolTensor[_DefaultShape, T_Device]": ...
 
     @overload
     def __getitem__(  # type: ignore
@@ -592,7 +590,7 @@ class TTensor(
         ...
 
     @overload
-    def double(self) -> "DoubleTensor":  # type: ignore
+    def double(self) -> "DoubleTensor[T_Shape, T_Device]":  # type: ignore
         ...
 
     @overload
@@ -627,16 +625,11 @@ class TTensor(
     def is_signed(self) -> _bool:  # type: ignore
         ...
 
-    @overload
-    def isfinite(self) -> "BoolTensor":  # type: ignore
-        ...
+    def isfinite(self) -> "BoolTensor[T_Shape, T_Device]": ...
 
-    @overload
-    def isinf(self) -> "BoolTensor":  # type: ignore
-        ...
+    def isinf(self) -> "BoolTensor[T_Shape, T_Device]": ...
 
-    @overload
-    def isnan(self) -> "BoolTensor":  # type: ignore
+    def isnan(self) -> "BoolTensor[T_Shape, T_Device]":  # type: ignore
         ...
 
     @overload
@@ -644,30 +637,33 @@ class TTensor(
         ...
 
     @overload
-    def long(self) -> "LongTensor":  # type: ignore
+    def long(self) -> "LongTensor[T_Shape, T_Device]":  # type: ignore
         ...
 
     @overload
-    def mean(self, dim: Literal[None] = None) -> "Tensor0D":  # type: ignore
+    def mean(self, dim: Literal[None] = None) -> "Tensor0D[T_DType, T_Device]":  # type: ignore
         ...
 
     @overload
-    def mean(self: "Tensor0D", dim: _int) -> "Tensor0D": ...
-
-    @overload
-    def mean(self: "Tensor1D", dim: _int) -> "Tensor0D":  # type: ignore
+    def mean(
+        self: "TTensor[_1DShape, T_DType, T_Device]", dim: _int
+    ) -> "TTensor[_0DShape, T_DType, T_Device]":  # type: ignore
         ...
 
     @overload
-    def mean(self: "Tensor2D", dim: _int) -> "Tensor1D":  # type: ignore
+    def mean(
+        self: "TTensor[_2DShape, T_DType, T_Device]", dim: _int
+    ) -> "TTensor[_1DShape, T_DType, T_Device]":  # type: ignore
         ...
 
     @overload
-    def mean(self: "Tensor3D", dim: _int) -> "Tensor2D":  # type: ignore
+    def mean(
+        self: "TTensor[_3DShape, T_DType, T_Device]", dim: _int
+    ) -> "TTensor[_2DShape, T_DType, T_Device]":  # type: ignore
         ...
 
     @overload
-    def mean(self, dim: _int) -> "Tensor":  # type: ignore
+    def mean(self, dim: _int) -> "TTensor[_DefaultShape, T_DType, T_Device]":  # type: ignore
         ...
 
     @overload
@@ -677,17 +673,24 @@ class TTensor(
     ) -> "TTensor[T_Shape2, T_DType, T_Device]": ...
 
     @overload
-    def reshape(self, size0: _int) -> "Tensor1D": ...  # type: ignore
+    def reshape(self, size0: _int) -> "TTensor[_1DShape, T_DType, T_Device]": ...
 
     @overload
-    def reshape(self, size0: _int, size1: _int) -> "Tensor2D": ...  # type: ignore
+    def reshape(
+        self, size0: _int, size1: _int
+    ) -> "TTensor[_2DShape, T_DType, T_Device]": ...  # type: ignore
 
     @overload
-    def reshape(self, size0: _int, size1: _int, size2: _int) -> "Tensor3D":  # type: ignore
+    def reshape(  # type: ignore
+        self,
+        size0: _int,
+        size1: _int,
+        size2: _int,
+    ) -> "TTensor[_3DShape, T_DType, T_Device]":  # type: ignore
         ...
 
     @overload
-    def short(self) -> "ShortTensor":  # type: ignore
+    def short(self) -> "TTensor[T_Shape, DTypeEnum.short, T_Device]":  # type: ignore
         ...
 
     @overload
@@ -701,22 +704,28 @@ class TTensor(
     ) -> "TTensor[_DefaultShape, T_DType, T_Device]": ...
 
     @overload
-    def sum(self, dim: Literal[None] = None) -> "Tensor0D":  # type: ignore
+    def sum(self, dim: Literal[None] = None) -> "Tensor0D[T_DType, T_Device]":  # type: ignore
         ...
 
     @overload
-    def sum(self: "Tensor1D", dim: _int) -> "Tensor0D": ...
+    def sum(
+        self: "TTensor[_1DShape, T_DType, T_Device]", dim: _int
+    ) -> "TTensor[_0DShape, T_DType, T_Device]": ...
 
     @overload
-    def sum(self: "Tensor2D", dim: _int) -> "Tensor1D":  # type: ignore
+    def sum(
+        self: "TTensor[_2DShape, T_DType, T_Device]", dim: _int
+    ) -> "TTensor[_1DShape, T_DType, T_Device]":  # type: ignore
         ...
 
     @overload
-    def sum(self: "Tensor3D", dim: _int) -> "Tensor2D":  # type: ignore
+    def sum(
+        self: "TTensor[_3DShape, T_DType, T_Device]", dim: _int
+    ) -> "TTensor[_2DShape, T_DType, T_Device]":  # type: ignore
         ...
 
     @overload
-    def sum(self, dim: Optional[_int] = None) -> "Tensor":  # type: ignore
+    def sum(self, dim: Optional[_int] = None) -> "TTensor[_0DShape, T_DType, T_Device]":  # type: ignore
         ...
 
     @overload
@@ -931,3 +940,15 @@ o = y[0]
 r = o[None]
 
 b = x[None] == y
+
+c = x.double()
+d = x.short()
+
+e = x.isfinite()
+f = x.isinf()
+
+g = x.mean()
+h = x.sum().isinf()
+
+i = g.ndim
+j = h.ndim
