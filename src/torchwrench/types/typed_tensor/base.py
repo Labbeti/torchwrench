@@ -204,7 +204,7 @@ def _generic_device_to_device(
 def _cls_to_generics(cls: type) -> _TTensorGenerics:
     """Get the generic parameters of a TTensor subclass."""
 
-    if get_origin(cls) is TTensor:
+    if cls is TTensor or get_origin(cls) is TTensor:
         args = get_args(cls)
     elif hasattr(cls, "__orig_bases__"):
         orig_bases = cls.__orig_bases__  # type: ignore
@@ -219,6 +219,10 @@ def _cls_to_generics(cls: type) -> _TTensorGenerics:
     else:
         msg = f"Invalid argument {cls=}. (expected TTensor or subclass or TTensor)"
         raise TypeError(msg)
+
+    if len(args) < 3:
+        missing = (_AnyShape, _AnyDType, _AnyDevice)[len(args) :]
+        args = args + missing
 
     if len(args) != 3:
         msg = (
