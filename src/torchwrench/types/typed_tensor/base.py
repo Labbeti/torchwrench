@@ -112,6 +112,13 @@ class _TTensorGenerics:
             and self.is_compatible_with_device(x.device)
         )
 
+    def is_compatible_with_tensor_generics(self, x: Self) -> _bool:
+        return (
+            (x.shape is None or self.is_compatible_with_shape(x.shape))
+            and (x.dtype is None or self.is_compatible_with_dtype(x.dtype))
+            and (x.device is None or self.is_compatible_with_device(x.device))
+        )
+
     def is_compatible_with_shape(self, shape: Tuple[Optional[_int], ...]) -> _bool:
         if self.shape is None:
             return True
@@ -138,19 +145,13 @@ class _TTensorGenerics:
         return self.dtype == dtype_enum
 
     def is_compatible_with_device(
-        self, device: Union[torch.device, str, _int]
+        self,
+        device: Union[torch.device, str, _int],
     ) -> _bool:
         if self.device is None:
             return True
 
         return as_device(self.device) == as_device(device)
-
-    def is_compatible_with_tensor_generics(self, x: Self) -> _bool:
-        return (
-            (x.shape is None or self.is_compatible_with_shape(x.shape))
-            and (x.dtype is None or self.is_compatible_with_dtype(x.dtype))
-            and (x.device is None or self.is_compatible_with_device(x.device))
-        )
 
     @property
     def ndim(self) -> Optional[_int]:
@@ -332,6 +333,7 @@ class TTensor(
         cls_dtype = gen.dtype
         cls_ndim = gen.ndim
         cls_shape = gen.shape
+        cls_device = gen.device
 
         # Sanity checks for dtype
         if dtype is None:
@@ -351,6 +353,16 @@ class TTensor(
             msg = (
                 f"Invalid argument {dtype=} for {cls.__name__}. (expected {cls_dtype})"
             )
+            raise ValueError(msg)
+
+        # Sanity checks for device
+        if device is None:
+            if cls_device is not None:
+                device = cls_device
+        elif cls_device is None or device == cls_device:
+            pass
+        else:
+            msg = f"Invalid argument {device=} for {cls.__name__}. (expected {cls_device})"
             raise ValueError(msg)
 
         # Sanity checks for data and ndim
