@@ -115,12 +115,12 @@ class TestNDimShape(TestCase):
         assert get_shape(example, return_indicator=True) == (True, expected)
 
         example = [tw.rand(5), list(range(3))]
-        assert get_shape(example, return_default_on_invalid=True, default=None) == None
+        assert get_shape(example, return_default_on_invalid=True, default=None) is None
 
         with self.assertRaises(ValueError):
             assert (
                 get_shape(example, return_default_on_invalid=False, default=None)
-                == None
+                is None
             )
 
         assert (
