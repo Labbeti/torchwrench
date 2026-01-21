@@ -603,27 +603,29 @@ class TTensor(
     ) -> "TTensor[T_Shape, T_DType, L[DeviceEnum.cuda]]": ...
 
     @overload
-    def double(self) -> "DoubleTensor[T_Shape, T_Device]":  # type: ignore
+    def double(self) -> "TTensor[T_Shape, L[DTypeEnum.double], T_Device]":  # type: ignore
         ...
 
     @overload
-    def eq(self: "TTensor", other: Union[torch.Tensor, BuiltinNumber]) -> "BoolTensor":  # type: ignore
-        ...
+    def eq(  # type: ignore
+        self: "TTensor",
+        other: Union[torch.Tensor, BuiltinNumber],
+    ) -> "TTensor[_AnyShape, L[DTypeEnum.bool], T_Device]": ...
 
     @overload
     def equal(self: "TTensor", other: torch.Tensor) -> _bool:  # type: ignore
         ...
 
     @overload
-    def float(self) -> "FloatTensor":  # type: ignore
+    def float(self) -> "TTensor[T_Shape, L[DTypeEnum.float], T_Device]":  # type: ignore
         ...
 
     @overload
-    def half(self) -> "HalfTensor":  # type: ignore
+    def half(self) -> "TTensor[T_Shape, L[DTypeEnum.half], T_Device]":  # type: ignore
         ...
 
     @overload
-    def int(self) -> "IntTensor":  # type: ignore
+    def int(self) -> "TTensor[T_Shape, L[DTypeEnum.int], T_Device]":  # type: ignore
         ...
 
     @overload
@@ -649,11 +651,11 @@ class TTensor(
         ...
 
     @overload
-    def long(self) -> "LongTensor[T_Shape, T_Device]":  # type: ignore
+    def long(self) -> "TTensor[T_Shape, L[DTypeEnum.long], T_Device]":  # type: ignore
         ...
 
     @overload
-    def mean(self, dim: L[None] = None) -> "Tensor0D[T_DType, T_Device]":  # type: ignore
+    def mean(self, dim: L[None] = None) -> "TTensor[_0DShape, T_DType, T_Device]":  # type: ignore
         ...
 
     @overload
@@ -716,7 +718,7 @@ class TTensor(
     ) -> "TTensor[_AnyShape, T_DType, T_Device]": ...
 
     @overload
-    def sum(self, dim: L[None] = None) -> "Tensor0D[T_DType, T_Device]":  # type: ignore
+    def sum(self, dim: L[None] = None) -> "TTensor[_0DShape, T_DType, T_Device]":  # type: ignore
         ...
 
     @overload
