@@ -21,7 +21,7 @@ if not _TORCHAUDIO_AVAILABLE:
 import torchaudio
 
 try:
-    from torchaudio import _AudioMetaData
+    from torchaudio import _AudioMetaData  # type: ignore
     from torchaudio.io import CodecConfig  # type: ignore
 except (ImportError, AttributeError):
 
