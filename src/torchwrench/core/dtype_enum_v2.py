@@ -189,6 +189,7 @@ _DTYPES_TABLE: List[Tuple[str, torch.dtype, type]] = [
     ("uint8", torch.uint8, UInt8DType),
 ]
 
+
 # Optional
 if hasattr(torch, "complex32"):
     _DTYPES_TABLE += [("complex32", torch.complex32, Complex32DType)]
@@ -222,10 +223,40 @@ def dtype_cls_to_dtype(dtype_cls: Type[DTypeBase]) -> torch.dtype:
 
 
 @lru_cache(len(_DTYPES_TABLE))
+def dtype_cls_to_dtype_name(dtype_cls: Type[DTypeBase]) -> str:
+    for dtype_name_2, _, dtype_cls_2 in _DTYPES_TABLE:
+        if dtype_cls == dtype_cls_2:
+            return dtype_name_2
+
+    msg = f"Invalid argument {dtype_cls=}."
+    raise ValueError(msg)
+
+
+@lru_cache(len(_DTYPES_TABLE))
 def dtype_name_to_dtype(dtype_name: Type[DTypeBase]) -> torch.dtype:
     for dtype_name_2, dtype_2, _ in _DTYPES_TABLE:
         if dtype_name == dtype_name_2:
             return dtype_2
 
     msg = f"Invalid argument {dtype_name=}."
+    raise ValueError(msg)
+
+
+@lru_cache(len(_DTYPES_TABLE))
+def dtype_name_to_dtype_cls(dtype_name: str) -> Type[DTypeBase]:
+    for dtype_name_2, _, dtype_cls_2 in _DTYPES_TABLE:
+        if dtype_name == dtype_name_2:
+            return dtype_cls_2
+
+    msg = f"Invalid argument {dtype_name=}."
+    raise ValueError(msg)
+
+
+@lru_cache(len(_DTYPES_TABLE))
+def dtype_to_dtype_cls(dtype: torch.dtype) -> Type[DTypeBase]:
+    for _, dtype_2, dtype_cls_2 in _DTYPES_TABLE:
+        if dtype == dtype_2:
+            return dtype_cls_2
+
+    msg = f"Invalid argument {dtype=}."
     raise ValueError(msg)

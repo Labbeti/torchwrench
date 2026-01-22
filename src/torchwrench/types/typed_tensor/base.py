@@ -21,8 +21,13 @@ from pythonwrench.typing.classes import BuiltinNumber
 from torch._C import _TensorMeta
 from typing_extensions import Self, Type, TypeAlias, TypeVar
 
+from torchwrench.core import dtype_enum_v2 as dtypes
 from torchwrench.core.device_enum import DeviceEnum
-from torchwrench.core.dtype_enum import DTypeEnum
+from torchwrench.core.dtype_enum_v2 import (
+    DTypeBase,
+    dtype_cls_to_dtype,
+    dtype_to_dtype_cls,
+)
 from torchwrench.core.make import DeviceLike, DTypeLike, as_device, as_dtype
 
 _0DShape = Tuple[()]
@@ -37,7 +42,7 @@ _AnyDType: TypeAlias = Any
 _AnyDevice: TypeAlias = Any
 
 _ShapeGenericType: TypeAlias = Union[Tuple[_int, ...], _AnyShape]
-_DTypeGenericType: TypeAlias = Union[DTypeEnum, _AnyDType]
+_DTypeGenericType: TypeAlias = Union[DTypeBase, _AnyDType]
 _DeviceGenericType: TypeAlias = Union[DeviceEnum, _AnyDevice]
 
 
@@ -132,13 +137,13 @@ class _TTensorGenerics:
         ]
         return all(valid)
 
-    def is_compatible_with_dtype(self, dtype: Union[torch.dtype, DTypeEnum]) -> _bool:
+    def is_compatible_with_dtype(self, dtype: Union[torch.dtype, DTypeBase]) -> _bool:
         """Check if the dtype is compatible with the generic dtype."""
         if self.dtype is None or dtype is None:
             return True
 
         if isinstance(dtype, torch.dtype):
-            dtype_enum = DTypeEnum.from_dtype(dtype)
+            dtype_enum = dtype_to_dtype_cls(dtype)
         else:
             dtype_enum = dtype
 
@@ -186,8 +191,8 @@ def _generic_dtype_to_dtype(generic_dtype: _DTypeGenericType) -> Optional[torch.
     if isinstance(generic_dtype, TypeVar) or generic_dtype is _AnyDType:
         return None
 
-    if isinstance(generic_dtype, DTypeEnum):
-        return generic_dtype.dtype
+    if isinstance(generic_dtype, type) and DTypeBase in generic_dtype.__mro__:
+        return dtype_cls_to_dtype(generic_dtype)
 
     msg = f"Invalid argument {generic_dtype=} (expected DTypeEnum or None)."
     raise TypeError(msg)
@@ -313,7 +318,7 @@ class TTensor(
     torch.Tensor,
     metaclass=_TTensorMeta,
 ):
-    _DEFAULT_DTYPE: Optional[DTypeEnum] = None
+    _DEFAULT_DTYPE: Optional[Type[DTypeBase]] = None
 
     def __new__(
         cls: "Type[TTensor[T_Shape, T_DType, T_Device]]",
@@ -340,7 +345,7 @@ class TTensor(
             if cls_dtype is not None:
                 dtype = cls_dtype
             elif cls._DEFAULT_DTYPE is not None:
-                dtype = cls._DEFAULT_DTYPE.dtype
+                dtype = dtype_cls_to_dtype(cls._DEFAULT_DTYPE)
 
         elif cls_dtype is None:
             if not gen.is_compatible_with_dtype(dtype):
@@ -439,25 +444,25 @@ class TTensor(
     def __eq__(  # type: ignore
         self,
         other: "TTensor[T_Shape, T_DType2, T_Device]",
-    ) -> "TTensor[T_Shape, L[DTypeEnum.bool], T_Device]": ...
+    ) -> "TTensor[T_Shape, dtypes.BoolDType, T_Device]": ...
 
     @overload
     def __eq__(  # type: ignore
         self,
         other: BuiltinNumber,
-    ) -> "TTensor[T_Shape, L[DTypeEnum.bool], T_Device]": ...
+    ) -> "TTensor[T_Shape, dtypes.BoolDType, T_Device]": ...
 
     @overload
     def __eq__(  # type: ignore
         self,
         other: Any,
-    ) -> "TTensor[_AnyShape, L[DTypeEnum.bool], T_Device]": ...
+    ) -> "TTensor[_AnyShape, dtypes.BoolDType, T_Device]": ...
 
     @overload
     def __ge__(  # type: ignore
         self,
         other: Any,
-    ) -> "TTensor[_AnyShape, L[DTypeEnum.bool], T_Device]": ...
+    ) -> "TTensor[_AnyShape, dtypes.BoolDType, T_Device]": ...
 
     @overload
     def __getitem__(  # type: ignore
@@ -517,29 +522,29 @@ class TTensor(
     @overload
     def __gt__(  # type: ignore
         self: "TTensor[T_Shape, T_DType, T_Device]", other: Any
-    ) -> "TTensor[_AnyShape, L[DTypeEnum.bool], T_Device]": ...
+    ) -> "TTensor[_AnyShape, dtypes.BoolDType, T_Device]": ...
 
     @overload
     def __le__(  # type: ignore
         self: "TTensor[T_Shape, T_DType, T_Device]", other: Any
-    ) -> "TTensor[_AnyShape, L[DTypeEnum.bool], T_Device]": ...
+    ) -> "TTensor[_AnyShape, dtypes.BoolDType, T_Device]": ...
 
     @overload
     def __lt__(  # type: ignore
         self: "TTensor[T_Shape, T_DType, T_Device]", other: Any
-    ) -> "TTensor[_AnyShape, L[DTypeEnum.bool], T_Device]": ...
+    ) -> "TTensor[_AnyShape, dtypes.BoolDType, T_Device]": ...
 
     @overload
     def __ne__(  # type: ignore
         self: "TTensor[T_Shape, Any, T_Device]",
         other: "TTensor[T_Shape, Any, T_Device]",
-    ) -> "TTensor[T_Shape, L[DTypeEnum.bool], T_Device]": ...
+    ) -> "TTensor[T_Shape, dtypes.BoolDType, T_Device]": ...
 
     @overload
     def __ne__(  # type: ignore
         self,
         other: Any,
-    ) -> "TTensor[_AnyShape, L[DTypeEnum.bool], T_Device]": ...
+    ) -> "TTensor[_AnyShape, dtypes.BoolDType, T_Device]": ...
 
     @overload
     def abs(  # type: ignore
@@ -560,32 +565,32 @@ class TTensor(
     def all(  # type: ignore
         self,
         dim: L[None] = None,
-    ) -> "TTensor[_0DShape, L[DTypeEnum.bool], T_Device]": ...
+    ) -> "TTensor[_0DShape, dtypes.BoolDType, T_Device]": ...
 
     @overload
     def all(  # type: ignore
         self,
         dim: Union[_int, Tuple[_int, ...]],
         keepdim: _bool = False,
-    ) -> "TTensor[_AnyShape, L[DTypeEnum.bool], T_Device]": ...
+    ) -> "TTensor[_AnyShape, dtypes.BoolDType, T_Device]": ...
 
     @overload
     def any(  # type: ignore
         self,
         dim: L[None] = None,
-    ) -> "TTensor[_0DShape, L[DTypeEnum.bool], T_Device]": ...
+    ) -> "TTensor[_0DShape, dtypes.BoolDType, T_Device]": ...
 
     @overload
     def any(  # type: ignore
         self,
         dim: Union[_int, Tuple[_int, ...]],
         keepdim: _bool = False,
-    ) -> "TTensor[_AnyShape, L[DTypeEnum.bool], T_Device]": ...
+    ) -> "TTensor[_AnyShape, dtypes.BoolDType, T_Device]": ...
 
     @overload
     def bool(  # type: ignore
         self,
-    ) -> "TTensor[T_Shape, L[DTypeEnum.bool], T_Device]": ...
+    ) -> "TTensor[T_Shape, dtypes.BoolDType, T_Device]": ...
 
     @overload
     def contiguous(  # type: ignore
@@ -603,55 +608,80 @@ class TTensor(
     ) -> "TTensor[T_Shape, T_DType, L[DeviceEnum.cuda]]": ...
 
     @overload
-    def double(self) -> "TTensor[T_Shape, L[DTypeEnum.double], T_Device]":  # type: ignore
+    def double(self) -> "TTensor[T_Shape, dtypes.DoubleDType, T_Device]":  # type: ignore
         ...
 
     @overload
     def eq(  # type: ignore
         self: "TTensor",
         other: Union[torch.Tensor, BuiltinNumber],
-    ) -> "TTensor[_AnyShape, L[DTypeEnum.bool], T_Device]": ...
+    ) -> "TTensor[_AnyShape, dtypes.BoolDType, T_Device]": ...
 
     @overload
     def equal(self: "TTensor", other: torch.Tensor) -> _bool:  # type: ignore
         ...
 
     @overload
-    def float(self) -> "TTensor[T_Shape, L[DTypeEnum.float], T_Device]":  # type: ignore
+    def float(self) -> "TTensor[T_Shape, dtypes.FloatDType, T_Device]":  # type: ignore
         ...
 
     @overload
-    def half(self) -> "TTensor[T_Shape, L[DTypeEnum.half], T_Device]":  # type: ignore
+    def half(self) -> "TTensor[T_Shape, dtypes.HalfDType, T_Device]":  # type: ignore
         ...
 
     @overload
-    def int(self) -> "TTensor[T_Shape, L[DTypeEnum.int], T_Device]":  # type: ignore
+    def int(self) -> "TTensor[T_Shape, dtypes.IntDType, T_Device]":  # type: ignore
         ...
 
     @overload
-    def is_complex(self) -> _bool:  # type: ignore
+    def is_complex(self: "TTensor[Any, DTypeBase[L[True], Any, Any], Any]") -> L[True]:  # type: ignore
         ...
 
     @overload
-    def is_floating_point(self) -> _bool:  # type: ignore
+    def is_complex(
+        self: "TTensor[Any, DTypeBase[L[False], Any, Any], Any]",
+    ) -> L[False]: ...
+
+    @overload
+    def is_complex(self) -> _bool: ...
+
+    @overload
+    def is_floating_point(  # type: ignore
+        self: "TTensor[Any, DTypeBase[Any, L[True], Any], Any]",
+    ) -> L[True]: ...
+
+    @overload
+    def is_floating_point(
+        self: "TTensor[Any, DTypeBase[Any, L[False], Any], Any]",
+    ) -> L[False]: ...
+
+    @overload
+    def is_floating_point(self) -> _bool: ...
+
+    @overload
+    def is_signed(self: "TTensor[Any, DTypeBase[Any, Any, L[True]], Any]") -> L[True]:  # type: ignore
         ...
 
     @overload
-    def is_signed(self) -> _bool:  # type: ignore
-        ...
+    def is_signed(
+        self: "TTensor[Any, DTypeBase[Any, Any, L[False]], Any]",
+    ) -> L[False]: ...
 
-    def isfinite(self) -> "TTensor[T_Shape, L[DTypeEnum.bool], T_Device]": ...
+    @overload
+    def is_signed(self) -> _bool: ...
 
-    def isinf(self) -> "TTensor[T_Shape, L[DTypeEnum.bool], T_Device]": ...
+    def isfinite(self) -> "TTensor[T_Shape, dtypes.BoolDType, T_Device]": ...
 
-    def isnan(self) -> "TTensor[T_Shape, L[DTypeEnum.bool], T_Device]": ...
+    def isinf(self) -> "TTensor[T_Shape, dtypes.BoolDType, T_Device]": ...
+
+    def isnan(self) -> "TTensor[T_Shape, dtypes.BoolDType, T_Device]": ...
 
     @overload
     def item(self) -> BuiltinNumber:  # type: ignore
         ...
 
     @overload
-    def long(self) -> "TTensor[T_Shape, L[DTypeEnum.long], T_Device]":  # type: ignore
+    def long(self) -> "TTensor[T_Shape, dtypes.LongDType, T_Device]":  # type: ignore
         ...
 
     @overload
@@ -704,7 +734,7 @@ class TTensor(
         ...
 
     @overload
-    def short(self) -> "TTensor[T_Shape, DTypeEnum.short, T_Device]":  # type: ignore
+    def short(self) -> "TTensor[T_Shape, dtypes.ShortDType, T_Device]":  # type: ignore
         ...
 
     @overload

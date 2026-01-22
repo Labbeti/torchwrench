@@ -3,9 +3,10 @@
 
 from typing import Generic
 
+from torchwrench.core import dtype_enum_v2 as dtypes
+
 from .base import (
     DeviceEnum,
-    DTypeEnum,
     T_Device,
     T_DType,
     T_Shape,
@@ -43,13 +44,13 @@ class Tensor3D(
 
 class BoolTensor(
     Generic[T_Shape, T_Device],
-    TTensor[T_Shape, DTypeEnum.bool, T_Device],
+    TTensor[T_Shape, dtypes.BoolDType, T_Device],
 ): ...
 
 
 class BoolTensor0D(
     Generic[T_Device],
-    TTensor[_0DShape, DTypeEnum.bool, T_Device],
+    TTensor[_0DShape, dtypes.BoolDType, T_Device],
 ): ...
 
 
@@ -60,54 +61,54 @@ class CPUTensor(
 
 
 class CUDAFloatTensor2D(
-    TTensor[_2DShape, DTypeEnum.f32, DeviceEnum.cuda],
+    TTensor[_2DShape, dtypes.FloatDType, DeviceEnum.cuda],
 ): ...
 
 
 class DoubleTensor(
     Generic[T_Shape, T_Device],
-    TTensor[T_Shape, DTypeEnum.f64, T_Device],
+    TTensor[T_Shape, dtypes.DoubleDType, T_Device],
 ): ...
 
 
 class FloatTensor(
     Generic[T_Shape, T_Device],
-    TTensor[T_Shape, DTypeEnum.f32, T_Device],
+    TTensor[T_Shape, dtypes.FloatDType, T_Device],
 ): ...
 
 
 class FloatTensor2D(
     Generic[T_Device],
-    TTensor[_2DShape, DTypeEnum.f32, T_Device],
+    TTensor[_2DShape, dtypes.FloatDType, T_Device],
 ): ...
 
 
 class HalfTensor(
     Generic[T_Shape, T_Device],
-    TTensor[T_Shape, DTypeEnum.half, T_Device],
+    TTensor[T_Shape, dtypes.HalfDType, T_Device],
 ): ...
 
 
 class IntTensor(
     Generic[T_Shape, T_Device],
-    TTensor[T_Shape, DTypeEnum.int, T_Device],
+    TTensor[T_Shape, dtypes.IntDType, T_Device],
 ): ...
 
 
 class LongTensor(
     Generic[T_Shape, T_Device],
-    TTensor[T_Shape, DTypeEnum.long, T_Device],
+    TTensor[T_Shape, dtypes.LongDType, T_Device],
 ): ...
 
 
 class ShortTensor(
     Generic[T_Shape, T_Device],
-    TTensor[T_Shape, DTypeEnum.short, T_Device],
+    TTensor[T_Shape, dtypes.ShortDType, T_Device],
 ): ...
 
 
 # TODO: rm
-x = Tensor2D[DTypeEnum.f32, DeviceEnum.cuda]([[2, 3, 4], [5, 6, 7]])
+x = Tensor2D[dtypes.FloatDType, DeviceEnum.cpu]([[2, 3, 4], [5, 6, 7]])
 m = x.ndim
 z = x[0]
 p = z.shape
@@ -133,3 +134,11 @@ h = x.sum().isinf()
 
 i = g.ndim
 j = h.ndim
+
+k = x == c
+
+is_signed = x.is_signed()
+m = TTensor[_0DShape, dtypes.UInt32DType, DeviceEnum.cpu]()
+is_signed = m.is_signed()
+is_complex = m.is_complex()
+is_floating_point = m.is_floating_point()
