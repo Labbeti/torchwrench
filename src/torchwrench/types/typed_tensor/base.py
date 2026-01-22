@@ -804,6 +804,15 @@ class TTensor(
     ) -> "TTensor[_0DShape, T_DType, T_Device]": ...
 
     @overload
+    def to(self, device: DeviceLike) -> "TTensor[T_Shape, T_DType, _AnyDevice]": ...  # type: ignore
+
+    @overload
+    def to(self, dtype: DTypeLike) -> "TTensor[T_Shape, _AnyDType, T_Device]": ...  # type: ignore
+
+    @overload
+    def to(self, *args, **kwargs) -> "TTensor[T_Shape, _AnyDType, _AnyDevice]": ...  # type: ignore
+
+    @overload
     def tolist(self: "TTensor[_0DShape, dtypes.BoolDType, _AnyDevice]") -> _bool: ...  # type: ignore
 
     @overload
@@ -1003,6 +1012,7 @@ class TTensor(
     size = torch.Tensor.size  # noqa: F811  # type: ignore
     squeeze = torch.Tensor.squeeze  # noqa: F811  # type: ignore
     sum = torch.Tensor.sum  # noqa: F811  # type: ignore
+    to = torch.Tensor.to  # noqa: F811  # type: ignore
     tolist = torch.Tensor.tolist  # noqa: F811  # type: ignore
     unsqueeze = torch.Tensor.unsqueeze  # noqa: F811  # type: ignore
     view = torch.Tensor.view  # noqa: F811  # type: ignore
