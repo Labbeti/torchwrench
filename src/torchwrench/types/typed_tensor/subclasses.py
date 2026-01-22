@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from typing import Generic
+from typing import Any, Generic
 
 from torchwrench.core import dtype_enum_v2 as dtypes
 
@@ -142,3 +142,8 @@ m = TTensor[_0DShape, dtypes.UInt32DType, DeviceEnum.cpu]()
 is_signed = m.is_signed()
 is_complex = m.is_complex()
 is_floating_point = m.is_floating_point()
+
+n = m.bool().item()
+
+o = TTensor[Any, dtypes.BoolDType](1)
+p = o.item()

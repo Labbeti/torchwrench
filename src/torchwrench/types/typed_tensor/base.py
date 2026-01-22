@@ -2,11 +2,14 @@
 # -*- coding: utf-8 -*-
 
 from builtins import bool as _bool
+from builtins import complex as _complex
+from builtins import float as _float
 from builtins import int as _int
 from dataclasses import dataclass
 from typing import (
     Any,
     Generic,
+    List,
     Optional,
     Tuple,
     Union,
@@ -17,7 +20,7 @@ from typing import (
 from typing import Literal as L
 
 import torch
-from pythonwrench.typing.classes import BuiltinNumber
+from pythonwrench.typing.classes import BuiltinNumber, EllipsisType
 from torch._C import _TensorMeta
 from typing_extensions import Self, Type, TypeAlias, TypeVar
 
@@ -546,18 +549,15 @@ class TTensor(
         other: Any,
     ) -> "TTensor[_AnyShape, dtypes.BoolDType, T_Device]": ...
 
-    @overload
-    def abs(  # type: ignore
+    def abs(
         self: "TTensor[T_Shape, T_DType, T_Device]",
     ) -> "TTensor[T_Shape, T_DType, T_Device]": ...
 
-    @overload
-    def absolute(  # type: ignore
+    def absolute(
         self: "TTensor[T_Shape, T_DType, T_Device]",
     ) -> "TTensor[T_Shape, T_DType, T_Device]": ...
 
-    @overload
-    def acos(  # type: ignore
+    def acos(
         self,
     ) -> "TTensor[T_Shape, T_DType, T_Device]": ...
 
@@ -587,51 +587,41 @@ class TTensor(
         keepdim: _bool = False,
     ) -> "TTensor[_AnyShape, dtypes.BoolDType, T_Device]": ...
 
-    @overload
-    def bool(  # type: ignore
+    def bool(
         self,
     ) -> "TTensor[T_Shape, dtypes.BoolDType, T_Device]": ...
 
-    @overload
-    def contiguous(  # type: ignore
-        self: "TTensor[T_Shape, T_DType, T_Device]",
+    def contiguous(
+        self,
+        memory_format: torch.memory_format = torch.contiguous_format,
     ) -> "TTensor[T_Shape, T_DType, T_Device]": ...
 
-    @overload
-    def cpu(  # type: ignore
-        self: "TTensor[T_Shape, T_DType, T_Device]",
+    def cpu(
+        self,
+        memory_format: torch.memory_format = torch.preserve_format,
     ) -> "TTensor[T_Shape, T_DType, L[DeviceEnum.cpu]]": ...
 
-    @overload
-    def cuda(  # type: ignore
+    def cuda(
         self,
+        device: Union[torch.device, _int, str, None] = None,
+        non_blocking: _bool = False,
+        memory_format: torch.memory_format = torch.preserve_format,
     ) -> "TTensor[T_Shape, T_DType, L[DeviceEnum.cuda]]": ...
 
-    @overload
-    def double(self) -> "TTensor[T_Shape, dtypes.DoubleDType, T_Device]":  # type: ignore
-        ...
+    def double(self) -> "TTensor[T_Shape, dtypes.DoubleDType, T_Device]": ...
 
-    @overload
-    def eq(  # type: ignore
-        self: "TTensor",
+    def eq(
+        self,
         other: Union[torch.Tensor, BuiltinNumber],
     ) -> "TTensor[_AnyShape, dtypes.BoolDType, T_Device]": ...
 
-    @overload
-    def equal(self: "TTensor", other: torch.Tensor) -> _bool:  # type: ignore
-        ...
+    def equal(self, other: torch.Tensor) -> _bool: ...
 
-    @overload
-    def float(self) -> "TTensor[T_Shape, dtypes.FloatDType, T_Device]":  # type: ignore
-        ...
+    def float(self) -> "TTensor[T_Shape, dtypes.FloatDType, T_Device]": ...
 
-    @overload
-    def half(self) -> "TTensor[T_Shape, dtypes.HalfDType, T_Device]":  # type: ignore
-        ...
+    def half(self) -> "TTensor[T_Shape, dtypes.HalfDType, T_Device]": ...
 
-    @overload
-    def int(self) -> "TTensor[T_Shape, dtypes.IntDType, T_Device]":  # type: ignore
-        ...
+    def int(self) -> "TTensor[T_Shape, dtypes.IntDType, T_Device]": ...
 
     @overload
     def is_complex(self: "TTensor[Any, DTypeBase[L[True], Any, Any], Any]") -> L[True]:  # type: ignore
@@ -677,8 +667,25 @@ class TTensor(
     def isnan(self) -> "TTensor[T_Shape, dtypes.BoolDType, T_Device]": ...
 
     @overload
-    def item(self) -> BuiltinNumber:  # type: ignore
-        ...
+    def item(self: "TTensor[_AnyShape, dtypes.BoolDType, _AnyDevice]") -> _bool: ...  # type: ignore
+
+    @overload
+    def item(
+        self: "TTensor[_AnyShape, DTypeBase[L[False], L[False], Any], _AnyDevice]",
+    ) -> _int: ...
+
+    @overload
+    def item(
+        self: "TTensor[_AnyShape, DTypeBase[L[False], L[True], L[True]], _AnyDevice]",
+    ) -> _float: ...
+
+    @overload
+    def item(
+        self: "TTensor[_AnyShape, DTypeBase[L[True], L[False], L[False]], _AnyDevice]",
+    ) -> _complex: ...
+
+    @overload
+    def item(self) -> BuiltinNumber: ...
 
     @overload
     def long(self) -> "TTensor[T_Shape, dtypes.LongDType, T_Device]":  # type: ignore
@@ -690,21 +697,21 @@ class TTensor(
 
     @overload
     def mean(
-        self: "TTensor[_1DShape, T_DType, T_Device]", dim: _int
-    ) -> "TTensor[_0DShape, T_DType, T_Device]":  # type: ignore
-        ...
+        self: "TTensor[_1DShape, T_DType, T_Device]",
+        dim: _int,
+    ) -> "TTensor[_0DShape, T_DType, T_Device]": ...
 
     @overload
     def mean(
-        self: "TTensor[_2DShape, T_DType, T_Device]", dim: _int
-    ) -> "TTensor[_1DShape, T_DType, T_Device]":  # type: ignore
-        ...
+        self: "TTensor[_2DShape, T_DType, T_Device]",
+        dim: _int,
+    ) -> "TTensor[_1DShape, T_DType, T_Device]": ...
 
     @overload
     def mean(
-        self: "TTensor[_3DShape, T_DType, T_Device]", dim: _int
-    ) -> "TTensor[_2DShape, T_DType, T_Device]":  # type: ignore
-        ...
+        self: "TTensor[_3DShape, T_DType, T_Device]",
+        dim: _int,
+    ) -> "TTensor[_2DShape, T_DType, T_Device]": ...
 
     @overload
     def mean(self, dim: _int) -> "TTensor[_AnyShape, T_DType, T_Device]":  # type: ignore
@@ -733,18 +740,39 @@ class TTensor(
     ) -> "TTensor[_3DShape, T_DType, T_Device]":  # type: ignore
         ...
 
-    @overload
-    def short(self) -> "TTensor[T_Shape, dtypes.ShortDType, T_Device]":  # type: ignore
-        ...
+    def short(self) -> "TTensor[T_Shape, dtypes.ShortDType, T_Device]": ...
 
     @overload
-    def size(self: "TTensor[T_Shape, T_DType, T_Device]") -> T_Shape:  # type: ignore
+    def size(self, dim: None = None) -> T_Shape:  # type: ignore
+        ...
+    @overload
+    def size(self, dim: _int) -> _int: ...
+    @overload
+    def size(self, dim: Optional[_int]) -> Any:  # type: ignore
         ...
 
     @overload
     def squeeze(  # type: ignore
-        self: "TTensor[T_Shape, T_DType, T_Device]",
-        dim: Optional[_int] = None,
+        self,
+        dim: _int,
+    ) -> "TTensor[_AnyShape, T_DType, T_Device]": ...
+
+    @overload
+    def squeeze(
+        self,
+        dim: torch.Size,
+    ) -> "TTensor[_AnyShape, T_DType, T_Device]": ...
+
+    @overload
+    def squeeze(
+        self,
+        *dim: _int,
+    ) -> "TTensor[_AnyShape, T_DType, T_Device]": ...
+
+    @overload
+    def squeeze(  # type: ignore
+        self,
+        dim: Union[None, str, EllipsisType] = None,
     ) -> "TTensor[_AnyShape, T_DType, T_Device]": ...
 
     @overload
@@ -753,28 +781,128 @@ class TTensor(
 
     @overload
     def sum(
-        self: "TTensor[_1DShape, T_DType, T_Device]", dim: _int
+        self: "TTensor[_1DShape, T_DType, T_Device]",
+        dim: _int,
     ) -> "TTensor[_0DShape, T_DType, T_Device]": ...
 
     @overload
     def sum(
-        self: "TTensor[_2DShape, T_DType, T_Device]", dim: _int
-    ) -> "TTensor[_1DShape, T_DType, T_Device]":  # type: ignore
-        ...
+        self: "TTensor[_2DShape, T_DType, T_Device]",
+        dim: _int,
+    ) -> "TTensor[_1DShape, T_DType, T_Device]": ...
 
     @overload
     def sum(
-        self: "TTensor[_3DShape, T_DType, T_Device]", dim: _int
-    ) -> "TTensor[_2DShape, T_DType, T_Device]":  # type: ignore
-        ...
+        self: "TTensor[_3DShape, T_DType, T_Device]",
+        dim: _int,
+    ) -> "TTensor[_2DShape, T_DType, T_Device]": ...
 
     @overload
-    def sum(self, dim: Optional[_int] = None) -> "TTensor[_0DShape, T_DType, T_Device]":  # type: ignore
-        ...
+    def sum(  # type: ignore
+        self,
+        dim: Optional[_int] = None,
+    ) -> "TTensor[_0DShape, T_DType, T_Device]": ...
 
     @overload
-    def tolist(self) -> Any:  # type: ignore
-        ...
+    def tolist(self: "TTensor[_0DShape, dtypes.BoolDType, _AnyDevice]") -> _bool: ...  # type: ignore
+
+    @overload
+    def tolist(
+        self: "TTensor[_0DShape, DTypeBase[L[False], L[False], Any], _AnyDevice]",
+    ) -> _int: ...
+
+    @overload
+    def tolist(
+        self: "TTensor[_0DShape, DTypeBase[L[False], L[True], L[True]], _AnyDevice]",
+    ) -> _float: ...
+
+    @overload
+    def tolist(
+        self: "TTensor[_0DShape, DTypeBase[L[True], L[False], L[False]], _AnyDevice]",
+    ) -> _complex: ...
+
+    @overload
+    def tolist(
+        self: "TTensor[_0DShape, _AnyDType, _AnyDevice]",
+    ) -> BuiltinNumber: ...
+
+    @overload
+    def tolist(  # type: ignore
+        self: "TTensor[_1DShape, dtypes.BoolDType, _AnyDevice]",
+    ) -> List[_bool]: ...
+
+    @overload
+    def tolist(
+        self: "TTensor[_1DShape, DTypeBase[L[False], L[False], Any], _AnyDevice]",
+    ) -> List[_int]: ...
+
+    @overload
+    def tolist(
+        self: "TTensor[_1DShape, DTypeBase[L[False], L[True], L[True]], _AnyDevice]",
+    ) -> List[_float]: ...
+
+    @overload
+    def tolist(
+        self: "TTensor[_1DShape, DTypeBase[L[True], L[False], L[False]], _AnyDevice]",
+    ) -> List[_complex]: ...
+
+    @overload
+    def tolist(
+        self: "TTensor[_1DShape, _AnyDType, _AnyDevice]",
+    ) -> list: ...
+
+    @overload
+    def tolist(  # type: ignore
+        self: "TTensor[_2DShape, dtypes.BoolDType, _AnyDevice]",
+    ) -> List[List[_bool]]: ...
+
+    @overload
+    def tolist(
+        self: "TTensor[_2DShape, DTypeBase[L[False], L[False], Any], _AnyDevice]",
+    ) -> List[List[_int]]: ...
+
+    @overload
+    def tolist(
+        self: "TTensor[_2DShape, DTypeBase[L[False], L[True], L[True]], _AnyDevice]",
+    ) -> List[List[_float]]: ...
+
+    @overload
+    def tolist(
+        self: "TTensor[_2DShape, DTypeBase[L[True], L[False], L[False]], _AnyDevice]",
+    ) -> List[List[_complex]]: ...
+
+    @overload
+    def tolist(
+        self: "TTensor[_2DShape, _AnyDType, _AnyDevice]",
+    ) -> List[list]: ...
+
+    @overload
+    def tolist(  # type: ignore
+        self: "TTensor[_3DShape, dtypes.BoolDType, _AnyDevice]",
+    ) -> List[List[List[_bool]]]: ...
+
+    @overload
+    def tolist(
+        self: "TTensor[_3DShape, DTypeBase[L[False], L[False], Any], _AnyDevice]",
+    ) -> List[List[List[_int]]]: ...
+
+    @overload
+    def tolist(
+        self: "TTensor[_3DShape, DTypeBase[L[False], L[True], L[True]], _AnyDevice]",
+    ) -> List[List[List[_float]]]: ...
+
+    @overload
+    def tolist(
+        self: "TTensor[_3DShape, DTypeBase[L[True], L[False], L[False]], _AnyDevice]",
+    ) -> List[List[List[_complex]]]: ...
+
+    @overload
+    def tolist(
+        self: "TTensor[_3DShape, _AnyDType, _AnyDevice]",
+    ) -> List[List[list]]: ...
+
+    @overload
+    def tolist(self) -> Any: ...
 
     @overload
     def unsqueeze(  # type: ignore
