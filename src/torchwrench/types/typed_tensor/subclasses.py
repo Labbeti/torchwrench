@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 
 from typing import Any, Generic
+from typing import Literal as L
 
 from torchwrench.core import dtype_enum_v2 as dtypes
-
-from .base import (
+from torchwrench.types.typed_tensor.base import (
     DeviceEnum,
     T_Device,
     T_DType,
@@ -107,6 +107,12 @@ class ShortTensor(
 ): ...
 
 
+class SignedIntegerTensor(
+    Generic[T_Shape, T_Device],
+    TTensor[T_Shape, dtypes.DTypeBase[L[False], L[False], L[True]], T_Device],
+): ...
+
+
 # TODO: rm
 x = Tensor2D[dtypes.FloatDType, DeviceEnum.cpu]([[2, 3, 4], [5, 6, 7]])
 m = x.ndim
@@ -147,3 +153,7 @@ n = m.bool().item()
 
 o = TTensor[Any, dtypes.BoolDType](1)
 p = o.item()
+q = o.int()
+
+print(isinstance(o, SignedIntegerTensor))
+print(isinstance(q, SignedIntegerTensor))
