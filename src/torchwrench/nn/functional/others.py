@@ -147,7 +147,7 @@ def get_ndim(
 
     def _impl(
         x: Union[ScalarLike, Tensor, np.ndarray, Iterable],
-    ) -> Tuple[bool, int]:
+    ) -> Tuple[bool, Union[int, U]]:
         if is_scalar_like(x):
             return True, 0
         elif isinstance(x, (Tensor, np.ndarray, np.generic, pd.DataFrame)):
@@ -155,7 +155,7 @@ def get_ndim(
         elif isinstance(x, (set, frozenset, dict)):
             return True, 0
         elif isinstance(x, (list, tuple)):
-            valids_and_ndims = unzip(_impl(xi) for xi in x)  # type: ignore
+            valids_and_ndims = unzip(_impl(xi) for xi in x)
             if len(valids_and_ndims) == 0:
                 return True, 1
 
@@ -163,7 +163,7 @@ def get_ndim(
             if (use_first_for_list_tuple and valids[0]) or (
                 all(valids) and builtin_all_eq(ndims)
             ):
-                return True, ndims[0] + 1
+                return True, ndims[0] + 1  # type: ignore
             else:
                 return False, default
         else:
