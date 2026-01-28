@@ -15,6 +15,7 @@ def masked_mean(
     non_pad_mask: T_TensorOrArray,
     *,
     dim: Union[None, int, Iterable[int]] = None,
+    min_div: Optional[float] = 1.0,
 ) -> T_TensorOrArray:
     """Average a tensor along the specified dim(s).
 
@@ -23,6 +24,7 @@ def masked_mean(
         non_pad_mask: Non-padding mask, should be broadcastable with argument tensor and reduced with argument dim.
             It should be a boolean tensor or a float tensor containing only 1 and 0 values.
         dim: Optional dim(s) to reduce. If None, result will be reduced to a scalar. defaults to None.
+        min_div: Minimal value to avoid division by 0. defaults to 1.0.
     """
     if dim is None:
         dim = ()
@@ -32,7 +34,7 @@ def masked_mean(
         dim = tuple(dim)
 
     masked = x * non_pad_mask
-    reduced = masked.sum(dim) / non_pad_mask.sum(dim).clamp(min=1.0)
+    reduced = masked.sum(dim) / non_pad_mask.sum(dim).clamp(min=min_div)
     return reduced  # type: ignore
 
 
