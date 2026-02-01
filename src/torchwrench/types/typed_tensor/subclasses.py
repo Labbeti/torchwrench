@@ -4,9 +4,9 @@
 from typing import Any, Generic
 from typing import Literal as L
 
+from torchwrench.core import device_enum as devices
 from torchwrench.core import dtype_enum_v2 as dtypes
 from torchwrench.types.typed_tensor.base import (
-    DeviceEnum,
     T_Device,
     T_DType,
     T_Shape,
@@ -56,12 +56,12 @@ class BoolTensor0D(
 
 class CPUTensor(
     Generic[T_Shape, T_DType],
-    TTensor[T_Shape, T_DType, DeviceEnum.cpu],
+    TTensor[T_Shape, T_DType, devices.CPUDeviceType],
 ): ...
 
 
 class CUDAFloatTensor2D(
-    TTensor[_2DShape, dtypes.FloatDType, DeviceEnum.cuda],
+    TTensor[_2DShape, dtypes.FloatDType, devices.CUDADeviceType],
 ): ...
 
 
@@ -113,8 +113,25 @@ class SignedIntegerTensor(
 ): ...
 
 
+m = TTensor[_0DShape, dtypes.UInt32DType]()
+
+# is_signed = x.is_signed()
+is_signed = m.is_signed()
+is_complex = m.is_complex()
+is_floating_point = m.is_floating_point()
+
+n = m.bool().item()
+
+o = TTensor[Any, dtypes.BoolDType](1)
+p = o.item()
+q = o.int()
+
+print(isinstance(o, SignedIntegerTensor))
+print(isinstance(q, SignedIntegerTensor))
+
+
 # TODO: rm
-x = Tensor2D[dtypes.FloatDType, DeviceEnum.cpu]([[2, 3, 4], [5, 6, 7]])
+x = Tensor2D[dtypes.FloatDType, devices.CPUDeviceType]([[2, 3, 4], [5, 6, 7]])
 m = x.ndim
 z = x[0]
 p = z.shape
@@ -142,18 +159,3 @@ i = g.ndim
 j = h.ndim
 
 k = x == c
-
-is_signed = x.is_signed()
-m = TTensor[_0DShape, dtypes.UInt32DType, DeviceEnum.cpu]()
-is_signed = m.is_signed()
-is_complex = m.is_complex()
-is_floating_point = m.is_floating_point()
-
-n = m.bool().item()
-
-o = TTensor[Any, dtypes.BoolDType](1)
-p = o.item()
-q = o.int()
-
-print(isinstance(o, SignedIntegerTensor))
-print(isinstance(q, SignedIntegerTensor))

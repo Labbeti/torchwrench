@@ -25,7 +25,12 @@ from torch._C import _TensorMeta
 from typing_extensions import Self, Type, TypeAlias, TypeVar
 
 from torchwrench.core import dtype_enum_v2 as dtypes
-from torchwrench.core.device_enum import DeviceEnum
+from torchwrench.core.device_enum import (
+    CPUDeviceType,
+    CUDADeviceType,
+    DeviceBase,
+    device_cls_to_torch_device,
+)
 from torchwrench.core.dtype_enum_v2 import (
     DTypeBase,
     dtype_cls_to_dtype,
@@ -46,7 +51,7 @@ _AnyDevice: TypeAlias = Any
 
 _ShapeGenericType: TypeAlias = Union[Tuple[_int, ...], _AnyShape]
 _DTypeGenericType: TypeAlias = Union[DTypeBase, _AnyDType]
-_DeviceGenericType: TypeAlias = Union[DeviceEnum, _AnyDevice]
+_DeviceGenericType: TypeAlias = Union[DeviceBase, _AnyDevice]
 
 
 T_Shape = TypeVar(
@@ -64,7 +69,7 @@ T_DType = TypeVar(
 T_Device = TypeVar(
     "T_Device",
     bound=_DeviceGenericType,
-    default=_AnyDevice,
+    default=CPUDeviceType,
     covariant=True,
 )
 
@@ -207,13 +212,19 @@ def _generic_device_to_device(
     if isinstance(generic_device, TypeVar) or generic_device is _AnyDevice:
         return None
     else:
-        return as_device(generic_device)
+        return device_cls_to_torch_device(generic_device)
 
 
 def _cls_to_generics(cls: type) -> _TTensorGenerics:
     """Get the generic parameters of a TTensor subclass."""
 
-    if cls is TTensor or get_origin(cls) is TTensor:
+    if (
+        hasattr(cls, "__gen_shape__")
+        and hasattr(cls, "__gen_dtype__")
+        and hasattr(cls, "__gen_device__")
+    ):
+        args = (cls.__gen_shape__, cls.__gen_dtype__, cls.__gen_device__)
+    elif cls is TTensor or get_origin(cls) is TTensor:
         args = get_args(cls)
     elif hasattr(cls, "__orig_bases__"):
         orig_bases = cls.__orig_bases__  # type: ignore
@@ -240,6 +251,13 @@ def _cls_to_generics(cls: type) -> _TTensorGenerics:
         raise TypeError(msg)
 
     generic_shape, generic_dtype, generic_device = args
+    # TODO: rm
+    # print(f"{cls=}")
+    # print(f"{generic_shape=}")
+    # print(f"{generic_dtype=}")
+    # print(f"{generic_device=}")
+    # breakpoint()
+
     shape = _generic_shape_to_shape(generic_shape)
     dtype = _generic_dtype_to_dtype(generic_dtype)
     device = _generic_device_to_device(generic_device)
@@ -316,12 +334,165 @@ class _ndim_descriptor:
         raise NotImplementedError
 
 
+def _resolve_ttensors_generics(cls, args):
+    # Find TTensor[...] base
+    for base in getattr(cls, "__orig_bases__", ()):
+        if get_origin(base) is TTensor:
+            base_args = list(get_args(base))  # (_2DShape, T_DType, T_Device)
+            break
+    else:
+        base_args = [None, None, None]
+
+    # Replace TypeVars with provided args
+    resolved = []
+    arg_iter = iter(args)
+
+    for a in base_args:
+        if isinstance(a, TypeVar):
+            resolved.append(next(arg_iter))
+        else:
+            resolved.append(a)
+
+    return tuple(resolved)
+
+
 class TTensor(
     Generic[T_Shape, T_DType, T_Device],
     torch.Tensor,
     metaclass=_TTensorMeta,
 ):
     _DEFAULT_DTYPE: Optional[Type[DTypeBase]] = None
+
+    @classmethod
+    def __class_getitem__(cls, gen_args):
+        # # Create a specialized subclass: Box[int], Box[str], etc.
+        # name = f"{cls.__name__}[" + ",".join(map(str, args)) + "]"
+        # print(f"{cls=}")
+        # print(f"{args=}")
+        # return type(name, (cls,), {"__orig_bases__": [TTensor], "__custom__": args})    # Create a specialized subclass with proper generic parameters
+
+        # # Create a specialized subclass with proper generic parameters
+        name = f"{cls.__name__}[" + ",".join(map(str, gen_args)) + "]"
+
+        # if cls is TTensor:
+        #     generic_args = args[0]
+        # else:
+        #     generic_args = ()
+        # breakpoint()
+
+        # TODO: rm
+        # print(f"{generic_args=}")
+        # breakpoint()
+
+        # # Get the current class's __orig_bases__ to extract the shape constraint
+        # if hasattr(cls, "__orig_bases__"):
+        #     orig_bases = cls.__orig_bases__  # type: ignore
+        #     # Find TTensor base
+        #     ttensor_base = None
+        #     for base in orig_bases:
+        #         if get_origin(base) is TTensor:
+        #             ttensor_base = base
+        #             break
+        #     base_args = get_args(ttensor_base) if ttensor_base else ()
+        # else:
+        #     base_args = ()
+
+        # Extract shape from parent, merge with new args
+        # shape_arg = base_args[0] if len(base_args) > 0 else _AnyShape
+        # dtype_arg = args[0] if len(args) > 0 else _AnyDType
+        # device_arg = args[1] if len(args) > 1 else _AnyDevice
+
+        # Create a wrapper class that stores generics and delegates __new__ to parent
+        # class SpecializedTensor:  # type: ignore
+        #     __new__ = cls.__new__
+        #     # __generic_params__ = (shape_arg, dtype_arg, device_arg)
+        #     __generic_params__ = args[0]
+
+        # SpecializedTensor.__name__ = name
+        # SpecializedTensor.__qualname__ = name
+
+        # print(f"{SpecializedTensor.__generic_params__=}")
+        # breakpoint()
+        # return SpecializedTensor  # type: ignore
+
+        # full_generics = _resolve_ttensors_generics(cls, args)
+        print(f"Class getitem:")
+        print(f"{cls=}")
+        print(f"{gen_args=}")
+        # print(f"{full_generics=}")
+
+        # class SpecializedTensor(cls):
+        #     __new__ = cls.__new__
+        #     __generic_params__ = generic_args
+
+        # SpecializedTensor.__name__ = name
+        # SpecializedTensor.__qualname__ = name
+
+        base_cls = cls
+        cls = type(name, (cls,), {"__orig__": TTensor})
+
+        if base_cls is TTensor:
+            if len(gen_args) > 0:
+                gen_shape = gen_args[0]
+            else:
+                gen_shape = T_Shape
+
+            if len(gen_args) > 1:
+                gen_dtype = gen_args[1]
+            else:
+                gen_dtype = T_DType
+
+            if len(gen_args) > 2:
+                gen_device = gen_args[2]
+            else:
+                gen_device = T_Device
+
+            if not hasattr(cls, "__gen_shape__") or isinstance(
+                cls.__gen_shape__, TypeVar
+            ):
+                cls.__gen_shape__ = gen_shape
+            if not hasattr(cls, "__gen_dtype__") or isinstance(
+                cls.__gen_dtype__, TypeVar
+            ):
+                cls.__gen_dtype__ = gen_dtype
+            if not hasattr(cls, "__gen_device__") or isinstance(
+                cls.__gen_device__, TypeVar
+            ):
+                cls.__gen_device__ = gen_device
+
+            return super().__class_getitem__(())  # type: ignore
+        else:
+            for arg in gen_args:
+                if (
+                    not hasattr(cls, "__gen_shape__")
+                    or isinstance(cls.__gen_shape__, TypeVar)
+                ) and get_origin(arg) is tuple:
+                    cls.__gen_shape__ = arg
+                if (
+                    (
+                        not hasattr(cls, "__gen_dtype__")
+                        or isinstance(cls.__gen_dtype__, TypeVar)
+                    )
+                    and isinstance(arg, type)
+                    and issubclass(arg, DTypeBase)
+                ):
+                    cls.__gen_dtype__ = arg
+                if (
+                    (
+                        not hasattr(cls, "__gen_device__")
+                        or isinstance(cls.__gen_device__, TypeVar)
+                    )
+                    and isinstance(arg, type)
+                    and issubclass(arg, DeviceBase)
+                ):
+                    cls.__gen_device__ = arg
+
+        print(f"{cls.__gen_shape__=}")
+        print(f"{cls.__gen_dtype__=}")
+        print(f"{cls.__gen_device__=}")
+
+        # breakpoint()
+        return super().__class_getitem__((gen_args,))  # type: ignore
 
     def __new__(
         cls: "Type[TTensor[T_Shape, T_DType, T_Device]]",
@@ -343,11 +514,20 @@ class TTensor(
         cls_shape = gen.shape
         cls_device = gen.device
 
+        # TODO: rm
+        print(f"New tensor:")
+        print(f"{cls=}")
+        print(f"{gen=}")
+        print(f"{cls.__gen_shape__=}")
+        print(f"{cls.__gen_dtype__=}")
+        print(f"{cls.__gen_device__=}")
+        # breakpoint()
+
         # Sanity checks for dtype
         if dtype is None:
             if cls_dtype is not None:
                 dtype = cls_dtype
-            elif cls._DEFAULT_DTYPE is not None:
+            elif getattr(cls, "_DEFAULT_DTYPE", None) is not None:
                 dtype = dtype_cls_to_dtype(cls._DEFAULT_DTYPE)
 
         elif cls_dtype is None:
@@ -599,14 +779,14 @@ class TTensor(
     def cpu(
         self,
         memory_format: torch.memory_format = torch.preserve_format,
-    ) -> "TTensor[T_Shape, T_DType, L[DeviceEnum.cpu]]": ...
+    ) -> "TTensor[T_Shape, T_DType, CPUDeviceType]": ...
 
     def cuda(
         self,
         device: Union[torch.device, _int, str, None] = None,
         non_blocking: _bool = False,
         memory_format: torch.memory_format = torch.preserve_format,
-    ) -> "TTensor[T_Shape, T_DType, L[DeviceEnum.cuda]]": ...
+    ) -> "TTensor[T_Shape, T_DType, CUDADeviceType]": ...
 
     def double(self) -> "TTensor[T_Shape, dtypes.DoubleDType, T_Device]": ...
 
