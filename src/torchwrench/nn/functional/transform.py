@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import math
+from dataclasses import asdict
 from numbers import Real
 from typing import (
     Any,
@@ -35,6 +36,7 @@ from pythonwrench.typing import (
     SupportsIterLen,
     T_BuiltinScalar,
     is_builtin_scalar,
+    is_dataclass_instance,
 )
 from torch import Tensor, nn
 from typing_extensions import Never
@@ -211,7 +213,7 @@ def resample_nearest_steps(
         indexes = round_fn(indexes).long().clamp(min=0, max=length - 1)
         slices[dim] = indexes
 
-    x = x[slices]
+    x = x[tuple(slices)]
     return x
 
 
@@ -276,10 +278,10 @@ def pad_and_crop_dim(
 
 
 def shuffled(
-    x: Tensor,
+    x: T_Tensor,
     dims: Union[int, Iterable[int]] = -1,
     generator: GeneratorLike = None,
-) -> Tensor:
+) -> T_Tensor:
     """Returns a shuffled version of the input tensor along specific dimension(s)."""
     if isinstance(dims, int):
         dims = [dims]
@@ -291,7 +293,8 @@ def shuffled(
     for dim in dims:
         indices = torch.randperm(x.shape[dim], generator=generator)
         slices[dim] = indices
-    x = x[slices]
+
+    x = x[tuple(slices)]  # type: ignore
     return x
 
 
@@ -598,29 +601,32 @@ def move_to(
     predicate: Optional[Callable[[Union[Tensor, nn.Module]], bool]] = None,
     **kwargs,
 ) -> Any:
-    """Move all modules and tensors recursively to a specific dtype or device."""
+    """Move all modules and tensors recursively to a specific dtype or device.
+
+    Works recursively on Iterables, Mappings or dataclasses.
+    """
     if "device" in kwargs:
         kwargs["device"] = as_device(kwargs["device"])
+    if "dtype" in kwargs:
+        kwargs["dtype"] = as_dtype(kwargs["dtype"])
 
-    if is_builtin_scalar(x, strict=True):
-        return x
-    elif isinstance(x, (Tensor, nn.Module)):
+    if isinstance(x, (Tensor, nn.Module)):
         if predicate is None or predicate(x):
             return x.to(**kwargs)
         else:
             return x
+    elif is_builtin_scalar(x, strict=True):
+        return x
+    elif is_dataclass_instance(x):
+        return type(x)(**move_to(asdict(x)))
     elif isinstance(x, Mapping):
         return {k: move_to(v, predicate=predicate, **kwargs) for k, v in x.items()}
     elif isinstance(x, Iterable):
         generator = (move_to(xi, predicate=predicate, **kwargs) for xi in x)
         if isinstance(x, PythonGenerator):
             return generator
-        elif isinstance(x, tuple):
-            return tuple(generator)
-        elif isinstance(x, set):
-            return set(generator)
-        elif isinstance(x, frozenset):
-            return frozenset(generator)
+        elif isinstance(x, (tuple, set, frozenset)):
+            return type(x)(generator)
         else:
             return list(generator)
     else:
@@ -669,7 +675,7 @@ def as_tensor(
 @overload
 def as_tensor(  # type: ignore
     data: bool,
-    dtype: Literal[None, "bool"] = None,
+    dtype: Literal[None] = None,
     device: DeviceLike = None,
 ) -> BoolTensor0D: ...
 
@@ -677,7 +683,7 @@ def as_tensor(  # type: ignore
 @overload
 def as_tensor(  # type: ignore
     data: Sequence[bool],
-    dtype: Literal[None, "bool"] = None,
+    dtype: Literal[None] = None,
     device: DeviceLike = None,
 ) -> BoolTensor1D: ...
 
@@ -685,7 +691,7 @@ def as_tensor(  # type: ignore
 @overload
 def as_tensor(
     data: Sequence[Sequence[bool]],
-    dtype: Literal[None, "bool"] = None,
+    dtype: Literal[None] = None,
     device: DeviceLike = None,
 ) -> BoolTensor2D: ...
 
@@ -693,7 +699,39 @@ def as_tensor(
 @overload
 def as_tensor(
     data: Sequence[Sequence[Sequence[bool]]],
-    dtype: Literal[None, "bool"] = None,
+    dtype: Literal[None] = None,
+    device: DeviceLike = None,
+) -> BoolTensor3D: ...
+
+
+@overload
+def as_tensor(  # type: ignore
+    data: BuiltinNumber,
+    dtype: Literal["bool"],
+    device: DeviceLike = None,
+) -> BoolTensor0D: ...
+
+
+@overload
+def as_tensor(  # type: ignore
+    data: Sequence[BuiltinNumber],
+    dtype: Literal["bool"],
+    device: DeviceLike = None,
+) -> BoolTensor1D: ...
+
+
+@overload
+def as_tensor(
+    data: Sequence[Sequence[BuiltinNumber]],
+    dtype: Literal["bool"],
+    device: DeviceLike = None,
+) -> BoolTensor2D: ...
+
+
+@overload
+def as_tensor(
+    data: Sequence[Sequence[Sequence[BuiltinNumber]]],
+    dtype: Literal["bool"],
     device: DeviceLike = None,
 ) -> BoolTensor3D: ...
 
@@ -702,7 +740,7 @@ def as_tensor(
 @overload
 def as_tensor(
     data: int,
-    dtype: Literal[None, "int64", "long"] = None,
+    dtype: Literal[None] = None,
     device: DeviceLike = None,
 ) -> LongTensor0D: ...
 
@@ -710,7 +748,7 @@ def as_tensor(
 @overload
 def as_tensor(
     data: Sequence[int],
-    dtype: Literal[None, "int64", "long"] = None,
+    dtype: Literal[None] = None,
     device: DeviceLike = None,
 ) -> LongTensor1D: ...
 
@@ -718,7 +756,7 @@ def as_tensor(
 @overload
 def as_tensor(
     data: Sequence[Sequence[int]],
-    dtype: Literal[None, "int64", "long"] = None,
+    dtype: Literal[None] = None,
     device: DeviceLike = None,
 ) -> LongTensor2D: ...
 
@@ -726,7 +764,39 @@ def as_tensor(
 @overload
 def as_tensor(
     data: Sequence[Sequence[Sequence[int]]],
-    dtype: Literal[None, "int64", "long"] = None,
+    dtype: Literal[None] = None,
+    device: DeviceLike = None,
+) -> LongTensor3D: ...
+
+
+@overload
+def as_tensor(
+    data: BuiltinNumber,
+    dtype: Literal["int64", "long"],
+    device: DeviceLike = None,
+) -> LongTensor0D: ...
+
+
+@overload
+def as_tensor(
+    data: Sequence[BuiltinNumber],
+    dtype: Literal["int64", "long"],
+    device: DeviceLike = None,
+) -> LongTensor1D: ...
+
+
+@overload
+def as_tensor(
+    data: Sequence[Sequence[BuiltinNumber]],
+    dtype: Literal["int64", "long"],
+    device: DeviceLike = None,
+) -> LongTensor2D: ...
+
+
+@overload
+def as_tensor(
+    data: Sequence[Sequence[Sequence[BuiltinNumber]]],
+    dtype: Literal["int64", "long"],
     device: DeviceLike = None,
 ) -> LongTensor3D: ...
 
@@ -735,7 +805,7 @@ def as_tensor(
 @overload
 def as_tensor(
     data: float,
-    dtype: Literal[None, "float32", "float"] = None,
+    dtype: Literal[None] = None,
     device: DeviceLike = None,
 ) -> FloatTensor0D: ...
 
@@ -743,7 +813,7 @@ def as_tensor(
 @overload
 def as_tensor(
     data: Sequence[float],
-    dtype: Literal[None, "float32", "float"] = None,
+    dtype: Literal[None] = None,
     device: DeviceLike = None,
 ) -> FloatTensor1D: ...
 
@@ -751,7 +821,7 @@ def as_tensor(
 @overload
 def as_tensor(
     data: Sequence[Sequence[float]],
-    dtype: Literal[None, "float32", "float"] = None,
+    dtype: Literal[None] = None,
     device: DeviceLike = None,
 ) -> FloatTensor2D: ...
 
@@ -759,7 +829,39 @@ def as_tensor(
 @overload
 def as_tensor(
     data: Sequence[Sequence[Sequence[float]]],
-    dtype: Literal[None, "float32", "float"] = None,
+    dtype: Literal[None] = None,
+    device: DeviceLike = None,
+) -> FloatTensor3D: ...
+
+
+@overload
+def as_tensor(
+    data: BuiltinNumber,
+    dtype: Literal["float32", "float"],
+    device: DeviceLike = None,
+) -> FloatTensor0D: ...
+
+
+@overload
+def as_tensor(
+    data: Sequence[BuiltinNumber],
+    dtype: Literal["float32", "float"],
+    device: DeviceLike = None,
+) -> FloatTensor1D: ...
+
+
+@overload
+def as_tensor(
+    data: Sequence[Sequence[BuiltinNumber]],
+    dtype: Literal["float32", "float"],
+    device: DeviceLike = None,
+) -> FloatTensor2D: ...
+
+
+@overload
+def as_tensor(
+    data: Sequence[Sequence[Sequence[BuiltinNumber]]],
+    dtype: Literal["float32", "float"],
     device: DeviceLike = None,
 ) -> FloatTensor3D: ...
 
@@ -768,7 +870,7 @@ def as_tensor(
 @overload
 def as_tensor(
     data: complex,
-    dtype: Literal[None, "complex64", "cfloat"] = None,
+    dtype: Literal[None] = None,
     device: DeviceLike = None,
 ) -> CFloatTensor0D: ...
 
@@ -776,7 +878,7 @@ def as_tensor(
 @overload
 def as_tensor(
     data: Sequence[complex],
-    dtype: Literal[None, "complex64", "cfloat"] = None,
+    dtype: Literal[None] = None,
     device: DeviceLike = None,
 ) -> CFloatTensor1D: ...
 
@@ -784,7 +886,7 @@ def as_tensor(
 @overload
 def as_tensor(
     data: Sequence[Sequence[complex]],
-    dtype: Literal[None, "complex64", "cfloat"] = None,
+    dtype: Literal[None] = None,
     device: DeviceLike = None,
 ) -> CFloatTensor2D: ...
 
@@ -792,7 +894,39 @@ def as_tensor(
 @overload
 def as_tensor(
     data: Sequence[Sequence[Sequence[complex]]],
-    dtype: Literal[None, "complex64", "cfloat"] = None,
+    dtype: Literal[None] = None,
+    device: DeviceLike = None,
+) -> CFloatTensor3D: ...
+
+
+@overload
+def as_tensor(
+    data: BuiltinNumber,
+    dtype: Literal["complex64", "cfloat"],
+    device: DeviceLike = None,
+) -> CFloatTensor0D: ...
+
+
+@overload
+def as_tensor(
+    data: Sequence[BuiltinNumber],
+    dtype: Literal["complex64", "cfloat"],
+    device: DeviceLike = None,
+) -> CFloatTensor1D: ...
+
+
+@overload
+def as_tensor(
+    data: Sequence[Sequence[BuiltinNumber]],
+    dtype: Literal["complex64", "cfloat"],
+    device: DeviceLike = None,
+) -> CFloatTensor2D: ...
+
+
+@overload
+def as_tensor(
+    data: Sequence[Sequence[Sequence[BuiltinNumber]]],
+    dtype: Literal["complex64", "cfloat"],
     device: DeviceLike = None,
 ) -> CFloatTensor3D: ...
 

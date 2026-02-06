@@ -67,18 +67,22 @@ def load_torch(
     map_location: MapLocationLike = None,
     pickle_module: Any = None,
     *,
-    weights_only: bool = False,
+    weights_only: bool = ...,
     mmap: Optional[bool] = None,
     **pickle_load_args: Any,
 ) -> Any:
     kwds = {}
-    if Version(torch.__version__) >= Version("2.0.0"):
+
+    if Version(torch.__version__) < Version("2.1.0"):
+        pickle_module = pickle
+    else:
+        if weights_only is ...:
+            weights_only = Version(torch.__version__) >= "2.6.0"
+
         kwds.update(
             weights_only=weights_only,
             mmap=mmap,
         )
-    else:
-        pickle_module = pickle
 
     return torch.load(
         f,

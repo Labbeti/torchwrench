@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import copy
 from typing import Callable, Dict, Generic, Iterable, List, Mapping, Optional, overload
 
 from torch import nn
@@ -17,7 +18,6 @@ from ._mixins import (
     InType,
     OutType,
     OutType3,
-    TypedModule,
     TypedModuleLike,
 )
 
@@ -130,19 +130,29 @@ class EModulePartial(
     Generic[InType, OutType],
     EModule[InType, OutType],
 ):
+    """Wrap a python callable to nn.Module class."""
+
     def __init__(
         self,
         fn: Callable[Concatenate[InType, P], OutType],
         *args: P.args,
         **kwargs: P.kwargs,
     ) -> None:
+        """
+        Args:
+            fn: Callable to wrap.
+            *args: Positional arguments.
+            **kwargs:
+        """
         super().__init__()
         self.fn = fn
         self.args = args
         self.kwargs = kwargs
 
-    def forward(self, x: InType) -> OutType:  # type: ignore
-        return self.fn(x, *self.args, **self.kwargs)
+    def forward(self, x: InType, **kwargs: P.kwargs) -> OutType:  # type: ignore
+        kwds = copy.copy(self.kwargs)
+        kwds.update(kwargs)
+        return self.fn(x, *self.args, **kwds)  # type: ignore
 
     def extra_repr(self) -> str:
         return f"{self.fn.__name__}, {ConfigModule.extra_repr(self)}"
@@ -156,65 +166,3 @@ else:
     from torch.nn import ModuleDict, ModuleList, Sequential  # noqa: F401
 
 ModulePartial = EModulePartial
-
-
-def __test_typing_1() -> None:
-    import torch
-    from torch import Tensor
-
-    class LayerA(EModule[Tensor, Tensor]):
-        def forward(self, x: Tensor) -> Tensor:
-            return x * x
-
-    class LayerB(EModule[Tensor, int]):
-        def forward(self, x: Tensor) -> int:
-            return int(x.sum().item())
-
-    class LayerC(EModule[int, Tensor]):
-        def forward(self, x: int) -> Tensor:
-            return torch.as_tensor(x)
-
-    x = torch.rand(10)
-    xa = LayerA()(x)
-    xb = LayerB()(x)
-
-    seq = ESequential(LayerA(), LayerA(), LayerB())
-    xab = seq(x)
-
-    seq = LayerA() | LayerA() | LayerB()
-    xab = seq(x)
-
-    seq = LayerC().chain(LayerA())
-    xc = seq(2)
-
-    assert isinstance(xa, Tensor)
-    assert isinstance(xb, int)
-    assert isinstance(xab, int)
-    assert isinstance(xc, Tensor)
-
-    class LayerD(nn.Module):
-        def forward(self, x: Tensor) -> int:
-            return int(x.item())
-
-    class LayerE(nn.Module):
-        def forward(self, x: bool) -> str:
-            return str(x)
-
-    seq = ESequential(LayerD(), LayerE())
-    y = seq(torch.rand())
-
-    assert isinstance(y, str)
-
-    class LayerF(TypedModule[bool, str]):
-        def forward(self, x):
-            return str(x)
-
-    seq = ESequential(LayerF())
-    y = seq(True)
-
-    class LayerG(EModule):
-        def forward(self, x: int) -> Tensor:
-            return torch.as_tensor(x)
-
-    seq = ESequential(LayerG())
-    y = seq(1)

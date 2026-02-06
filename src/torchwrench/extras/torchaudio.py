@@ -5,7 +5,7 @@ import io
 import os
 from io import BufferedWriter
 from pathlib import Path
-from typing import BinaryIO, Optional, Tuple, Union
+from typing import BinaryIO, Optional, Tuple, TypedDict, Union
 
 from pythonwrench._core import _setup_output_fpath
 from pythonwrench.functools import function_alias
@@ -21,10 +21,31 @@ if not _TORCHAUDIO_AVAILABLE:
 import torchaudio
 
 try:
+    from torchaudio import _AudioMetaData
     from torchaudio.io import CodecConfig  # type: ignore
 except (ImportError, AttributeError):
 
     class CodecConfig(Placeholder): ...
+
+    class _AudioMetaData(Placeholder): ...
+
+
+class AudioMetaDataDict(TypedDict):
+    sample_rate: int
+    num_frames: int
+    num_channels: int
+    bits_per_sample: int
+    encoding: str
+
+
+def audio_metadata_to_dict(meta: _AudioMetaData) -> AudioMetaDataDict:
+    return {
+        "sample_rate": meta.sample_rate,
+        "num_frames": meta.num_frames,
+        "num_channels": meta.num_channels,
+        "bits_per_sample": meta.bits_per_sample,
+        "encoding": meta.encoding,
+    }
 
 
 def dump_with_torchaudio(

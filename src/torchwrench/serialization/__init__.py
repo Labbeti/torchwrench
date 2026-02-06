@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from pythonwrench.jsonl import dump_jsonl, load_jsonl
 from torch.serialization import *  # type: ignore
 
 from .common import as_builtin

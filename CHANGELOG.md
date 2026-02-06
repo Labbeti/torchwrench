@@ -3,6 +3,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.7] 2026-02-06
+### Added
+- Re-introduce `TabularDataset` class.
+- `SubsetSampler`, `BalancedSampler` and `SubsetCycleSampler` classes.
+- `RealTensor` typing class.
+- Ratios conversions functions for masking.
+- `invalid_shape` argument to `get_shape` function.
+- `return_default_on_invalid` option to `get_shape` and `get_ndim` fns.
+
+### Modified
+- `move_to` function now supports dataclasses.
+
 ## [0.7.6] 2025-10-16
 ### Added
 - Option `dims` in `pad_dims` now accepts `None` or `"auto"` value.

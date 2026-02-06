@@ -142,7 +142,12 @@ def segments_list_to_activity(
         segments_list = F.as_tensor(segments_list)
         return _segments_list_tensor_to_activity(segments_list, maxsize, device)
 
-    elif ndim > 2 and F.get_shape(segments_list, return_valid=True).valid:
+    elif (
+        ndim > 2
+        and F.get_shape(
+            segments_list, return_indicator=True, return_default_on_invalid=True
+        ).valid
+    ):
         segments_list = F.as_tensor(segments_list)
         return _segments_list_tensor_to_activity(segments_list, maxsize, device)
 

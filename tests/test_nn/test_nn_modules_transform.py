@@ -10,7 +10,7 @@ from torchwrench import nn
 
 class TestCollate(TestCase):
     def test_advanced_example_1(self) -> None:
-        pipe = nn.Sequential(
+        pipe = nn.ESequential(
             nn.AsTensor(),
             nn.Flatten(),
             nn.Unsqueeze(dim=0),
@@ -18,11 +18,13 @@ class TestCollate(TestCase):
             nn.Shuffled(dims=(0, 1)),
             nn.Sort(dim=-1, descending=True, return_indices=False, return_values=True),
             nn.PadAndCropDim(3),
+            nn.Squeeze(),
         )
 
         x = [[1, 2], [3, 4]]
-        expected = tw.as_tensor([[4, 3, 0]])
-        assert (pipe(x) == expected).all()
+        expected = tw.as_tensor([4, 3, 0])
+        result = pipe(x)
+        assert (result == expected).all()
 
 
 if __name__ == "__main__":

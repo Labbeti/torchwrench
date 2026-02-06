@@ -110,6 +110,16 @@ class TestPad(TestCase):
         sequence = [[], [[]]]
         self.assertRaises(ValueError, pad_and_stack_rec, sequence, 0)
 
+    def test_pad_sequence_rec_limit_5(self) -> None:
+        sequence = [[], [[]], ""]
+        self.assertRaises(TypeError, pad_and_stack_rec, sequence, 0)
+
+    def test_pad_sequence_rec_limit_6(self) -> None:
+        sequence = [[], [0], [0, 0j]]
+        expected_shape = (3, 2)
+        result = pad_and_stack_rec(sequence, -1, align="random")
+        assert result.shape == expected_shape
+
 
 class TestCatPaddedBatch(TestCase):
     def test_example_1(self) -> None:
@@ -202,6 +212,16 @@ class TestPadDims(TestCase):
         padded = pad_dims(x, (9,), aligns="center")
         expected = torch.as_tensor([0, 0, 0, 1, 2, 3, 4, 0, 0])
         assert torch.equal(padded, expected)
+
+    def test_example_4(self) -> None:
+        sequence = torch.as_tensor([[1, 2, 3], [4, 5, 6j]])
+        expected = torch.as_tensor([[1, 2, 3], [4, 5, 6j], [6, 6, 6]])
+        result = pad_dims(sequence, [3, 3], pad_value=lambda x: x.nelement())
+        assert torch.equal(result, expected)
+
+    def test_example_5(self) -> None:
+        self.assertRaises(ValueError, pad_dims, [[1]], [0, 1], aligns=["left"])
+        self.assertRaises(ValueError, pad_dims, [[1]], [0, 1], dims=[0])
 
 
 if __name__ == "__main__":

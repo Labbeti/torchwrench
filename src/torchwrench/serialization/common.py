@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import math
 import re
 from pathlib import Path
 from typing import (
@@ -34,6 +35,7 @@ pylog = logging.getLogger(__name__)
 SavingBackend = Literal[
     "csv",
     "json",
+    "jsonl",
     "h5py",
     "numpy",
     "pickle",
@@ -48,6 +50,7 @@ PATTERN_TO_BACKEND: Dict[str, SavingBackend] = {
     r"^.+\.tsv$": "csv",
     r"^.+\.csv$": "csv",
     r"^.+\.json$": "json",
+    r"^.+\.jsonl$": "jsonl",
     r"^.+\.pkl$": "pickle",
     r"^.+\.pickle$": "pickle",
     r"^.+\.torch$": "torch",
@@ -165,7 +168,16 @@ if _OMEGACONF_AVAILABLE:
 
 if _PANDAS_AVAILABLE:
     import pandas as pd
+    from pandas._libs.missing import NAType
 
     @register_as_builtin_fn(pd.DataFrame)
     def _dataframe_to_builtin(x: pd.DataFrame) -> Any:
         return as_builtin(x.to_dict("list"))
+
+    @register_as_builtin_fn(pd.Series)
+    def _series_to_builtin(x: pd.Series) -> Any:
+        return as_builtin(x.to_list())
+
+    @register_as_builtin_fn(NAType)
+    def _na_to_builtin(x: NAType) -> float:
+        return math.nan

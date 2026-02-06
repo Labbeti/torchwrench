@@ -38,11 +38,6 @@ else:
     import yaml
     from yaml import (
         BaseLoader,
-        CBaseLoader,
-        CFullLoader,
-        CLoader,
-        CSafeLoader,
-        CUnsafeLoader,
         FullLoader,
         Loader,
         MappingNode,
@@ -54,6 +49,23 @@ else:
     )
     from yaml.parser import ParserError
     from yaml.scanner import ScannerError
+
+    try:
+        from yaml import (
+            CBaseLoader,
+            CFullLoader,
+            CLoader,
+            CSafeLoader,
+            CUnsafeLoader,
+        )
+    except ImportError:
+        from torchwrench.extras.yaml._yaml_fallback import (
+            CBaseLoader,
+            CFullLoader,
+            CLoader,
+            CSafeLoader,
+            CUnsafeLoader,
+        )
 
 
 if _OMEGACONF_AVAILABLE:
@@ -149,7 +161,7 @@ def load_yaml(
     Loader: YamlLoaders = SafeLoader,
     on_error: Literal["raise", "ignore"] = "raise",
 ) -> Any:
-    """Load content from yaml filepath."""
+    """Load YAML from filepath or opened file."""
     if not _YAML_AVAILABLE:
         msg = f"Cannot use python module {__file__} since pyyaml package is not installed. Please install it with `pip install torchwrench[extras]`."
         raise ImportError(msg)
@@ -170,6 +182,7 @@ def loads_yaml(
     Loader: YamlLoaders = SafeLoader,
     on_error: Literal["raise", "ignore"] = "raise",
 ) -> Any:
+    """Load YAML from string and text-io stream."""
     if isinstance(content, str):
         with io.StringIO(content) as buffer:
             return loads_yaml(buffer, Loader=Loader, on_error=on_error)

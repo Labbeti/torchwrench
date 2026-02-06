@@ -16,6 +16,8 @@ from typing import (
     overload,
 )
 
+from pythonwrench.functools import function_alias
+from pythonwrench.jsonl import load_jsonl
 from typing_extensions import TypeAlias
 
 from torchwrench.core.packaging import (
@@ -42,6 +44,7 @@ LoadFnLike: TypeAlias = Union[LoadFn[T], SavingBackend]
 LOAD_FNS: Dict[SavingBackend, LoadFn[Any]] = {
     "csv": load_csv,
     "json": load_json,
+    "jsonl": load_jsonl,
     "pickle": load_pickle,
     "torch": load_torch,
 }
@@ -118,3 +121,7 @@ def load(
     load_fn = LOAD_FNS[saving_backend]
     result = load_fn(fpath, *args, **kwargs)
     return result
+
+
+@function_alias(load)
+def read(*args, **kwargs): ...

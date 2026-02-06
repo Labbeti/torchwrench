@@ -24,6 +24,7 @@ from pythonwrench.collections import unzip
 from pythonwrench.functools import function_alias, identity
 from pythonwrench.semver import Version
 from pythonwrench.typing import BuiltinNumber, SupportsIterLen, T_BuiltinNumber
+from pythonwrench.warnings import warn_once
 from torch import Tensor, nn
 
 from torchwrench.extras.numpy import np
@@ -39,8 +40,8 @@ from torchwrench.types.guards import is_scalar_like
 from torchwrench.types.tensor_subclasses import Tensor0D, Tensor1D, Tensor2D, Tensor3D
 from torchwrench.utils import return_types
 
-T = TypeVar("T")
-U = TypeVar("U")
+T = TypeVar("T", covariant=True)
+U = TypeVar("U", covariant=True)
 
 
 def count_parameters(
@@ -93,7 +94,11 @@ def find(
 def get_ndim(
     x: Union[ScalarLike, Tensor, np.ndarray, Iterable],
     *,
-    return_valid: Literal[False] = False,
+    use_first_for_list_tuple: bool = False,
+    return_indicator: Literal[False] = False,
+    return_default_on_invalid: Literal[False] = False,
+    default: Any = -1,
+    return_valid: Optional[bool] = None,
 ) -> int: ...
 
 
@@ -101,33 +106,72 @@ def get_ndim(
 def get_ndim(
     x: Union[ScalarLike, Tensor, np.ndarray, Iterable],
     *,
-    return_valid: Literal[True],
-) -> return_types.ndim: ...
+    use_first_for_list_tuple: bool = False,
+    return_indicator: Literal[False] = False,
+    return_default_on_invalid: bool,
+    default: U = -1,
+    return_valid: Optional[bool] = None,
+) -> Union[int, U]: ...
+
+
+@overload
+def get_ndim(
+    x: Union[ScalarLike, Tensor, np.ndarray, Iterable],
+    *,
+    use_first_for_list_tuple: bool = False,
+    return_indicator: Literal[True],
+    return_default_on_invalid: Literal[False] = False,
+    default: Any = -1,
+    return_valid: Optional[bool] = None,
+) -> return_types.ndim[int]: ...
+
+
+@overload
+def get_ndim(
+    x: Union[ScalarLike, Tensor, np.ndarray, Iterable],
+    *,
+    use_first_for_list_tuple: bool = False,
+    return_indicator: Literal[True],
+    return_default_on_invalid: bool,
+    default: U = -1,
+    return_valid: Optional[bool] = None,
+) -> return_types.ndim[Union[int, U]]: ...
 
 
 def get_ndim(
     x: Union[ScalarLike, Tensor, np.ndarray, Iterable],
     *,
-    return_valid: bool = False,
     use_first_for_list_tuple: bool = False,
-) -> Union[int, return_types.ndim]:
+    return_indicator: bool = False,
+    return_default_on_invalid: bool = False,
+    default: U = -1,
+    return_valid: Optional[bool] = None,
+) -> Union[Union[int, U], return_types.ndim[Union[int, U]]]:
     """Scan first argument to return its number of dimension(s). Works recursively with Tensors, numpy arrays and builtins types instances.
 
-    Note: Sets and dicts are considered as scalars with a shape equal to 0.
+    Note: Sets and dicts are considered as scalars with a ndim equal to 0.
 
     Args:
         x: Input value to scan.
-        return_valid: If True, returns a tuple containing a boolean indicator if the data has an homogeneous ndim instead of raising a ValueError. defaults to False.
         use_first_for_list_tuple: If True, use first value to determine ndim for list and tuple argument. Otherwise it will scan each value in argument to determine its shape. defaults to False.
+        return_indicator: If True, returns a tuple containing a boolean indicator if the data has an homogeneous ndim instead of raising a ValueError. defaults to False.
+        return_default_on_invalid: If True and return_indicator=False, returns the default value instead of raising a ValueError. defaults to False.
+        default: Value to return if input is a heterogeneous list/tuple. defaults to ().
+        return_valid: Deprecated. Use return_indicator instead.
 
     Raises:
-        ValueError if input has an heterogeneous number of dimensions.
+        ValueError if input has an heterogeneous number of dimensions and return_valid=False.
         TypeError if input has an unsupported type.
     """
+    if return_valid is not None:
+        msg = f"Deprecated argument {return_valid=}. Use return_indicator instead."
+        warn_once(msg)
+        return_indicator = return_valid
+    del return_valid
 
     def _impl(
         x: Union[ScalarLike, Tensor, np.ndarray, Iterable],
-    ) -> Tuple[bool, int]:
+    ) -> Tuple[bool, Union[int, U]]:
         if is_scalar_like(x):
             return True, 0
         elif isinstance(x, (Tensor, np.ndarray, np.generic, pd.DataFrame)):
@@ -135,7 +179,7 @@ def get_ndim(
         elif isinstance(x, (set, frozenset, dict)):
             return True, 0
         elif isinstance(x, (list, tuple)):
-            valids_and_ndims = unzip(_impl(xi) for xi in x)  # type: ignore
+            valids_and_ndims = unzip(_impl(xi) for xi in x)
             if len(valids_and_ndims) == 0:
                 return True, 1
 
@@ -143,20 +187,22 @@ def get_ndim(
             if (use_first_for_list_tuple and valids[0]) or (
                 all(valids) and builtin_all_eq(ndims)
             ):
-                return True, ndims[0] + 1
+                return True, ndims[0] + 1  # type: ignore
             else:
-                return False, -1
+                return False, default
         else:
             raise TypeError(f"Invalid argument type {type(x)}.")
 
     valid, ndim = _impl(x)
-    if return_valid:
-        return return_types.ndim(valid, ndim)
-    elif valid:
-        return ndim
-    else:
+
+    if not valid and not return_indicator and not return_default_on_invalid:
         msg = f"Invalid argument {x}. (cannot compute ndim for heterogeneous data)"
         raise ValueError(msg)
+
+    if return_indicator:
+        ndim = return_types.shape(valid, ndim)
+
+    return ndim  # type: ignore
 
 
 @function_alias(get_ndim)
@@ -165,29 +211,76 @@ def ndim(*args, **kwargs): ...
 
 @overload
 def get_shape(
-    x: Union[ScalarLike, Tensor, np.ndarray, Iterable],
+    x: Union[
+        ScalarLike, Tensor, np.ndarray, pd.DataFrame, list, tuple, set, frozenset, dict
+    ],
     *,
     output_type: Callable[[Tuple[int, ...]], T] = identity,
-    return_valid: Literal[False] = False,
+    use_first_for_list_tuple: bool = False,
+    return_indicator: Literal[False] = False,
+    return_default_on_invalid: Literal[False] = False,
+    default: Any = (),
+    return_valid: Optional[bool] = None,
 ) -> T: ...
 
 
 @overload
 def get_shape(
-    x: Union[ScalarLike, Tensor, np.ndarray, Iterable],
+    x: Union[
+        ScalarLike, Tensor, np.ndarray, pd.DataFrame, list, tuple, set, frozenset, dict
+    ],
     *,
     output_type: Callable[[Tuple[int, ...]], T] = identity,
-    return_valid: Literal[True],
+    use_first_for_list_tuple: bool = False,
+    return_indicator: Literal[False] = False,
+    return_default_on_invalid: bool,
+    default: U = (),
+    return_valid: Optional[bool] = None,
+) -> Union[T, U]: ...
+
+
+@overload
+def get_shape(
+    x: Union[
+        ScalarLike, Tensor, np.ndarray, pd.DataFrame, list, tuple, set, frozenset, dict
+    ],
+    *,
+    output_type: Callable[[Tuple[int, ...]], T] = identity,
+    use_first_for_list_tuple: bool = False,
+    return_indicator: Literal[True],
+    return_default_on_invalid: Literal[False] = False,
+    default: Any = (),
+    return_valid: Optional[bool] = None,
 ) -> return_types.shape[T]: ...
 
 
+@overload
 def get_shape(
-    x: Union[ScalarLike, Tensor, np.ndarray, Iterable],
+    x: Union[
+        ScalarLike, Tensor, np.ndarray, pd.DataFrame, list, tuple, set, frozenset, dict
+    ],
     *,
     output_type: Callable[[Tuple[int, ...]], T] = identity,
-    return_valid: bool = False,
     use_first_for_list_tuple: bool = False,
-) -> Union[T, return_types.shape[T]]:
+    return_indicator: Literal[True],
+    return_default_on_invalid: bool,
+    default: U = (),
+    return_valid: Optional[bool] = None,
+) -> return_types.shape[Union[T, U]]: ...
+
+
+def get_shape(
+    x: Union[
+        ScalarLike, Tensor, np.ndarray, pd.DataFrame, list, tuple, set, frozenset, dict
+    ],
+    *,
+    output_type: Callable[[Tuple[int, ...]], T] = identity,
+    use_first_for_list_tuple: bool = False,
+    return_indicator: bool = False,
+    return_default_on_invalid: bool = False,
+    default: U = (),
+    return_valid: Optional[bool] = None,
+) -> Union[T, U, return_types.shape[Union[T, U]]]:
     """Scan first argument to return its shape. Works recursively with Tensors, numpy arrays and builtins types instances.
 
     Note: Sets and dicts are considered as scalars with a shape equal to ().
@@ -195,17 +288,25 @@ def get_shape(
     Args:
         x: Input value to scan.
         output_type: Output shape type. defaults to identity, which returns a tuple of ints.
-        return_valid: If True, returns a tuple containing a boolean indicator if the data has an homogeneous shape instead of raising a ValueError. defaults to False.
-        use_first_for_list_tuple: If True, use first value to determine ndim for list and tuple argument. Otherwise it will scan each value in argument to determine its shape. defaults to False.
+        use_first_for_list_tuple: If True, use first value in sequences to determine shape for list and tuple argument. Otherwise it will scan each value in argument to determine its shape. defaults to False.
+        return_indicator: If True, returns a tuple containing a boolean indicator if the data has an homogeneous shape instead of raising a ValueError. defaults to False.
+        return_default_on_invalid: If True and return_indicator=False, returns the default value instead of raising a ValueError. defaults to False.
+        default: Value to return if input is a heterogeneous list/tuple. This default value is NOT passed to the output_type() callable argument. defaults to ().
+        return_valid: Deprecated. Use return_indicator instead.
 
     Raises:
-        ValueError: if input has an heterogeneous shape.
+        ValueError: if input has an heterogeneous shape and return_valid=False.
         TypeError: if input has an unsupported type.
     """
+    if return_valid is not None:
+        msg = f"Deprecated argument {return_valid=}. Use return_indicator instead."
+        warn_once(msg)
+        return_indicator = return_valid
+    del return_valid
 
     def _impl(
         x: Union[ScalarLike, Tensor, np.ndarray, Iterable],
-    ) -> Tuple[bool, Tuple[int, ...]]:
+    ) -> Tuple[bool, Union[Tuple[int, ...], U]]:
         if is_scalar_like(x):
             return True, ()
         elif isinstance(x, (Tensor, np.ndarray, np.generic, pd.DataFrame)):
@@ -221,22 +322,25 @@ def get_shape(
             if (use_first_for_list_tuple and valids[0]) or (
                 all(valids) and builtin_all_eq(shapes)
             ):
-                return True, (len(shapes),) + shapes[0]
+                return True, (len(shapes),) + shapes[0]  # type: ignore
             else:
-                return False, ()
+                return False, default
         else:
             raise TypeError(f"Invalid argument type {type(x)}.")
 
     valid, shape = _impl(x)
-    if return_valid:
-        shape = output_type(shape)
-        return return_types.shape(valid, shape)
-    elif valid:
-        shape = output_type(shape)
-        return shape
-    else:
+
+    if not valid and not return_indicator and not return_default_on_invalid:
         msg = f"Invalid argument {x}. (cannot compute shape for heterogeneous data)"
         raise ValueError(msg)
+
+    if valid:
+        shape = output_type(shape)  # type: ignore
+
+    if return_indicator:
+        shape = return_types.shape(valid, shape)
+
+    return shape  # type: ignore
 
 
 @function_alias(get_shape)

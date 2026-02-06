@@ -51,11 +51,14 @@ else:
 
 if Version.python() < (3, 11, 0):
     # workaround for typing in python 3.8 - 3.10
-    class _shape_base(NamedTuple):
+    class _indicator_base(NamedTuple):
         valid: bool
         shape: T  # type: ignore
 
-    class shape(_shape_base, Generic[T]):  # type: ignore
+    class shape(_indicator_base, Generic[T]):  # type: ignore
+        ...
+
+    class ndim(_indicator_base, Generic[T]):  # type: ignore
         ...
 
 else:
@@ -64,10 +67,9 @@ else:
         valid: bool
         shape: T
 
-
-class ndim(NamedTuple):
-    valid: bool
-    ndim: int
+    class ndim(NamedTuple, Generic[T]):
+        valid: bool
+        ndim: T
 
 
 class top_p(_namedtuple_values_indices): ...

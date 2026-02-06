@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from typing import Iterable, List, Optional, Union
+from typing import Iterable, List, Optional, Tuple, Union
 
 import torch
 from torch import Tensor
@@ -15,6 +15,7 @@ def masked_mean(
     non_pad_mask: T_TensorOrArray,
     *,
     dim: Union[None, int, Iterable[int]] = None,
+    min_div: Optional[float] = 1.0,
 ) -> T_TensorOrArray:
     """Average a tensor along the specified dim(s).
 
@@ -23,6 +24,7 @@ def masked_mean(
         non_pad_mask: Non-padding mask, should be broadcastable with argument tensor and reduced with argument dim.
             It should be a boolean tensor or a float tensor containing only 1 and 0 values.
         dim: Optional dim(s) to reduce. If None, result will be reduced to a scalar. defaults to None.
+        min_div: Minimal value to avoid division by 0. defaults to 1.0.
     """
     if dim is None:
         dim = ()
@@ -32,7 +34,7 @@ def masked_mean(
         dim = tuple(dim)
 
     masked = x * non_pad_mask
-    reduced = masked.sum(dim) / non_pad_mask.sum(dim).clamp(min=1.0)
+    reduced = masked.sum(dim) / non_pad_mask.sum(dim).clamp(min=min_div)
     return reduced  # type: ignore
 
 
@@ -340,12 +342,13 @@ def tensor_to_pad_mask(
 
 
 def tensor_to_tensors_list(
-    tensor: Tensor,
+    x: Tensor,
     *,
     pad_value: Optional[float] = None,
     end_value: Optional[float] = None,
     non_pad_mask: Optional[Tensor] = None,
-    lengths: Optional[Tensor] = None,
+    lengths: Union[None, Tensor, List[int]] = None,
+    dim: int = -1,
 ) -> List[Tensor]:
     """Convert padded tensor to tensor list.
 
@@ -359,31 +362,46 @@ def tensor_to_tensors_list(
         `end_value`: End value index. defaults to None.
         `non_pad_mask`: Optional non-padded boolean mask. defaults to None.
         `lengths`: Length of each sequence in padded batch.
+        `dim`: Dimension to get lengths. defaults to -1.
     """
     if pad_value is not None:
-        lengths = tensor_to_lengths(tensor, pad_value=pad_value)
-        return tensor_to_tensors_list(tensor, lengths=lengths)
+        lengths = tensor_to_lengths(x, pad_value=pad_value, dim=dim)
+        return tensor_to_tensors_list(x, lengths=lengths, dim=dim)
 
     elif end_value is not None:
-        lengths = tensor_to_lengths(tensor, end_value=end_value)
-        return tensor_to_tensors_list(tensor, lengths=lengths)
+        lengths = tensor_to_lengths(x, end_value=end_value, dim=dim)
+        return tensor_to_tensors_list(x, lengths=lengths, dim=dim)
 
     elif non_pad_mask is not None:
-        lengths = non_pad_mask_to_lengths(non_pad_mask)
-        return tensor_to_tensors_list(tensor, lengths=lengths)
+        lengths = non_pad_mask_to_lengths(non_pad_mask, dim=dim)
+        return tensor_to_tensors_list(x, lengths=lengths, dim=dim)
 
     elif lengths is not None:
-        slices_lst = [
-            [slice(None) for _ in range(tensor.ndim)] + [slice(0, len_)]
-            for len_ in lengths
-        ]
-        tensors = [tensor[slices] for slices in slices_lst]
+        if isinstance(lengths, Tensor):
+            lengths = lengths.tolist()
+
+        if x.ndim > 2:
+            dim = dim % x.ndim
+            return [
+                tensor_to_tensors_list(xi, lengths=length_i, dim=dim - 1)  # type: ignore
+                for xi, length_i in zip(x, lengths)
+            ]
+
+        if x.ndim != 2:
+            msg = f"Invalid argument {x.ndim=}. (expected >=2)"
+            raise ValueError(msg)
+
+        slices_lst: List[Tuple[slice, ...]] = []
+        for i, length in enumerate(lengths):
+            slices: list = [i] * x.ndim
+            slices[dim] = slice(0, length)
+            slices_lst.append(tuple(slices))
+        result = [x[slices] for slices in slices_lst]
+        return result
 
     else:
         msg = "Invalid arguments. Please provide only one of the arguments : end_value, pad_value, non_pad_mask or lengths."
         raise ValueError(msg)
-
-    return tensors
 
 
 def tensors_list_to_lengths(tensors: List[Tensor], dim: int = -1) -> LongTensor1D:
@@ -399,3 +417,61 @@ def tensors_list_to_lengths(tensors: List[Tensor], dim: int = -1) -> LongTensor1
     lst = [tensor.shape[dim] for tensor in tensors]
     output = torch.as_tensor(lst, dtype=torch.long, device=device)
     return output  # type: ignore
+
+
+def ratios_to_lengths(ratios: Tensor, max_len: int, dtype: DTypeLike = None) -> Tensor:
+    dtype = as_dtype(dtype)
+    return (ratios * max_len).round().to(dtype=dtype)
+
+
+def ratios_to_non_pad_mask(
+    ratios: Tensor,
+    max_len: int,
+    include_end: bool = False,
+    *,
+    dtype: DTypeLike = None,
+) -> Tensor:
+    lengths = ratios_to_lengths(ratios, max_len)
+    non_pad_mask = lengths_to_non_pad_mask(lengths, max_len, include_end, dtype=dtype)
+    return non_pad_mask
+
+
+def ratios_to_pad_mask(
+    ratios: Tensor,
+    max_len: int,
+    include_end: bool = True,
+    *,
+    dtype: DTypeLike = None,
+) -> Tensor:
+    lengths = ratios_to_lengths(ratios, max_len)
+    pad_mask = lengths_to_pad_mask(lengths, max_len, include_end, dtype=dtype)
+    return pad_mask
+
+
+def lengths_to_ratios(
+    lengths: Tensor,
+    max_len: Optional[int] = None,
+) -> Tensor:
+    if max_len is None:
+        max_len = int(lengths.max().item())
+    return lengths / max_len
+
+
+def non_pad_mask_to_ratios(
+    non_pad_mask: Tensor,
+    *,
+    dim: int = -1,
+) -> Tensor:
+    lengths = non_pad_mask_to_lengths(non_pad_mask, dim=dim)
+    ratios = lengths_to_ratios(lengths, non_pad_mask.shape[dim])
+    return ratios
+
+
+def pad_mask_to_ratios(
+    pad_mask: Tensor,
+    *,
+    dim: int = -1,
+) -> Tensor:
+    lengths = pad_mask_to_lengths(pad_mask, dim=dim)
+    ratios = lengths_to_ratios(lengths, pad_mask.shape[dim])
+    return ratios

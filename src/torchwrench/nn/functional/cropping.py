@@ -111,5 +111,6 @@ def crop_dims(
 
         slices[dim] = slice(start, end)
 
+    slices = tuple(slices)
     x = x[slices]
     return x

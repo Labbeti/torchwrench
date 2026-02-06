@@ -131,17 +131,6 @@ def multi_indices_to_multihot(
     return multihot
 
 
-@deprecated_alias(multi_indices_to_multihot)
-def indices_to_multihot(
-    indices: Iterable,
-    num_classes: int,
-    *,
-    padding_idx: Optional[int] = None,
-    device: DeviceLike = None,
-    dtype: DTypeLike = torch.bool,
-) -> Tensor: ...
-
-
 @overload
 def multi_indices_to_multinames(
     indices: Iterable[int],
@@ -200,15 +189,6 @@ def multi_indices_to_multinames(
 
     names = _impl(indices)
     return names  # type: ignore
-
-
-@deprecated_alias(multi_indices_to_multinames)
-def indices_to_multinames(
-    indices: Union[Iterable[Union[int, Iterable[int], TensorOrArray]], TensorOrArray],
-    idx_to_name: Union[Mapping[int, T_Name], Sequence[T_Name]],
-    *,
-    padding_idx: Optional[int] = None,
-) -> List[List[T_Name]]: ...
 
 
 @overload
@@ -304,16 +284,6 @@ def multihot_to_multi_indices(
     return result
 
 
-@deprecated_alias(multihot_to_multi_indices)
-def multihot_to_indices(
-    multihot: Iterable,
-    *,
-    keep_tensor: bool = False,
-    padding_idx: Optional[int] = None,
-    dim: int = -1,
-) -> Union[List, LongTensor]: ...
-
-
 def multihot_to_multinames(
     multihot: Union[
         TensorOrArray,
@@ -366,13 +336,6 @@ def multinames_to_multi_indices(
     return indices  # type: ignore
 
 
-@deprecated_alias(multinames_to_multi_indices)
-def multinames_to_indices(
-    names: List[List[T_Name]],
-    idx_to_name: Union[Mapping[int, T_Name], Sequence[T_Name]],
-) -> List[List[int]]: ...
-
-
 def multinames_to_multihot(
     names: List[List[T_Name]],
     idx_to_name: Union[Mapping[int, T_Name], Sequence[T_Name]],
@@ -416,16 +379,6 @@ def probs_to_multi_indices(
     multihot = probs_to_multihot(probs, threshold, dim=dim)
     indices = multihot_to_multi_indices(multihot, padding_idx=padding_idx, dim=dim)
     return indices
-
-
-@deprecated_alias(probs_to_multi_indices)
-def probs_to_indices(
-    probs: TensorOrArray,
-    threshold: Union[float, Sequence[float], TensorOrArray],
-    *,
-    padding_idx: Optional[int] = None,
-    dim: int = -1,
-) -> Union[List, LongTensor]: ...
 
 
 def probs_to_multihot(
@@ -474,6 +427,7 @@ def probs_to_multihot(
 
     dim = dim % probs.ndim
     slices = [(slice(None) if i == dim else None) for i in range(probs.ndim)]
+    slices = tuple(slices)
     threshold = threshold[slices]
 
     multihot = probs >= threshold
@@ -507,3 +461,50 @@ def _is_valid_indices(x: TensorOrArray, dim: int = -1) -> bool:
         return idx == dim
     except ValueError:
         return True
+
+
+@deprecated_alias(multi_indices_to_multihot)
+def indices_to_multihot(
+    indices: Iterable,
+    num_classes: int,
+    *,
+    padding_idx: Optional[int] = None,
+    device: DeviceLike = None,
+    dtype: DTypeLike = torch.bool,
+) -> Tensor: ...
+
+
+@deprecated_alias(multi_indices_to_multinames)
+def indices_to_multinames(
+    indices: Union[Iterable[Union[int, Iterable[int], TensorOrArray]], TensorOrArray],
+    idx_to_name: Union[Mapping[int, T_Name], Sequence[T_Name]],
+    *,
+    padding_idx: Optional[int] = None,
+) -> List[List[T_Name]]: ...
+
+
+@deprecated_alias(multihot_to_multi_indices)
+def multihot_to_indices(
+    multihot: Iterable,
+    *,
+    keep_tensor: bool = False,
+    padding_idx: Optional[int] = None,
+    dim: int = -1,
+) -> Union[List, LongTensor]: ...
+
+
+@deprecated_alias(multinames_to_multi_indices)
+def multinames_to_indices(
+    names: List[List[T_Name]],
+    idx_to_name: Union[Mapping[int, T_Name], Sequence[T_Name]],
+) -> List[List[int]]: ...
+
+
+@deprecated_alias(probs_to_multi_indices)
+def probs_to_indices(
+    probs: TensorOrArray,
+    threshold: Union[float, Sequence[float], TensorOrArray],
+    *,
+    padding_idx: Optional[int] = None,
+    dim: int = -1,
+) -> Union[List, LongTensor]: ...

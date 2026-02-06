@@ -39,7 +39,7 @@ To check if the package is installed and show the package version, you can use t
 torchwrench-info
 ```
 
-This library has been tested on all Python versions **3.8 - 3.13**, all PyTorch versions **1.10 - 2.6**, and on **Linux, Mac and Windows** systems.
+This library has been tested on all Python versions **3.8 - 3.14**, all PyTorch versions **1.10 - 2.9**, and on **Linux, Mac and Windows** systems.
 
 ## Examples
 

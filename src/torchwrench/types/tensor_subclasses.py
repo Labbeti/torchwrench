@@ -3,24 +3,28 @@
 
 """Tensor subclasses for typing and instance checks.
 
-Note: torchwrench.FloatTensor != torch.FloatTensor but issubclass(torchwrench.FloatTensor, torch.FloatTensor) is False because torch.FloatTensor cannot be subclassed
+Note: torchwrench.FloatTensor != torch.FloatTensor which is caused by `issubclass(torchwrench.FloatTensor, torch.FloatTensor) is False` because torch.FloatTensor cannot be subclassed
 
 Here is an overview of the valid tensor subclasses tree:
-                                                                            Tensor
-                                                                              |
-                  +---------------------------------------+-------------------+------------------------------------+
-                  |                                       |                                                        |
-        ComplexFloatingTensor                       FloatingTensor                                           IntegralTensor
-                  |                                       |                                                        |
-     +------------+------------+              +-----------+-----------+                         +------------------+------------------+
-     |            |            |              |           |           |                         |                                     |
-CHalfTensor CFloatTensor CDoubleTensor    HalfTensor FloatTensor DoubleTensor          SignedIntegerTensor                  UnsignedIntegerTensor
-   (c32)        (c64)       (c128)          (f16)       (f32)       (f64)                       |                                     |
+
+                                                  Tensor
+                                                    |
+                  +---------------------------------+---------------------------------+
+                  |                                                                   |
+        ComplexFloatingTensor                                                     RealTensor
+                  |                                                                   |
+     +------------+------------+                          +---------------------------+----------------------------+
+     |            |            |                          |                                                        |
+CHalfTensor CFloatTensor CDoubleTensor              FloatingTensor                                           IntegralTensor
+   (c32)        (c64)       (c128)                        |                                                        |
+                                              +-----------+-----------+                         +------------------+------------------+
+                                              |           |           |                         |                                     |
+                                          HalfTensor FloatTensor DoubleTensor          SignedIntegerTensor                  UnsignedIntegerTensor
+                                            (f16)       (f32)       (f64)                       |                                     |
                                                                               +-----------+-----+-----+-----------+             +-----+-----+
                                                                               |           |           |           |             |           |
                                                                           CharTensor  ShortTensor  IntTensor  LongTensor   ByteTensor   BoolTensor
                                                                              (i8)       (i16)       (i32)       (i64)         (u8)       (bool)
-
 """
 
 import builtins
@@ -181,7 +185,10 @@ class _TensorNDMeta(
     Generic[T_DType, T_NDim, T_BuiltinNumber, T_Floating, T_Complex, T_Signed],
     _TensorMeta,
 ):
-    """Tensor metaclass with redefined instance check based on generic properties."""
+    """Tensor metaclass with redefined instance check based on generic properties.
+
+    Generic attributes are: T_DType, T_NDim, T_BuiltinNumber, T_Floating, T_Complex, T_Signed
+    """
 
     def __instancecheck__(self, instance: Any) -> _bool:
         """Called method to check isinstance(instance, self)"""
@@ -202,7 +209,10 @@ class _TensorNDBase(
     Generic[T_DType, T_NDim, T_BuiltinNumber, T_Floating, T_Complex, T_Signed],
     torch.Tensor,
 ):
-    """Tensor base class with redefined constructor and overloaded methods."""
+    """Tensor base class with redefined constructor and overloaded methods.
+
+    Generic attributes are: T_DType, T_NDim, T_BuiltinNumber, T_Floating, T_Complex, T_Signed
+    """
 
     _DEFAULT_DTYPE: ClassVar[Optional[DTypeEnum]] = None
 
@@ -714,6 +724,14 @@ class _TensorNDBase(
     tolist = torch.Tensor.tolist  # noqa: F811  # type: ignore
     unsqueeze = torch.Tensor.unsqueeze  # noqa: F811  # type: ignore
     view = torch.Tensor.view  # noqa: F811  # type: ignore
+
+
+# # TODO: rm
+# class TTensor(
+#     Generic[T_DType, T_NDim, T_BuiltinNumber, T_Floating, T_Complex, T_Signed],
+#     _TensorNDBase[T_DType, T_NDim, T_BuiltinNumber, T_Floating, T_Complex, T_Signed],
+#     metaclass=_TensorNDMeta,
+# ): ...
 
 
 class Tensor(
@@ -2612,3 +2630,114 @@ class IntegralTensor3D(
     ],
 ):
     _DEFAULT_DTYPE = DTypeEnum.long
+
+
+class RealTensor(
+    _TensorNDBase[
+        Literal[None],
+        _int,
+        _int,
+        bool,
+        Literal[False],
+        _bool,
+    ],
+    metaclass=_TensorNDMeta[
+        Literal[None],
+        _int,
+        _int,
+        bool,
+        Literal[False],
+        _bool,
+    ],
+):
+    """Intermediate class for checking and typing real data type (non complex) tensors.
+    - Concrete subclasses are: HalfTensor, FloatTensor, DoubleTensor, CharTensor, ShortTensor, IntTensor, LongTensor, BoolTensor, ByteTensor.
+    - Properties are: is_complex=False.
+    - By default, instantiate this class will create an FloatTensor.
+    """
+
+    _DEFAULT_DTYPE = DTypeEnum.float32
+
+
+class RealTensor0D(
+    _TensorNDBase[
+        Literal[None],
+        Literal[0],
+        _int,
+        bool,
+        Literal[False],
+        _bool,
+    ],
+    metaclass=_TensorNDMeta[
+        Literal[None],
+        Literal[0],
+        _int,
+        bool,
+        Literal[False],
+        _bool,
+    ],
+):
+    _DEFAULT_DTYPE = DTypeEnum.float32
+
+
+class RealTensor1D(
+    _TensorNDBase[
+        Literal[None],
+        Literal[1],
+        _int,
+        bool,
+        Literal[False],
+        _bool,
+    ],
+    metaclass=_TensorNDMeta[
+        Literal[None],
+        Literal[1],
+        _int,
+        bool,
+        Literal[False],
+        _bool,
+    ],
+):
+    _DEFAULT_DTYPE = DTypeEnum.float32
+
+
+class RealTensor2D(
+    _TensorNDBase[
+        Literal[None],
+        Literal[2],
+        _int,
+        bool,
+        Literal[False],
+        _bool,
+    ],
+    metaclass=_TensorNDMeta[
+        Literal[None],
+        Literal[2],
+        _int,
+        bool,
+        Literal[False],
+        _bool,
+    ],
+):
+    _DEFAULT_DTYPE = DTypeEnum.float32
+
+
+class RealTensor3D(
+    _TensorNDBase[
+        Literal[None],
+        Literal[3],
+        _int,
+        bool,
+        Literal[False],
+        _bool,
+    ],
+    metaclass=_TensorNDMeta[
+        Literal[None],
+        Literal[3],
+        _int,
+        bool,
+        Literal[False],
+        _bool,
+    ],
+):
+    _DEFAULT_DTYPE = DTypeEnum.float32

@@ -9,7 +9,7 @@ __author_email__ = "labbeti.pub@gmail.com"
 __license__ = "MIT"
 __maintainer__ = "Étienne Labbé (Labbeti)"
 __status__ = "Development"
-__version__ = "0.7.6"
+__version__ = "0.7.7"
 
 # Import global functions and classes from torch
 # Imports from pythonwrench
@@ -51,10 +51,9 @@ from . import hub as hub
 from . import nn as nn
 from . import optim as optim
 from . import serialization as serialization
+from . import special as special
 from . import types as types
 from . import utils as utils
-
-# Global imports
 from .core.dtype_enum import DTypeEnum
 from .core.dtype_enum import DTypeEnum as dtype_enum
 from .core.make import (
@@ -65,6 +64,9 @@ from .core.make import (
     Generator,
     GeneratorLike,
 )
+
+# Global imports
+from .core.version import get_githash_full, get_githash_short
 from .extras.numpy import ndarray_to_tensor, tensor_to_ndarray, to_ndarray
 from .extras.yaml.yaml import (
     dump_yaml,
@@ -176,6 +178,11 @@ from .types.tensor_subclasses import (
     LongTensor1D,
     LongTensor2D,
     LongTensor3D,
+    RealTensor,
+    RealTensor0D,
+    RealTensor1D,
+    RealTensor2D,
+    RealTensor3D,
     ShortTensor,
     ShortTensor0D,
     ShortTensor1D,
@@ -186,6 +193,7 @@ from .types.tensor_subclasses import (
     SignedIntegerTensor1D,
     SignedIntegerTensor2D,
     SignedIntegerTensor3D,
+    Tensor,
     Tensor0D,
     Tensor1D,
     Tensor2D,

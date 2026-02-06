@@ -7,7 +7,7 @@ from unittest import TestCase
 
 import torch
 
-from torchwrench import as_tensor
+from torchwrench import as_tensor, deep_equal
 from torchwrench.nn.functional.mask import (
     generate_square_subsequent_mask,
     lengths_to_non_pad_mask,
@@ -17,8 +17,12 @@ from torchwrench.nn.functional.mask import (
     masked_sum,
     non_pad_mask_to_lengths,
     pad_mask_to_lengths,
+    pad_mask_to_ratios,
+    ratios_to_lengths,
     tensor_to_non_pad_mask,
     tensor_to_pad_mask,
+    tensor_to_tensors_list,
+    tensors_list_to_lengths,
 )
 
 
@@ -265,6 +269,23 @@ class TestMaskLengths(TestCase):
             f"{include_end=}; {pad_mask=}; {expected_mask=}",
         )
 
+    def test_tensor_to_tensors_list_example_1(self) -> None:
+        x = torch.as_tensor([[1, 1, 0], [1, 0, 0], [1, 1, 1], [0, 0, 0]])
+        expected = [
+            torch.as_tensor([1, 1]),
+            torch.as_tensor([1]),
+            torch.as_tensor([1, 1, 1]),
+            torch.as_tensor([], dtype=x.dtype),
+        ]
+        result = tensor_to_tensors_list(x, pad_value=0)
+        assert deep_equal(result, expected), f"\n{result=};\n{expected=}"
+
+    def test_tensors_list_to_lengths_example_1(self) -> None:
+        x = [torch.as_tensor([1, 2]), torch.as_tensor([3])]
+        expected = [2, 1]
+        result = tensors_list_to_lengths(x)
+        assert deep_equal(result, expected), f"{result=}; {expected=}"
+
 
 class TestGenerateSqMask(TestCase):
     def test_generate_square_subsequent_mask_example_1(self) -> None:
@@ -330,6 +351,26 @@ class TestGenerateSqMask(TestCase):
         )
         assert output.shape == expected.shape
         assert torch.equal(output, expected)
+
+
+class TestRatios(TestCase):
+    def test_ratios_to_lengths_example_1(self) -> None:
+        ratios = torch.as_tensor([0.50, 0.25, 1.0])
+        expected = torch.as_tensor([50, 25, 100])
+        result = ratios_to_lengths(ratios, 100, dtype=expected.dtype)
+        assert torch.equal(result, expected)
+
+    def test_pad_mask_to_ratios_example_1(self) -> None:
+        pad_mask = torch.as_tensor(
+            [
+                [False, False, True, True],
+                [False, True, True, True],
+                [False, False, False, False],
+            ]
+        )
+        expected = torch.as_tensor([0.50, 0.25, 1.0])
+        result = pad_mask_to_ratios(pad_mask)
+        assert torch.equal(result, expected), f"{result=}; {expected=}"
 
 
 if __name__ == "__main__":

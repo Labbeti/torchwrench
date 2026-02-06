@@ -5,6 +5,7 @@ import unittest
 from unittest import TestCase
 
 import torch
+from torch import Tensor
 
 from torchwrench.nn.modules import (
     Abs,
@@ -12,14 +13,20 @@ from torchwrench.nn.modules import (
     AsTensor,
     CropDim,
     CropDims,
+    EModuleDict,
+    EModuleList,
+    EModulePartial,
     ESequential,
+    Exp,
     Identity,
+    Log,
     LogSoftmaxMultidim,
     Mean,
     PadAndStackRec,
     PadDim,
     PadDims,
     Permute,
+    RepeatInterleave,
     RepeatInterleaveNd,
     ResampleNearestRates,
     SoftmaxMultidim,
@@ -60,6 +67,7 @@ class TestSequential(TestCase):
             Transpose(0, 1),
             LogSoftmaxMultidim(dims=(0, 1)),
             SoftmaxMultidim(dims=(1,)),
+            RepeatInterleave(1, -1),
         )
 
         x = torch.rand(16, 10)
@@ -78,6 +86,32 @@ class TestSequential(TestCase):
         result = transform(x)
 
         assert x.shape == result.shape
+
+
+class TestModuleDict(TestCase):
+    def test_example_1(self) -> None:
+        x = torch.rand(10)
+        modules = {"log": Log(), "exp": Exp()}
+        container = EModuleDict(modules)
+        result = container(x)
+        assert isinstance(result, dict)
+
+
+class TestModuleList(TestCase):
+    def test_example_1(self) -> None:
+        x = torch.rand(10)
+        modules = {"log": Log(), "exp": Exp()}
+        container = EModuleList(modules.values())
+        result = container(x)
+        assert isinstance(result, list)
+
+
+class TestModulePartial(TestCase):
+    def test_example_1(self) -> None:
+        x = torch.rand(10)
+        container = EModulePartial(Log())
+        result = container(x)
+        assert isinstance(result, Tensor)
 
 
 if __name__ == "__main__":

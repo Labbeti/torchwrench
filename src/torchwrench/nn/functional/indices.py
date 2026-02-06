@@ -6,7 +6,14 @@ from typing import Any, Dict, List, Union
 import torch
 from torch import Tensor
 
-from torchwrench.core.make import DeviceLike, GeneratorLike, as_device, as_generator
+from torchwrench.core.make import (
+    DeviceLike,
+    DTypeLike,
+    GeneratorLike,
+    as_device,
+    as_dtype,
+    as_generator,
+)
 from torchwrench.nn import functional as F
 from torchwrench.types import (
     BuiltinNumber,
@@ -51,14 +58,17 @@ def randperm_diff(
     size: int,
     generator: GeneratorLike = None,
     device: DeviceLike = None,
+    *,
+    dtype: DTypeLike = torch.long,
 ) -> LongTensor1D:
     """This function ensure that every value i cannot be the element at index i.
     The output will be a tensor of shape (size,).
 
     Args:
         size: The number of indices. Cannot be < 2.
-        seed: The seed or torch.Generator used to generate permutation.
-        device: The PyTorch device of the output indices tensor.
+        generator: The seed or torch.Generator used to generate permutation. defaults to None.
+        device: The PyTorch device of the output indices tensor. defaults to None.
+        dtype: The PyTorch datatype of the output tensor. defaults to torch.long.
 
     Example 1
     ----------
@@ -70,15 +80,16 @@ def randperm_diff(
     if size < 2:
         raise ValueError(f"Invalid argument {size=} < 2 for randperm_diff.")
 
-    device = as_device(device)
     generator = as_generator(generator)
+    device = as_device(device)
+    dtype = as_dtype(dtype)
 
-    perm_kws: Dict[str, Any] = dict(generator=generator, device=device)
-    arange = F.arange(size, device=device)
+    perm_kws: Dict[str, Any] = dict(generator=generator, device=device, dtype=dtype)
+    arange = F.arange(size, device=device, dtype=dtype)
     perm = F.randperm(size, **perm_kws)
 
     while perm.eq(arange).any():
-        perm = torch.randperm(size, **perm_kws)
+        perm = F.randperm(size, **perm_kws)
     return perm  # type: ignore
 
 
