@@ -5,6 +5,7 @@ import itertools
 from typing import Iterable, Iterator, List, Literal, Sequence, Union
 
 import torch
+from pythonwrench.semver import Version
 from torch import Tensor
 from torch.utils.data.sampler import Sampler
 
@@ -24,9 +25,14 @@ class SubsetSampler(Sampler[int]):
         Args:
             indices: List of indices to return.
         """
+        if Version(str(torch.__version__)) < "2.10.0":
+            args = (None,)
+        else:
+            args = ()
+
         indices = as_tensor(indices, dtype="long")
 
-        super().__init__(None)
+        super().__init__(*args)
         self._indices = indices
 
     def __iter__(self) -> Iterator[int]:
@@ -56,10 +62,15 @@ class SubsetCycleSampler(Sampler[int]):
             seed: Optional seed or generator used to shuffle indices.
                 defaults to None.
         """
+        if Version(str(torch.__version__)) < "2.10.0":
+            args = (None,)
+        else:
+            args = ()
+
         indices = as_tensor(indices, dtype="long")
         generator = as_generator(seed)
 
-        super().__init__(None)
+        super().__init__(*args)
         self._indices = indices
         self._n_max_iterations = n_max_iterations
         self._shuffle = shuffle
@@ -113,6 +124,11 @@ class BalancedSampler(Sampler):
             seed: Optional seed or generator used to shuffle indices.
                 defaults to None.
         """
+        if Version(str(torch.__version__)) < "2.10.0":
+            args = (None,)
+        else:
+            args = ()
+
         indices_per_class = [list(indices) for indices in indices_per_class]
         for cls_idx, indices in enumerate(indices_per_class):
             if len(indices) == 0:
@@ -126,7 +142,7 @@ class BalancedSampler(Sampler):
         local_idx_per_class = [0 for _ in range(len(indices_per_class))]
         generator = as_generator(seed)
 
-        super().__init__(None)
+        super().__init__(*args)
         self._cls_to_sample_indices = indices_per_class
         self._n_max_iterations = n_max_iterations
         self._shuffle = shuffle
