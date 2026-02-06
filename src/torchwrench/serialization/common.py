@@ -166,7 +166,10 @@ if _OMEGACONF_AVAILABLE:
 
 
 if _PANDAS_AVAILABLE:
+    import math
+
     import pandas as pd
+    from pandas._libs.missing import NAType
 
     @register_as_builtin_fn(pd.DataFrame)
     def _dataframe_to_builtin(x: pd.DataFrame) -> Any:
@@ -175,3 +178,7 @@ if _PANDAS_AVAILABLE:
     @register_as_builtin_fn(pd.Series)
     def _series_to_builtin(x: pd.Series) -> Any:
         return as_builtin(x.to_list())
+
+    @register_as_builtin_fn(NAType)
+    def _na_to_builtin(x: NAType) -> float:
+        return math.nan
