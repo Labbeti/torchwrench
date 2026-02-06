@@ -6,6 +6,14 @@ torchwrench.utils.data package
    :show-inheritance:
    :undoc-members:
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   torchwrench.utils.data.dataset
+
 Submodules
 ----------
 
@@ -14,6 +22,7 @@ Submodules
 
    torchwrench.utils.data.collate
    torchwrench.utils.data.dataloader
-   torchwrench.utils.data.dataset
+   torchwrench.utils.data.sampler
    torchwrench.utils.data.slicer
    torchwrench.utils.data.split
+   torchwrench.utils.data.tabular

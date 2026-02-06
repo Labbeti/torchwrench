@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import math
 import re
 from pathlib import Path
 from typing import (
@@ -166,8 +167,6 @@ if _OMEGACONF_AVAILABLE:
 
 
 if _PANDAS_AVAILABLE:
-    import math
-
     import pandas as pd
     from pandas._libs.missing import NAType
 
