@@ -3,7 +3,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.7.7] UNRELEASED
+## [0.7.7] 2026-02-06
 ### Added
 - Re-introduce `TabularDataset` class.
 - `SubsetSampler`, `BalancedSampler` and `SubsetCycleSampler` classes.
