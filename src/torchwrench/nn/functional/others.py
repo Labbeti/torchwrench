@@ -96,7 +96,19 @@ def get_ndim(
     *,
     use_first_for_list_tuple: bool = False,
     return_indicator: Literal[False] = False,
-    return_default_on_invalid: bool = False,
+    return_default_on_invalid: Literal[False] = False,
+    default: Any = -1,
+    return_valid: Optional[bool] = None,
+) -> int: ...
+
+
+@overload
+def get_ndim(
+    x: Union[ScalarLike, Tensor, np.ndarray, Iterable],
+    *,
+    use_first_for_list_tuple: bool = False,
+    return_indicator: Literal[False] = False,
+    return_default_on_invalid: bool,
     default: U = -1,
     return_valid: Optional[bool] = None,
 ) -> Union[int, U]: ...
@@ -108,7 +120,19 @@ def get_ndim(
     *,
     use_first_for_list_tuple: bool = False,
     return_indicator: Literal[True],
-    return_default_on_invalid: bool = False,
+    return_default_on_invalid: Literal[False] = False,
+    default: Any = -1,
+    return_valid: Optional[bool] = None,
+) -> return_types.ndim[int]: ...
+
+
+@overload
+def get_ndim(
+    x: Union[ScalarLike, Tensor, np.ndarray, Iterable],
+    *,
+    use_first_for_list_tuple: bool = False,
+    return_indicator: Literal[True],
+    return_default_on_invalid: bool,
     default: U = -1,
     return_valid: Optional[bool] = None,
 ) -> return_types.ndim[Union[int, U]]: ...
@@ -131,8 +155,8 @@ def get_ndim(
         x: Input value to scan.
         use_first_for_list_tuple: If True, use first value to determine ndim for list and tuple argument. Otherwise it will scan each value in argument to determine its shape. defaults to False.
         return_indicator: If True, returns a tuple containing a boolean indicator if the data has an homogeneous ndim instead of raising a ValueError. defaults to False.
-        default: Value to return if input is a heterogeneous list/tuple. defaults to ().
         return_default_on_invalid: If True and return_indicator=False, returns the default value instead of raising a ValueError. defaults to False.
+        default: Value to return if input is a heterogeneous list/tuple. defaults to ().
         return_valid: Deprecated. Use return_indicator instead.
 
     Raises:
@@ -171,7 +195,7 @@ def get_ndim(
 
     valid, ndim = _impl(x)
 
-    if not valid and not return_default_on_invalid:
+    if not valid and not return_indicator and not return_default_on_invalid:
         msg = f"Invalid argument {x}. (cannot compute ndim for heterogeneous data)"
         raise ValueError(msg)
 
@@ -194,7 +218,22 @@ def get_shape(
     output_type: Callable[[Tuple[int, ...]], T] = identity,
     use_first_for_list_tuple: bool = False,
     return_indicator: Literal[False] = False,
-    return_default_on_invalid: bool = False,
+    return_default_on_invalid: Literal[False] = False,
+    default: Any = (),
+    return_valid: Optional[bool] = None,
+) -> T: ...
+
+
+@overload
+def get_shape(
+    x: Union[
+        ScalarLike, Tensor, np.ndarray, pd.DataFrame, list, tuple, set, frozenset, dict
+    ],
+    *,
+    output_type: Callable[[Tuple[int, ...]], T] = identity,
+    use_first_for_list_tuple: bool = False,
+    return_indicator: Literal[False] = False,
+    return_default_on_invalid: bool,
     default: U = (),
     return_valid: Optional[bool] = None,
 ) -> Union[T, U]: ...
@@ -209,7 +248,22 @@ def get_shape(
     output_type: Callable[[Tuple[int, ...]], T] = identity,
     use_first_for_list_tuple: bool = False,
     return_indicator: Literal[True],
-    return_default_on_invalid: bool = False,
+    return_default_on_invalid: Literal[False] = False,
+    default: Any = (),
+    return_valid: Optional[bool] = None,
+) -> return_types.shape[T]: ...
+
+
+@overload
+def get_shape(
+    x: Union[
+        ScalarLike, Tensor, np.ndarray, pd.DataFrame, list, tuple, set, frozenset, dict
+    ],
+    *,
+    output_type: Callable[[Tuple[int, ...]], T] = identity,
+    use_first_for_list_tuple: bool = False,
+    return_indicator: Literal[True],
+    return_default_on_invalid: bool,
     default: U = (),
     return_valid: Optional[bool] = None,
 ) -> return_types.shape[Union[T, U]]: ...
@@ -236,8 +290,8 @@ def get_shape(
         output_type: Output shape type. defaults to identity, which returns a tuple of ints.
         use_first_for_list_tuple: If True, use first value in sequences to determine shape for list and tuple argument. Otherwise it will scan each value in argument to determine its shape. defaults to False.
         return_indicator: If True, returns a tuple containing a boolean indicator if the data has an homogeneous shape instead of raising a ValueError. defaults to False.
-        default: Value to return if input is a heterogeneous list/tuple. This default value is NOT passed to the output_type() callable argument. defaults to ().
         return_default_on_invalid: If True and return_indicator=False, returns the default value instead of raising a ValueError. defaults to False.
+        default: Value to return if input is a heterogeneous list/tuple. This default value is NOT passed to the output_type() callable argument. defaults to ().
         return_valid: Deprecated. Use return_indicator instead.
 
     Raises:
@@ -276,7 +330,7 @@ def get_shape(
 
     valid, shape = _impl(x)
 
-    if not valid and not return_default_on_invalid:
+    if not valid and not return_indicator and not return_default_on_invalid:
         msg = f"Invalid argument {x}. (cannot compute shape for heterogeneous data)"
         raise ValueError(msg)
 

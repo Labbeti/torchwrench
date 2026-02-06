@@ -112,14 +112,42 @@ class TestNDimShape(TestCase):
         example = [tw.rand(5), list(range(5))]
         expected = (2, 5)
         assert get_shape(example) == expected
-        assert get_shape(example, return_indicator=True) == (True, expected)
+        assert (
+            get_shape(example, return_indicator=False, return_default_on_invalid=False)
+            == expected
+        )
+        assert get_shape(
+            example, return_indicator=True, return_default_on_invalid=False
+        ) == (True, expected)
 
         example = [tw.rand(5), list(range(3))]
-        assert get_shape(example, return_default_on_invalid=True, default=None) is None
+        assert (
+            get_shape(
+                example,
+                return_indicator=False,
+                return_default_on_invalid=True,
+                default=None,
+            )
+            is None
+        )
+        assert get_shape(
+            example, return_indicator=True, return_default_on_invalid=True, default=None
+        ) == (False, None)
+        assert get_shape(
+            example,
+            return_indicator=True,
+            return_default_on_invalid=False,
+            default=None,
+        ) == (False, None)
 
         with self.assertRaises(ValueError):
             assert (
-                get_shape(example, return_default_on_invalid=False, default=None)
+                get_shape(
+                    example,
+                    return_indicator=False,
+                    return_default_on_invalid=False,
+                    default=None,
+                )
                 is None
             )
 
@@ -133,7 +161,10 @@ class TestNDimShape(TestCase):
             == "a"
         )
         assert get_shape(
-            example, return_indicator=True, return_default_on_invalid=True, default="a"
+            example,
+            return_indicator=True,
+            return_default_on_invalid=True,
+            default="a",
         ) == (False, "a")
 
 
