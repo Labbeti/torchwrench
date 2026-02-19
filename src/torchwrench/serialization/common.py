@@ -167,8 +167,8 @@ if OMEGACONF_AVAILABLE:
 
 
 if PANDAS_AVAILABLE:
-    import pandas as pd
-    from pandas._libs.missing import NAType
+    import pandas as pd  # type: ignore
+    from pandas._libs.missing import NAType  # type: ignore
 
     @register_as_builtin_fn(pd.DataFrame)
     def _dataframe_to_builtin(x: pd.DataFrame) -> Any:
