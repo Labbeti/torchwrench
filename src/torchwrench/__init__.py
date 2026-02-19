@@ -11,9 +11,9 @@ __maintainer__ = "Étienne Labbé (Labbeti)"
 __status__ = "Development"
 __version__ = "0.7.7"
 
-# Import global functions and classes from torch
+from typing import TYPE_CHECKING
+
 # Imports from pythonwrench
-from pythonwrench.semver import Version
 from pythonwrench.typing.checks import (
     is_builtin_collection,
     is_builtin_number,
@@ -24,6 +24,8 @@ from pythonwrench.typing.checks import (
     is_typed_dict,
     isinstance_generic,
 )
+
+# Import global functions and classes from torch
 from torch import *  # type: ignore
 from torch import (
     complex64,
@@ -44,16 +46,39 @@ from torch import (
     uint8,
 )
 
-# Re-import torchwrench modules for language servers
-from . import core as core
-from . import extras as extras
-from . import hub as hub
-from . import nn as nn
-from . import optim as optim
-from . import serialization as serialization
-from . import special as special
-from . import types as types
-from . import utils as utils
+if TYPE_CHECKING:
+    # Re-import torchwrench modules for language servers
+    from . import core as core
+    from . import extras as extras
+    from . import hub as hub
+    from . import nn as nn
+    from . import optim as optim
+    from . import serialization as serialization
+    from . import special as special
+    from . import types as types
+    from . import utils as utils
+
+else:
+    import lazy_loader as lazy
+
+    __getattr__, __dir__, _ = lazy.attach(
+        __name__,
+        [
+            "core",
+            "extras",
+            "hub",
+            "nn",
+            "optim",
+            "serialization",
+            "special",
+            "types",
+            "utils",
+        ],
+    )
+
+
+from pythonwrench.semver import Version
+
 from .core.dtype_enum import DTypeEnum
 from .core.dtype_enum import DTypeEnum as dtype_enum
 from .core.make import (
@@ -207,3 +232,5 @@ from .types.tensor_subclasses import (
 
 version = __version__
 version_info = Version(__version__)
+
+del Version, TYPE_CHECKING
