@@ -28,3 +28,17 @@ repos:
       args: [--select, I, --fix]
     - id: ruff-format
       types_or: [python, pyi]
+
+  - repo: local
+    hooks:
+      - id: generate-stubs
+        name: Generate .pyi stubs
+        entry: stubgen
+        language: python
+        additional_dependencies: [mypy]
+        args:
+          - -p
+          - torchwrench
+          - -o
+          - src
+        pass_filenames: false
