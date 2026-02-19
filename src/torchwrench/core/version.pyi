@@ -1,0 +1,6 @@
+from typing import TypeVar
+
+T = TypeVar("T")
+
+def get_githash_short(*, default: T = "unknown") -> str | T: ...
+def get_githash_full(*, default: T = "unknown") -> str | T: ...
