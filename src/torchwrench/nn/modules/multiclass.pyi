@@ -6,16 +6,36 @@ from torch import nn
 
 from torchwrench.core.make import DeviceLike as DeviceLike
 from torchwrench.core.make import DTypeLike as DTypeLike
-from torchwrench.nn.functional.multiclass import T_Name as T_Name
-from torchwrench.nn.functional.multiclass import index_to_name as index_to_name
-from torchwrench.nn.functional.multiclass import index_to_onehot as index_to_onehot
-from torchwrench.nn.functional.multiclass import name_to_index as name_to_index
-from torchwrench.nn.functional.multiclass import name_to_onehot as name_to_onehot
-from torchwrench.nn.functional.multiclass import onehot_to_index as onehot_to_index
-from torchwrench.nn.functional.multiclass import onehot_to_name as onehot_to_name
-from torchwrench.nn.functional.multiclass import probs_to_index as probs_to_index
-from torchwrench.nn.functional.multiclass import probs_to_name as probs_to_name
-from torchwrench.nn.functional.multiclass import probs_to_onehot as probs_to_onehot
+from torchwrench.nn.functional.multiclass import (
+    T_Name as T_Name,
+)
+from torchwrench.nn.functional.multiclass import (
+    index_to_name as index_to_name,
+)
+from torchwrench.nn.functional.multiclass import (
+    index_to_onehot as index_to_onehot,
+)
+from torchwrench.nn.functional.multiclass import (
+    name_to_index as name_to_index,
+)
+from torchwrench.nn.functional.multiclass import (
+    name_to_onehot as name_to_onehot,
+)
+from torchwrench.nn.functional.multiclass import (
+    onehot_to_index as onehot_to_index,
+)
+from torchwrench.nn.functional.multiclass import (
+    onehot_to_name as onehot_to_name,
+)
+from torchwrench.nn.functional.multiclass import (
+    probs_to_index as probs_to_index,
+)
+from torchwrench.nn.functional.multiclass import (
+    probs_to_name as probs_to_name,
+)
+from torchwrench.nn.functional.multiclass import (
+    probs_to_onehot as probs_to_onehot,
+)
 
 from .module import Module as Module
 

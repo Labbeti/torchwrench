@@ -6,10 +6,14 @@ from typing import Any, Callable, Generic, Iterable, TypeVar, overload
 import numpy as np
 from _typeshed import Incomplete
 from torch import Tensor
-from typing_extensions import Self, TypeAlias
+from typing_extensions import Self
 
-from torchwrench.extras.hdf.common import HDFDatasetAttributes as HDFDatasetAttributes
-from torchwrench.extras.hdf.common import HDFItemType as HDFItemType
+from torchwrench.extras.hdf.common import (
+    HDFDatasetAttributes as HDFDatasetAttributes,
+)
+from torchwrench.extras.hdf.common import (
+    HDFItemType as HDFItemType,
+)
 from torchwrench.extras.numpy.scan_info import (
     numpy_dtype_to_torch_dtype as numpy_dtype_to_torch_dtype,
 )
@@ -21,8 +25,8 @@ from torchwrench.utils.data.dataset.slicer import DatasetSlicer as DatasetSlicer
 
 T = TypeVar("T", covariant=True)
 U = TypeVar("U", covariant=False)
-IndexLike: TypeAlias = int | Iterable[int] | Tensor | slice | None
-ColumnLike: TypeAlias = str | Iterable[str] | None
+IndexLike = int | Iterable[int] | Tensor | slice | None
+ColumnLike = str | Iterable[str] | None
 CastMode: Incomplete
 pylog: Incomplete
 

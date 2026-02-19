@@ -2,13 +2,25 @@ from typing import overload
 
 from torch import Tensor as Tensor
 
-from torchwrench.core.make import DeviceLike as DeviceLike
-from torchwrench.core.make import DTypeLike as DTypeLike
-from torchwrench.core.make import as_device as as_device
-from torchwrench.core.make import as_dtype as as_dtype
+from torchwrench.core.make import (
+    DeviceLike as DeviceLike,
+)
+from torchwrench.core.make import (
+    DTypeLike as DTypeLike,
+)
+from torchwrench.core.make import (
+    as_device as as_device,
+)
+from torchwrench.core.make import (
+    as_dtype as as_dtype,
+)
 from torchwrench.nn.functional.multiclass import probs_to_onehot as probs_to_onehot
-from torchwrench.types.tensor_subclasses import Tensor2D as Tensor2D
-from torchwrench.types.tensor_subclasses import Tensor3D as Tensor3D
+from torchwrench.types.tensor_subclasses import (
+    Tensor2D as Tensor2D,
+)
+from torchwrench.types.tensor_subclasses import (
+    Tensor3D as Tensor3D,
+)
 
 @overload
 def multilabel_to_powerset(

@@ -52,8 +52,8 @@ from torchwrench.utils.data.dataset.slicer import DatasetSlicer
 T = TypeVar("T", covariant=True)
 U = TypeVar("U", covariant=False)
 
-IndexLike: TypeAlias = Union[int, Iterable[int], Tensor, slice, None]
-ColumnLike: TypeAlias = Union[str, Iterable[str], None]
+IndexLike = Union[int, Iterable[int], Tensor, slice, None]
+ColumnLike = Union[str, Iterable[str], None]
 CastMode = Literal[
     "to_torch_or_builtin",
     "to_torch_or_numpy",

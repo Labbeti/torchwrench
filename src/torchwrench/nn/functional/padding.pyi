@@ -4,12 +4,24 @@ from torch import Tensor
 from torch.types import Number
 from typing_extensions import TypeAlias
 
-from torchwrench.core.make import DeviceLike as DeviceLike
-from torchwrench.core.make import DTypeLike as DTypeLike
-from torchwrench.core.make import GeneratorLike as GeneratorLike
-from torchwrench.core.make import as_device as as_device
-from torchwrench.core.make import as_dtype as as_dtype
-from torchwrench.core.make import as_generator as as_generator
+from torchwrench.core.make import (
+    DeviceLike as DeviceLike,
+)
+from torchwrench.core.make import (
+    DTypeLike as DTypeLike,
+)
+from torchwrench.core.make import (
+    GeneratorLike as GeneratorLike,
+)
+from torchwrench.core.make import (
+    as_device as as_device,
+)
+from torchwrench.core.make import (
+    as_dtype as as_dtype,
+)
+from torchwrench.core.make import (
+    as_generator as as_generator,
+)
 from torchwrench.types import Tensor0D as Tensor0D
 from torchwrench.types import is_number_like as is_number_like
 

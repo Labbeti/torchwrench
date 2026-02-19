@@ -8,10 +8,18 @@ from torch.types import Device as Device
 from typing_extensions import TypeVar
 
 from torchwrench.core.dtype_enum import DTypeEnum as DTypeEnum
-from torchwrench.core.make import DeviceLike as DeviceLike
-from torchwrench.core.make import DTypeLike as DTypeLike
-from torchwrench.core.make import as_device as as_device
-from torchwrench.core.make import as_dtype as as_dtype
+from torchwrench.core.make import (
+    DeviceLike as DeviceLike,
+)
+from torchwrench.core.make import (
+    DTypeLike as DTypeLike,
+)
+from torchwrench.core.make import (
+    as_device as as_device,
+)
+from torchwrench.core.make import (
+    as_dtype as as_dtype,
+)
 
 T_BuiltinNumber = TypeVar("T_BuiltinNumber", bound=BuiltinNumber, covariant=True)
 T_Tensor = TypeVar("T_Tensor", bound="_TensorNDBase", contravariant=True)

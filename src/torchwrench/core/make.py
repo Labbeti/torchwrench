@@ -5,7 +5,6 @@ from typing import Literal, Optional, Union, overload
 
 import torch
 from torch.types import Device  # noqa: F401
-from typing_extensions import TypeAlias
 
 from torchwrench.core.dtype_enum import (
     DTypeEnum,
@@ -13,11 +12,26 @@ from torchwrench.core.dtype_enum import (
     str_to_torch_dtype,
 )
 
-DeviceLike: TypeAlias = Union[
-    torch.device, None, Literal["default", "cuda_if_available"], str, int
+DeviceLike = Union[
+    torch.device,
+    None,
+    Literal["default", "cuda_if_available"],
+    str,
+    int,
 ]
-DTypeLike: TypeAlias = Union[torch.dtype, None, Literal["default"], str, DTypeEnum]
-GeneratorLike: TypeAlias = Union[torch.Generator, None, Literal["default"], int]
+DTypeLike = Union[
+    torch.dtype,
+    None,
+    Literal["default"],
+    str,
+    DTypeEnum,
+]
+GeneratorLike = Union[
+    torch.Generator,
+    None,
+    Literal["default"],
+    int,
+]
 
 # Expose torch types
 Generator = torch.Generator

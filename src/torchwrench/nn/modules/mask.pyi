@@ -3,8 +3,12 @@ from typing import Iterable
 from _typeshed import Incomplete
 from torch import Tensor as Tensor
 
-from torchwrench.nn.functional.mask import masked_mean as masked_mean
-from torchwrench.nn.functional.mask import masked_sum as masked_sum
+from torchwrench.nn.functional.mask import (
+    masked_mean as masked_mean,
+)
+from torchwrench.nn.functional.mask import (
+    masked_sum as masked_sum,
+)
 
 from .module import Module as Module
 

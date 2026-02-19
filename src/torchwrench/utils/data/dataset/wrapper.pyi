@@ -3,8 +3,13 @@ from abc import abstractmethod
 from typing import Any, Callable, Generic, Iterable, Iterator, TypeVar
 
 from _typeshed import Incomplete
-from pythonwrench.typing.classes import SupportsGetitemIterLen, SupportsGetitemLen
-from pythonwrench.typing.classes import SupportsIterLen as SupportsIterLen
+from pythonwrench.typing.classes import (
+    SupportsGetitemIterLen,
+    SupportsGetitemLen,
+)
+from pythonwrench.typing.classes import (
+    SupportsIterLen as SupportsIterLen,
+)
 from torch.utils.data.dataset import Dataset, IterableDataset
 from torch.utils.data.dataset import Subset as TorchSubset
 

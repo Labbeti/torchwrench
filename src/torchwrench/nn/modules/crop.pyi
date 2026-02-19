@@ -4,9 +4,15 @@ from _typeshed import Incomplete
 from torch import Tensor as Tensor
 
 from torchwrench.core.make import GeneratorLike as GeneratorLike
-from torchwrench.nn.functional.cropping import CropAlign as CropAlign
-from torchwrench.nn.functional.cropping import crop_dim as crop_dim
-from torchwrench.nn.functional.cropping import crop_dims as crop_dims
+from torchwrench.nn.functional.cropping import (
+    CropAlign as CropAlign,
+)
+from torchwrench.nn.functional.cropping import (
+    crop_dim as crop_dim,
+)
+from torchwrench.nn.functional.cropping import (
+    crop_dims as crop_dims,
+)
 
 from .module import Module as Module
 

@@ -3,10 +3,18 @@ from typing import Iterable, Iterator, Literal, Sequence
 from torch import Tensor as Tensor
 from torch.utils.data.sampler import Sampler
 
-from torchwrench.nn.functional.transform import GeneratorLike as GeneratorLike
-from torchwrench.nn.functional.transform import as_generator as as_generator
-from torchwrench.nn.functional.transform import as_tensor as as_tensor
-from torchwrench.nn.functional.transform import shuffled as shuffled
+from torchwrench.nn.functional.transform import (
+    GeneratorLike as GeneratorLike,
+)
+from torchwrench.nn.functional.transform import (
+    as_generator as as_generator,
+)
+from torchwrench.nn.functional.transform import (
+    as_tensor as as_tensor,
+)
+from torchwrench.nn.functional.transform import (
+    shuffled as shuffled,
+)
 
 class SubsetSampler(Sampler[int]):
     def __init__(self, indices: list[int] | Tensor) -> None: ...

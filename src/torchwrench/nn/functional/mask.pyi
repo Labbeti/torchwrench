@@ -2,13 +2,27 @@ from typing import Iterable
 
 from torch import Tensor
 
-from torchwrench.core.make import DeviceLike as DeviceLike
-from torchwrench.core.make import DTypeLike as DTypeLike
-from torchwrench.core.make import as_device as as_device
-from torchwrench.core.make import as_dtype as as_dtype
-from torchwrench.types import LongTensor as LongTensor
-from torchwrench.types import LongTensor1D as LongTensor1D
-from torchwrench.types import T_TensorOrArray as T_TensorOrArray
+from torchwrench.core.make import (
+    DeviceLike as DeviceLike,
+)
+from torchwrench.core.make import (
+    DTypeLike as DTypeLike,
+)
+from torchwrench.core.make import (
+    as_device as as_device,
+)
+from torchwrench.core.make import (
+    as_dtype as as_dtype,
+)
+from torchwrench.types import (
+    LongTensor as LongTensor,
+)
+from torchwrench.types import (
+    LongTensor1D as LongTensor1D,
+)
+from torchwrench.types import (
+    T_TensorOrArray as T_TensorOrArray,
+)
 
 def masked_mean(
     x: T_TensorOrArray,

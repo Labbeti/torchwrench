@@ -1,21 +1,41 @@
 from typing import Any, Callable, Iterable, Literal, TypeVar, overload
 
-from pythonwrench.typing import BuiltinNumber as BuiltinNumber
-from pythonwrench.typing import T_BuiltinNumber as T_BuiltinNumber
+from pythonwrench.typing import (
+    BuiltinNumber as BuiltinNumber,
+)
+from pythonwrench.typing import (
+    T_BuiltinNumber as T_BuiltinNumber,
+)
 from torch import Tensor
 from torch import nn as nn
 
 from torchwrench.extras.numpy import np as np
 from torchwrench.extras.pandas import pd as pd
-from torchwrench.types._typing import LongTensor as LongTensor
-from torchwrench.types._typing import ScalarLike as ScalarLike
-from torchwrench.types._typing import T_TensorOrArray as T_TensorOrArray
-from torchwrench.types._typing import TensorOrArray as TensorOrArray
+from torchwrench.types._typing import (
+    LongTensor as LongTensor,
+)
+from torchwrench.types._typing import (
+    ScalarLike as ScalarLike,
+)
+from torchwrench.types._typing import (
+    T_TensorOrArray as T_TensorOrArray,
+)
+from torchwrench.types._typing import (
+    TensorOrArray as TensorOrArray,
+)
 from torchwrench.types.guards import is_scalar_like as is_scalar_like
-from torchwrench.types.tensor_subclasses import Tensor0D as Tensor0D
-from torchwrench.types.tensor_subclasses import Tensor1D as Tensor1D
-from torchwrench.types.tensor_subclasses import Tensor2D as Tensor2D
-from torchwrench.types.tensor_subclasses import Tensor3D as Tensor3D
+from torchwrench.types.tensor_subclasses import (
+    Tensor0D as Tensor0D,
+)
+from torchwrench.types.tensor_subclasses import (
+    Tensor1D as Tensor1D,
+)
+from torchwrench.types.tensor_subclasses import (
+    Tensor2D as Tensor2D,
+)
+from torchwrench.types.tensor_subclasses import (
+    Tensor3D as Tensor3D,
+)
 from torchwrench.utils import return_types as return_types
 
 T = TypeVar("T", covariant=True)
