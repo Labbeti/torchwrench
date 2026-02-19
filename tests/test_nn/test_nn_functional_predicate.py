@@ -7,7 +7,7 @@ from unittest import TestCase
 
 import torch
 
-from torchwrench.core.packaging import _NUMPY_AVAILABLE
+from torchwrench.core.packaging import NUMPY_AVAILABLE
 from torchwrench.extras.numpy import np
 from torchwrench.nn.functional.predicate import (
     all_eq,
@@ -37,7 +37,7 @@ class TestCanBeConvertedToTensor(TestCase):
             [[[]], []],
         ]
 
-        if _NUMPY_AVAILABLE:
+        if NUMPY_AVAILABLE:
             warnings.filterwarnings("ignore", category=UserWarning)
             examples += [
                 np.float64(42),
@@ -94,7 +94,7 @@ class TestAllEq(TestCase):
         assert not all_eq(x.T, dim=0).any()
         assert all_eq(x.T, dim=1).all()
 
-        if _NUMPY_AVAILABLE:
+        if NUMPY_AVAILABLE:
             x = x.numpy()
             assert not all_eq(x)
             assert all_eq(x, dim=0).all()

@@ -2,14 +2,12 @@ import torch
 from pythonwrench.checksum import checksum_any as checksum_any
 from torch import Tensor, nn
 
+from torchwrench.core.packaging import NUMPY_AVAILABLE as NUMPY_AVAILABLE
+from torchwrench.core.packaging import PANDAS_AVAILABLE as PANDAS_AVAILABLE
 from torchwrench.extras.numpy import np as np
 from torchwrench.extras.pandas import pd as pd
-from torchwrench.nn.functional.predicate import (
-    is_complex as is_complex,
-)
-from torchwrench.nn.functional.predicate import (
-    is_floating_point as is_floating_point,
-)
+from torchwrench.nn.functional.predicate import is_complex as is_complex
+from torchwrench.nn.functional.predicate import is_floating_point as is_floating_point
 
 def checksum_dataframe(x: pd.DataFrame, **kwargs) -> int: ...
 def checksum_series(x: pd.Series, **kwargs) -> int: ...

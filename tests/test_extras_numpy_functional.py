@@ -8,7 +8,7 @@ import pythonwrench as pw
 import torch
 
 import torchwrench as tw
-from torchwrench.core.packaging import _NUMPY_AVAILABLE
+from torchwrench.core.packaging import NUMPY_AVAILABLE
 from torchwrench.extras.numpy import (
     ndarray_to_tensor,
     np,
@@ -24,7 +24,7 @@ from torchwrench.extras.numpy import (
 
 class TestNumpy(TestCase):
     def test_example_1(self) -> None:
-        if not _NUMPY_AVAILABLE:
+        if not NUMPY_AVAILABLE:
             return None
 
         x_tensor = torch.rand(3, 4, 5)
@@ -34,7 +34,7 @@ class TestNumpy(TestCase):
         assert torch.equal(x_tensor, result)
 
     def test_complex(self) -> None:
-        if not _NUMPY_AVAILABLE:
+        if not NUMPY_AVAILABLE:
             return None
 
         complex_dtypes = [np.complex64, np.complex128]

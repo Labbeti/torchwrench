@@ -10,11 +10,11 @@ from pythonwrench.jsonl import dump_jsonl
 from typing_extensions import TypeAlias
 
 from torchwrench.core.packaging import (
-    _H5PY_AVAILABLE,
-    _NUMPY_AVAILABLE,
-    _SAFETENSORS_AVAILABLE,
-    _TORCHAUDIO_AVAILABLE,
-    _YAML_AVAILABLE,
+    H5PY_AVAILABLE,
+    NUMPY_AVAILABLE,
+    SAFETENSORS_AVAILABLE,
+    TORCHAUDIO_AVAILABLE,
+    YAML_AVAILABLE,
 )
 
 from .common import SavingBackend, _fpath_to_saving_backend
@@ -35,27 +35,27 @@ DUMP_FNS: Dict[SavingBackend, DumpFn] = {
     "torch": dump_torch,
 }
 
-if _H5PY_AVAILABLE:
+if H5PY_AVAILABLE:
     from .hdf import dump_hdf
 
     DUMP_FNS["h5py"] = dump_hdf
 
-if _NUMPY_AVAILABLE:
+if NUMPY_AVAILABLE:
     from .numpy import dump_ndarray
 
     DUMP_FNS["numpy"] = dump_ndarray
 
-if _SAFETENSORS_AVAILABLE:
+if SAFETENSORS_AVAILABLE:
     from torchwrench.extras.safetensors import dump_safetensors
 
     DUMP_FNS["safetensors"] = dump_safetensors
 
-if _TORCHAUDIO_AVAILABLE:
+if TORCHAUDIO_AVAILABLE:
     from .torchaudio import dump_with_torchaudio
 
     DUMP_FNS["torchaudio"] = dump_with_torchaudio
 
-if _YAML_AVAILABLE:
+if YAML_AVAILABLE:
     from .yaml import dump_yaml
 
     DUMP_FNS["yaml"] = dump_yaml

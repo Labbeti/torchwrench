@@ -5,9 +5,9 @@ from typing import Union
 
 from typing_extensions import TypeAlias
 
-from torchwrench.core.packaging import _NUMPY_AVAILABLE
+from torchwrench.core.packaging import NUMPY_AVAILABLE
 
-if not _NUMPY_AVAILABLE:
+if not NUMPY_AVAILABLE:
     from torchwrench.extras.numpy import _numpy_fallback as np  # noqa: F401
     from torchwrench.extras.numpy import _numpy_fallback as numpy
 

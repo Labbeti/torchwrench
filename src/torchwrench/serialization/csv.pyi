@@ -4,6 +4,7 @@ from typing import Any, Iterable, Literal, Mapping, overload
 
 from _typeshed import Incomplete
 
+from torchwrench.core.packaging import PANDAS_AVAILABLE as PANDAS_AVAILABLE
 from torchwrench.extras.pandas import pd as pd
 from torchwrench.serialization.common import as_builtin as as_builtin
 

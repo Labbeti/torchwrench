@@ -18,7 +18,7 @@ def _get_extra_version(name: str) -> str:
         return "unknown"
 
 
-_EXTRAS_PACKAGES = (
+EXTRA_PACKAGES = (
     "colorlog",
     "datasets",
     "h5py",
@@ -33,23 +33,23 @@ _EXTRAS_PACKAGES = (
     "tqdm",
     "yaml",
 )
-_EXTRA_AVAILABLE = {name: is_available_package(name) for name in _EXTRAS_PACKAGES}
-_EXTRA_VERSION = {name: _get_extra_version(name) for name in _EXTRAS_PACKAGES}
+EXTRA_AVAILABLE = {name: is_available_package(name) for name in EXTRA_PACKAGES}
+EXTRA_VERSION = {name: _get_extra_version(name) for name in EXTRA_PACKAGES}
 
 
-_COLORLOG_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["colorlog"]
-_DATASETS_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["datasets"]
-_H5PY_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["h5py"]
-_NUMPY_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["numpy"]
-_OMEGACONF_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["omegaconf"]
-_PANDAS_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["pandas"]
-_SAFETENSORS_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["safetensors"]
-_SCIPY_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["scipy"]
-_SPEECHBRAIN_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["speechbrain"]
-_TENSORBOARD_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["tensorboard"]
-_TORCHAUDIO_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["torchaudio"]
-_TQDM_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["tqdm"]
-_YAML_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["yaml"]
+COLORLOG_AVAILABLE: Final[bool] = EXTRA_AVAILABLE["colorlog"]
+DATASETS_AVAILABLE: Final[bool] = EXTRA_AVAILABLE["datasets"]
+H5PY_AVAILABLE: Final[bool] = EXTRA_AVAILABLE["h5py"]
+NUMPY_AVAILABLE: Final[bool] = EXTRA_AVAILABLE["numpy"]
+OMEGACONF_AVAILABLE: Final[bool] = EXTRA_AVAILABLE["omegaconf"]
+PANDAS_AVAILABLE: Final[bool] = EXTRA_AVAILABLE["pandas"]
+SAFETENSORS_AVAILABLE: Final[bool] = EXTRA_AVAILABLE["safetensors"]
+SCIPY_AVAILABLE: Final[bool] = EXTRA_AVAILABLE["scipy"]
+SPEECHBRAIN_AVAILABLE: Final[bool] = EXTRA_AVAILABLE["speechbrain"]
+TENSORBOARD_AVAILABLE: Final[bool] = EXTRA_AVAILABLE["tensorboard"]
+TORCHAUDIO_AVAILABLE: Final[bool] = EXTRA_AVAILABLE["torchaudio"]
+TQDM_AVAILABLE: Final[bool] = EXTRA_AVAILABLE["tqdm"]
+YAML_AVAILABLE: Final[bool] = EXTRA_AVAILABLE["yaml"]
 
 
 def torch_version_ge_1_13() -> bool:

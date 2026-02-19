@@ -12,9 +12,9 @@ from pythonwrench.functools import function_alias
 from pythonwrench.importlib import Placeholder
 from torch import Tensor
 
-from torchwrench.core.packaging import _TORCHAUDIO_AVAILABLE
+from torchwrench.core.packaging import TORCHAUDIO_AVAILABLE
 
-if not _TORCHAUDIO_AVAILABLE:
+if not TORCHAUDIO_AVAILABLE:
     msg = f"Cannot use python module {__file__} since torchaudio package is not installed."
     raise ImportError(msg)
 

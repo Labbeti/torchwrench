@@ -4,6 +4,8 @@ from typing import Iterable, TypedDict
 from _typeshed import Incomplete
 from typing_extensions import NotRequired
 
+from torchwrench.core.packaging import TENSORBOARD_AVAILABLE as TENSORBOARD_AVAILABLE
+
 msg: str
 pylog: Incomplete
 

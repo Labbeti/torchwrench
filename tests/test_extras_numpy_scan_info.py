@@ -4,13 +4,13 @@
 import unittest
 from unittest import TestCase
 
-from torchwrench.core.packaging import _NUMPY_AVAILABLE
+from torchwrench.core.packaging import NUMPY_AVAILABLE
 from torchwrench.extras.numpy import merge_numpy_dtypes, np
 
 
 class TestDType(TestCase):
     def test_merge_numpy_dtypes(self) -> None:
-        if not _NUMPY_AVAILABLE:
+        if not NUMPY_AVAILABLE:
             return None
 
         empty = None

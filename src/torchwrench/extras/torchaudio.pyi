@@ -8,6 +8,8 @@ from torch import Tensor as Tensor
 from torchaudio import _AudioMetaData
 from torchaudio.io import CodecConfig as CodecConfig
 
+from torchwrench.core.packaging import TORCHAUDIO_AVAILABLE as TORCHAUDIO_AVAILABLE
+
 msg: Incomplete
 
 class CodecConfig(Placeholder): ...

@@ -6,9 +6,7 @@ from torch import Tensor as Tensor
 from torchwrench.nn.functional.activation import (
     log_softmax_multidim as log_softmax_multidim,
 )
-from torchwrench.nn.functional.activation import (
-    softmax_multidim as softmax_multidim,
-)
+from torchwrench.nn.functional.activation import softmax_multidim as softmax_multidim
 
 from .module import Module as Module
 

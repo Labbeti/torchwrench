@@ -8,9 +8,7 @@ from pythonwrench import BuiltinScalar as BuiltinScalar
 from torchwrench.extras.numpy.definitions import (
     ACCEPTED_NUMPY_DTYPES as ACCEPTED_NUMPY_DTYPES,
 )
-from torchwrench.extras.numpy.definitions import (
-    np as np,
-)
+from torchwrench.extras.numpy.definitions import np as np
 
 T_Invalid = TypeVar("T_Invalid", covariant=True)
 T_EmptyNp = TypeVar("T_EmptyNp", covariant=True)

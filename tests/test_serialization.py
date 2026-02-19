@@ -13,10 +13,10 @@ import torch
 
 import torchwrench as tw
 from torchwrench.core.packaging import (
-    _NUMPY_AVAILABLE,
-    _PANDAS_AVAILABLE,
-    _SAFETENSORS_AVAILABLE,
-    _YAML_AVAILABLE,
+    NUMPY_AVAILABLE,
+    PANDAS_AVAILABLE,
+    SAFETENSORS_AVAILABLE,
+    YAML_AVAILABLE,
 )
 from torchwrench.hub.paths import get_tmp_dir
 from torchwrench.nn.functional import deep_equal
@@ -40,7 +40,7 @@ class TestSaving(TestCase):
         ]
         expected = [[[list(range(3))], "a", "path", {"a": 3, "b": 1, "c": 1}, []]]
 
-        if _PANDAS_AVAILABLE:
+        if PANDAS_AVAILABLE:
             import pandas as pd
 
             df = pd.DataFrame({"a": [1, 2]})
@@ -68,7 +68,7 @@ class TestSaving(TestCase):
             ("test.json", "json"),
             ("test.yaml.json", "json"),
         ]
-        if _YAML_AVAILABLE:
+        if YAML_AVAILABLE:
             tests += [
                 ("test.json.yaml", "yaml"),
                 ("test.yml", "yaml"),
@@ -90,7 +90,7 @@ class TestSaving(TestCase):
 
         assert result == data
 
-        if _NUMPY_AVAILABLE and _PANDAS_AVAILABLE:
+        if NUMPY_AVAILABLE and PANDAS_AVAILABLE:
             import numpy as np
 
             n = 10
@@ -123,7 +123,7 @@ class TestSaving(TestCase):
             ("pickle", data_objs, False, dict(), dict()),
         ]
 
-        if _NUMPY_AVAILABLE:
+        if NUMPY_AVAILABLE:
             from torchwrench.extras.numpy import to_ndarray
 
             tests += [
@@ -131,12 +131,12 @@ class TestSaving(TestCase):
                 for k, v in data_objs.items()
             ]
 
-        if _SAFETENSORS_AVAILABLE:
+        if SAFETENSORS_AVAILABLE:
             tests += [
                 ("safetensors", data_tensors, False, dict(), dict()),
             ]
 
-        if _YAML_AVAILABLE:
+        if YAML_AVAILABLE:
             tests += [
                 ("yaml", data_tensors, True, dict(), dict()),
                 ("yaml", data_objs, True, dict(), dict()),

@@ -1,5 +1,5 @@
 import pandas as pd
 
-from torchwrench.core.packaging import _PANDAS_AVAILABLE as _PANDAS_AVAILABLE
+from torchwrench.core.packaging import PANDAS_AVAILABLE as PANDAS_AVAILABLE
 
-__all__ = ["_PANDAS_AVAILABLE", "pd"]
+__all__ = ["PANDAS_AVAILABLE", "pd"]

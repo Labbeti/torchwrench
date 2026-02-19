@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from .definitions import _NUMPY_AVAILABLE, ACCEPTED_NUMPY_DTYPES, np, numpy
+from .definitions import ACCEPTED_NUMPY_DTYPES, NUMPY_AVAILABLE, np, numpy
 from .functional import (
     is_numpy_bool_array,
     is_numpy_integral_array,

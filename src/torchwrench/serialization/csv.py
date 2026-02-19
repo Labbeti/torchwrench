@@ -22,7 +22,7 @@ from pythonwrench.csv import load_csv as _load_csv_base
 from pythonwrench.functools import function_alias
 from pythonwrench.warnings import warn_once
 
-from torchwrench.core.packaging import _PANDAS_AVAILABLE
+from torchwrench.core.packaging import PANDAS_AVAILABLE
 from torchwrench.extras.pandas import pd
 from torchwrench.serialization.common import as_builtin
 
@@ -152,20 +152,20 @@ def load_csv(
 ) -> Union[List[Dict[str, Any]], Dict[str, List[Any]], pd.DataFrame]:
     """Load CSV file using CSV or pandas backend."""
     if backend == "auto":
-        if _PANDAS_AVAILABLE:
+        if PANDAS_AVAILABLE:
             backend = "pandas"
         else:
             backend = "csv"
 
     if orient == "auto":
-        if _PANDAS_AVAILABLE:
+        if PANDAS_AVAILABLE:
             orient = "dataframe"
         else:
             orient = "list"
 
     if backend == "csv":
         if orient == "dataframe":
-            if not _PANDAS_AVAILABLE:
+            if not PANDAS_AVAILABLE:
                 msg = f"Invalid argument {backend=} without pandas installed."
                 raise ValueError(msg)
             backend_orient = "dict"
@@ -220,7 +220,7 @@ def _dump_csv_with_pandas(
     **kwargs,
 ) -> str:
     backend = "pandas"
-    if not _PANDAS_AVAILABLE:
+    if not PANDAS_AVAILABLE:
         msg = f"Invalid argument {backend=} without pandas installed."
         raise ValueError(msg)
 
@@ -255,7 +255,7 @@ def _load_csv_with_pandas(
 ) -> Union[List[Dict[str, Any]], Dict[str, List[Any]], pd.DataFrame]:
     backend = "pandas"
 
-    if not _PANDAS_AVAILABLE:
+    if not PANDAS_AVAILABLE:
         msg = f"Invalid argument {backend=} without pandas installed."
         raise ValueError(msg)
 

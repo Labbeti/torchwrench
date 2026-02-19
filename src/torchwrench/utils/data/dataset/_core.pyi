@@ -8,32 +8,18 @@ from torch import Tensor
 from torch.utils.data.dataset import Dataset
 from typing_extensions import TypeVar
 
-from torchwrench.extras.numpy import (
-    is_numpy_bool_array as is_numpy_bool_array,
-)
-from torchwrench.extras.numpy import (
-    is_numpy_integral_array as is_numpy_integral_array,
-)
-from torchwrench.extras.numpy import (
-    np as np,
-)
+from torchwrench.extras.numpy import is_numpy_bool_array as is_numpy_bool_array
+from torchwrench.extras.numpy import is_numpy_integral_array as is_numpy_integral_array
+from torchwrench.extras.numpy import np as np
 from torchwrench.extras.pandas import pd as pd
 from torchwrench.extras.speechbrain import DynamicItemDataset as DynamicItemDataset
 from torchwrench.nn.functional.multilabel import (
     multihot_to_multi_indices as multihot_to_multi_indices,
 )
-from torchwrench.types import (
-    BoolTensor1D as BoolTensor1D,
-)
-from torchwrench.types import (
-    IntegralTensor as IntegralTensor,
-)
-from torchwrench.types import (
-    SignedIntegerTensor0D as SignedIntegerTensor0D,
-)
-from torchwrench.types import (
-    SignedIntegerTensor1D as SignedIntegerTensor1D,
-)
+from torchwrench.types import BoolTensor1D as BoolTensor1D
+from torchwrench.types import IntegralTensor as IntegralTensor
+from torchwrench.types import SignedIntegerTensor0D as SignedIntegerTensor0D
+from torchwrench.types import SignedIntegerTensor1D as SignedIntegerTensor1D
 
 T_RowIndex = TypeVar("T_RowIndex", bound=int, covariant=False, default=int)
 T_ColIndex = TypeVar("T_ColIndex", bound=int | str, covariant=False, default=str)

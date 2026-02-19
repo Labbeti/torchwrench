@@ -21,7 +21,7 @@ from pythonwrench.checksum import (
 from pythonwrench.inspect import get_fullname
 from torch import Tensor, nn
 
-from torchwrench.core.packaging import _NUMPY_AVAILABLE, _PANDAS_AVAILABLE
+from torchwrench.core.packaging import NUMPY_AVAILABLE, PANDAS_AVAILABLE
 from torchwrench.extras.numpy import np
 from torchwrench.extras.pandas import pd
 from torchwrench.nn.functional.predicate import is_complex, is_floating_point
@@ -29,7 +29,7 @@ from torchwrench.nn.functional.predicate import is_complex, is_floating_point
 
 @register_checksum_fn(pd.DataFrame)
 def checksum_dataframe(x: pd.DataFrame, **kwargs) -> int:
-    if not _PANDAS_AVAILABLE:
+    if not PANDAS_AVAILABLE:
         msg = "Cannot call function 'checksum_dataframe' because optional dependency 'pandas' is not installed. Please install it using 'pip install torchwrench[extras]'"
         raise NotImplementedError(msg)
 
@@ -42,7 +42,7 @@ def checksum_dataframe(x: pd.DataFrame, **kwargs) -> int:
 
 @register_checksum_fn(pd.Series)
 def checksum_series(x: pd.Series, **kwargs) -> int:
-    if not _PANDAS_AVAILABLE:
+    if not PANDAS_AVAILABLE:
         msg = "Cannot call function 'checksum_series' because optional dependency 'pandas' is not installed. Please install it using 'pip install torchwrench[extras]'"
         raise NotImplementedError(msg)
 
@@ -155,7 +155,7 @@ def _checksum_tensor_array_like(
         xbytes = x.tobytes()
         csum = checksum_bytes(xbytes, **kwargs)
     elif isinstance(x, Tensor):
-        if _NUMPY_AVAILABLE:
+        if NUMPY_AVAILABLE:
             xbytes = x.detach().cpu().numpy().tobytes()
         else:
             xbytes = _serialize_tensor_to_bytes(x)

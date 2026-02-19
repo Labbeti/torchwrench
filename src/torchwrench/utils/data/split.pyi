@@ -2,12 +2,8 @@ from typing import Callable, Iterable
 
 from torch import Tensor as Tensor
 
-from torchwrench.core.make import (
-    GeneratorLike as GeneratorLike,
-)
-from torchwrench.core.make import (
-    as_generator as as_generator,
-)
+from torchwrench.core.make import GeneratorLike as GeneratorLike
+from torchwrench.core.make import as_generator as as_generator
 from torchwrench.nn.functional.transform import as_tensor as as_tensor
 
 def random_split(

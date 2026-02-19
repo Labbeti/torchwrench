@@ -4,30 +4,14 @@ from _typeshed import Incomplete
 from torch import nn
 from typing_extensions import Concatenate, ParamSpec
 
-from ._mixins import (
-    ConfigModule as ConfigModule,
-)
-from ._mixins import (
-    DeviceDetectMode as DeviceDetectMode,
-)
-from ._mixins import (
-    EModule as EModule,
-)
-from ._mixins import (
-    ESequential as ESequential,
-)
-from ._mixins import (
-    InType as InType,
-)
-from ._mixins import (
-    OutType as OutType,
-)
-from ._mixins import (
-    OutType3 as OutType3,
-)
-from ._mixins import (
-    TypedModuleLike as TypedModuleLike,
-)
+from ._mixins import ConfigModule as ConfigModule
+from ._mixins import DeviceDetectMode as DeviceDetectMode
+from ._mixins import EModule as EModule
+from ._mixins import ESequential as ESequential
+from ._mixins import InType as InType
+from ._mixins import OutType as OutType
+from ._mixins import OutType3 as OutType3
+from ._mixins import TypedModuleLike as TypedModuleLike
 
 P = ParamSpec("P")
 

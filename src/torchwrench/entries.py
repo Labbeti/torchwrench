@@ -10,7 +10,7 @@ import torch
 from pythonwrench.json import dump_json
 
 import torchwrench as tw
-from torchwrench.core.packaging import _EXTRA_VERSION
+from torchwrench.core.packaging import EXTRA_VERSION
 from torchwrench.hub.paths import get_cache_dir, get_dir, get_tmp_dir
 from torchwrench.utils.data.dataloader import get_auto_num_cpus, get_auto_num_gpus
 
@@ -34,7 +34,7 @@ def get_install_info() -> Dict[str, Union[str, int]]:
         "cachedir": str(get_cache_dir()),
         "torch_hub": get_dir(),
     }
-    install_info.update({k: str(v) for k, v in _EXTRA_VERSION.items()})
+    install_info.update({k: str(v) for k, v in EXTRA_VERSION.items()})
     return install_info
 
 

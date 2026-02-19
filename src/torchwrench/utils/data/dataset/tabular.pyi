@@ -11,15 +11,9 @@ from torchwrench.extras.numpy import np
 from torchwrench.extras.pandas import pd
 from torchwrench.extras.speechbrain import DynamicItemDataset
 
-from ._core import (
-    T_ColIndex as T_ColIndex,
-)
-from ._core import (
-    T_RowIndex as T_RowIndex,
-)
-from ._core import (
-    TabularDatasetInterface,
-)
+from ._core import T_ColIndex as T_ColIndex
+from ._core import T_RowIndex as T_RowIndex
+from ._core import TabularDatasetInterface
 
 __all__ = ["TabularDataset", "T_RowIndex", "T_ColIndex"]
 

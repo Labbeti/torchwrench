@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 
 
-from torchwrench.core.packaging import _EXTRA_AVAILABLE
+from torchwrench.core.packaging import EXTRA_AVAILABLE
 
 _MISSING_DEPS = {
-    name: _EXTRA_AVAILABLE[name]
+    name: EXTRA_AVAILABLE[name]
     for name in ("h5py", "numpy")
-    if not _EXTRA_AVAILABLE[name]
+    if not EXTRA_AVAILABLE[name]
 }
 if len(_MISSING_DEPS) > 0:
     if len(_MISSING_DEPS) == 1:

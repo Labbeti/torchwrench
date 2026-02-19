@@ -8,9 +8,7 @@ from torchwrench.nn.functional.padding import pad_and_stack_rec as pad_and_stack
 from torchwrench.nn.functional.predicate import (
     is_convertible_to_tensor as is_convertible_to_tensor,
 )
-from torchwrench.nn.functional.predicate import (
-    is_stackable as is_stackable,
-)
+from torchwrench.nn.functional.predicate import is_stackable as is_stackable
 
 K = TypeVar("K")
 V = TypeVar("V")

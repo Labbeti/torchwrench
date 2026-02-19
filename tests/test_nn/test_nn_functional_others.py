@@ -8,7 +8,7 @@ from unittest import TestCase
 import torch
 
 import torchwrench as tw
-from torchwrench.core.packaging import _NUMPY_AVAILABLE
+from torchwrench.core.packaging import NUMPY_AVAILABLE
 from torchwrench.extras.numpy import np
 from torchwrench.nn.functional.others import (
     deep_equal,
@@ -76,7 +76,7 @@ class TestNDimShape(TestCase):
             ValueError,
         ]
 
-        if _NUMPY_AVAILABLE:
+        if NUMPY_AVAILABLE:
             examples += [
                 np.float64(42),
                 [[np.float64(42)], np.array([2])],
@@ -196,7 +196,7 @@ class TestDeepEqual(TestCase):
             (np.random.rand(10), 0, False),
         ]
 
-        if _NUMPY_AVAILABLE:
+        if NUMPY_AVAILABLE:
             tests += [
                 (math.nan, np.nan, True),
                 (np.array(["a", math.nan]), 0, False),

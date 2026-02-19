@@ -8,12 +8,8 @@ from _typeshed import Incomplete
 from torch import Tensor
 from typing_extensions import Self, TypeAlias
 
-from torchwrench.extras.hdf.common import (
-    HDFDatasetAttributes as HDFDatasetAttributes,
-)
-from torchwrench.extras.hdf.common import (
-    HDFItemType as HDFItemType,
-)
+from torchwrench.extras.hdf.common import HDFDatasetAttributes as HDFDatasetAttributes
+from torchwrench.extras.hdf.common import HDFItemType as HDFItemType
 from torchwrench.extras.numpy.scan_info import (
     numpy_dtype_to_torch_dtype as numpy_dtype_to_torch_dtype,
 )

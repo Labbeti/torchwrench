@@ -8,21 +8,11 @@ from typing_extensions import NotRequired
 
 from torchwrench.core.make import DeviceLike as DeviceLike
 from torchwrench.core.make import as_device as as_device
-from torchwrench.serialization.json import (
-    dump_json as dump_json,
-)
-from torchwrench.serialization.json import (
-    load_json as load_json,
-)
-from torchwrench.serialization.load_fn import (
-    LOAD_FNS as LOAD_FNS,
-)
-from torchwrench.serialization.load_fn import (
-    LoadFnLike as LoadFnLike,
-)
-from torchwrench.serialization.load_fn import (
-    load_torch as load_torch,
-)
+from torchwrench.serialization.json import dump_json as dump_json
+from torchwrench.serialization.json import load_json as load_json
+from torchwrench.serialization.load_fn import LOAD_FNS as LOAD_FNS
+from torchwrench.serialization.load_fn import LoadFnLike as LoadFnLike
+from torchwrench.serialization.load_fn import load_torch as load_torch
 
 from .paths import get_cache_dir as get_cache_dir
 

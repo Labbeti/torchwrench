@@ -5,15 +5,11 @@ from _typeshed import Incomplete
 from torch.types import Device as Device
 from typing_extensions import TypeAlias
 
-from torchwrench.core.dtype_enum import (
-    DTypeEnum as DTypeEnum,
-)
+from torchwrench.core.dtype_enum import DTypeEnum as DTypeEnum
 from torchwrench.core.dtype_enum import (
     enum_dtype_to_torch_dtype as enum_dtype_to_torch_dtype,
 )
-from torchwrench.core.dtype_enum import (
-    str_to_torch_dtype as str_to_torch_dtype,
-)
+from torchwrench.core.dtype_enum import str_to_torch_dtype as str_to_torch_dtype
 
 DeviceLike: TypeAlias
 DTypeLike: TypeAlias

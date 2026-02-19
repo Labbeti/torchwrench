@@ -8,7 +8,7 @@ from unittest import TestCase
 import pythonwrench as pw
 import torch
 
-from torchwrench.core.packaging import _NUMPY_AVAILABLE
+from torchwrench.core.packaging import NUMPY_AVAILABLE
 from torchwrench.extras.numpy import np
 
 
@@ -40,7 +40,7 @@ class TestChecksum(TestCase):
             b"abc",
             b"",
         ]
-        if _NUMPY_AVAILABLE:
+        if NUMPY_AVAILABLE:
             x += [
                 np.arange(10),
                 np.arange(10).reshape(2, 5),
@@ -56,7 +56,7 @@ class TestChecksum(TestCase):
         assert pw.checksum_any(x0) != pw.checksum_any(x1)
 
     def test_large_arrays_numpy(self) -> None:
-        if not _NUMPY_AVAILABLE:
+        if not NUMPY_AVAILABLE:
             return None
         x0 = np.random.rand(10000, 100)
         x1 = np.random.rand(10000, 100)
@@ -70,7 +70,7 @@ class TestChecksum(TestCase):
 
     def test_nan(self) -> None:
         # NaN pw.checksum_any are equal but nan itself can be different
-        if not _NUMPY_AVAILABLE:
+        if not NUMPY_AVAILABLE:
             return None
         x0 = math.nan
         x1 = np.nan

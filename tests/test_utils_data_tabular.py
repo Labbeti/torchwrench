@@ -7,9 +7,9 @@ from unittest import TestCase
 import pythonwrench as pw
 
 import torchwrench as tw
-from torchwrench.extras.numpy import _NUMPY_AVAILABLE, np
-from torchwrench.extras.pandas import _PANDAS_AVAILABLE, pd
-from torchwrench.extras.speechbrain import _SPEECHBRAIN_AVAILABLE, DynamicItemDataset
+from torchwrench.extras.numpy import NUMPY_AVAILABLE, np
+from torchwrench.extras.pandas import PANDAS_AVAILABLE, pd
+from torchwrench.extras.speechbrain import SPEECHBRAIN_AVAILABLE, DynamicItemDataset
 from torchwrench.utils.data.dataset import TabularDataset
 
 
@@ -52,15 +52,15 @@ class TestTabularDataset(TestCase):
         assert ds[2:4] == [{"a": 2, "b": 7}, {"a": 3, "b": 8}]
         assert ds[[3, 4, 3]] == [{"a": 3, "b": 8}, {"a": 4, "b": 9}, {"a": 3, "b": 8}]
 
-        if _NUMPY_AVAILABLE:
+        if NUMPY_AVAILABLE:
             expected = np.array([[0, 5], [1, 6], [2, 7], [3, 8], [4, 9]])
             assert tw.deep_equal(ds.to_numpy(), expected)
 
-        if _PANDAS_AVAILABLE:
+        if PANDAS_AVAILABLE:
             assert tw.deep_equal(ds.to_dataframe(), pd.DataFrame(data))
 
     def test_ndarray(self) -> None:
-        if not _NUMPY_AVAILABLE:
+        if not NUMPY_AVAILABLE:
             return None
 
         data: np.ndarray = np.random.rand(10, 3, 2)
@@ -82,7 +82,7 @@ class TestTabularDataset(TestCase):
         assert tuple(ds.keys()) == tuple(ds.column_names) == (0, 1, 2)
 
     def test_dynamic_item_dataset(self) -> None:
-        if not _SPEECHBRAIN_AVAILABLE:
+        if not SPEECHBRAIN_AVAILABLE:
             return None
 
         data = {f"{i}": {"string": i} for i in range(100)}
@@ -113,7 +113,7 @@ class TestTabularDataset(TestCase):
 
         mask = (
             tw.full((len(ds),), True)
-            if not _NUMPY_AVAILABLE
+            if not NUMPY_AVAILABLE
             else np.full((len(ds),), True)
         )
         assert ds[mask] == ds.to_list_dict()

@@ -4,58 +4,28 @@ from pathlib import Path
 from typing import Any, Iterable, Literal, Mapping
 
 from _typeshed import Incomplete
-from pythonwrench.typing import (
-    DataclassInstance as DataclassInstance,
-)
-from pythonwrench.typing import (
-    NamedTupleInstance as NamedTupleInstance,
-)
+from pythonwrench.typing import DataclassInstance as DataclassInstance
+from pythonwrench.typing import NamedTupleInstance as NamedTupleInstance
 from typing_extensions import TypeAlias
-from yaml import (
-    BaseLoader as BaseLoader,
-)
-from yaml import (
-    FullLoader as FullLoader,
-)
-from yaml import (
-    Loader as Loader,
-)
-from yaml import (
-    MappingNode as MappingNode,
-)
-from yaml import (
-    Node as Node,
-)
-from yaml import (
-    SafeLoader as SafeLoader,
-)
-from yaml import (
-    ScalarNode as ScalarNode,
-)
-from yaml import (
-    SequenceNode as SequenceNode,
-)
-from yaml import (
-    UnsafeLoader as UnsafeLoader,
-)
+from yaml import BaseLoader as BaseLoader
+from yaml import FullLoader as FullLoader
+from yaml import Loader as Loader
+from yaml import MappingNode as MappingNode
+from yaml import Node as Node
+from yaml import SafeLoader as SafeLoader
+from yaml import ScalarNode as ScalarNode
+from yaml import SequenceNode as SequenceNode
+from yaml import UnsafeLoader as UnsafeLoader
 from yaml.parser import ParserError as ParserError
 from yaml.scanner import ScannerError as ScannerError
 
-from torchwrench.extras.yaml._yaml_fallback import (
-    CBaseLoader as CBaseLoader,
-)
-from torchwrench.extras.yaml._yaml_fallback import (
-    CFullLoader as CFullLoader,
-)
-from torchwrench.extras.yaml._yaml_fallback import (
-    CLoader as CLoader,
-)
-from torchwrench.extras.yaml._yaml_fallback import (
-    CSafeLoader as CSafeLoader,
-)
-from torchwrench.extras.yaml._yaml_fallback import (
-    CUnsafeLoader as CUnsafeLoader,
-)
+from torchwrench.core.packaging import OMEGACONF_AVAILABLE as OMEGACONF_AVAILABLE
+from torchwrench.core.packaging import YAML_AVAILABLE as YAML_AVAILABLE
+from torchwrench.extras.yaml._yaml_fallback import CBaseLoader as CBaseLoader
+from torchwrench.extras.yaml._yaml_fallback import CFullLoader as CFullLoader
+from torchwrench.extras.yaml._yaml_fallback import CLoader as CLoader
+from torchwrench.extras.yaml._yaml_fallback import CSafeLoader as CSafeLoader
+from torchwrench.extras.yaml._yaml_fallback import CUnsafeLoader as CUnsafeLoader
 from torchwrench.serialization.common import as_builtin as as_builtin
 
 YamlLoaders: TypeAlias = (

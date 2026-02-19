@@ -1,6 +1,2 @@
-from torchwrench.extras.safetensors import (
-    dump_safetensors as dump_safetensors,
-)
-from torchwrench.extras.safetensors import (
-    load_safetensors as load_safetensors,
-)
+from torchwrench.extras.safetensors import dump_safetensors as dump_safetensors
+from torchwrench.extras.safetensors import load_safetensors as load_safetensors

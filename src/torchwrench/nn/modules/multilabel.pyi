@@ -6,9 +6,7 @@ from torch import nn
 
 from torchwrench.core.make import DeviceLike as DeviceLike
 from torchwrench.core.make import DTypeLike as DTypeLike
-from torchwrench.nn.functional.multilabel import (
-    T_Name as T_Name,
-)
+from torchwrench.nn.functional.multilabel import T_Name as T_Name
 from torchwrench.nn.functional.multilabel import (
     multi_indices_to_multihot as multi_indices_to_multihot,
 )
@@ -30,9 +28,7 @@ from torchwrench.nn.functional.multilabel import (
 from torchwrench.nn.functional.multilabel import (
     probs_to_multi_indices as probs_to_multi_indices,
 )
-from torchwrench.nn.functional.multilabel import (
-    probs_to_multihot as probs_to_multihot,
-)
+from torchwrench.nn.functional.multilabel import probs_to_multihot as probs_to_multihot
 from torchwrench.nn.functional.multilabel import (
     probs_to_multinames as probs_to_multinames,
 )

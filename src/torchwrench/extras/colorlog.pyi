@@ -1,6 +1,8 @@
 from _typeshed import Incomplete
 from colorlog import ColoredFormatter
 
+from torchwrench.core.packaging import COLORLOG_AVAILABLE as COLORLOG_AVAILABLE
+
 msg: str
 pylog: Incomplete
 LOG_COLORS: Incomplete

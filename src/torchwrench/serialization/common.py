@@ -19,13 +19,13 @@ from pythonwrench.cast import as_builtin, register_as_builtin_fn
 from torch import Tensor
 
 from torchwrench.core.packaging import (
-    _H5PY_AVAILABLE,
-    _NUMPY_AVAILABLE,
-    _OMEGACONF_AVAILABLE,
-    _PANDAS_AVAILABLE,
-    _SAFETENSORS_AVAILABLE,
-    _TORCHAUDIO_AVAILABLE,
-    _YAML_AVAILABLE,
+    H5PY_AVAILABLE,
+    NUMPY_AVAILABLE,
+    OMEGACONF_AVAILABLE,
+    PANDAS_AVAILABLE,
+    SAFETENSORS_AVAILABLE,
+    TORCHAUDIO_AVAILABLE,
+    YAML_AVAILABLE,
 )
 
 T = TypeVar("T")
@@ -58,7 +58,7 @@ PATTERN_TO_BACKEND: Dict[str, SavingBackend] = {
     r"^.+\.pt$": "torch",
 }
 
-if _H5PY_AVAILABLE:
+if H5PY_AVAILABLE:
     PATTERN_TO_BACKEND.update(
         {
             r"^.+\.h5$": "h5py",
@@ -68,7 +68,7 @@ if _H5PY_AVAILABLE:
     )
 
 
-if _NUMPY_AVAILABLE:
+if NUMPY_AVAILABLE:
     import numpy as np
 
     PATTERN_TO_BACKEND.update(
@@ -78,14 +78,14 @@ if _NUMPY_AVAILABLE:
         }
     )
 
-if _SAFETENSORS_AVAILABLE:
+if SAFETENSORS_AVAILABLE:
     PATTERN_TO_BACKEND.update(
         {
             r"^.+\.safetensors$": "safetensors",
         }
     )
 
-if _TORCHAUDIO_AVAILABLE:
+if TORCHAUDIO_AVAILABLE:
     PATTERN_TO_BACKEND.update(
         {
             r"^.+\.mp3$": "torchaudio",
@@ -96,7 +96,7 @@ if _TORCHAUDIO_AVAILABLE:
         }
     )
 
-if _YAML_AVAILABLE:
+if YAML_AVAILABLE:
     PATTERN_TO_BACKEND.update(
         {
             r".+\.yml$": "yaml",
@@ -142,7 +142,7 @@ def _torch_dtype_to_builtin(x: torch.dtype) -> Any:
     return str(x)
 
 
-if _NUMPY_AVAILABLE:
+if NUMPY_AVAILABLE:
     import numpy as np
 
     @register_as_builtin_fn(np.ndarray)
@@ -158,7 +158,7 @@ if _NUMPY_AVAILABLE:
         return str(x)
 
 
-if _OMEGACONF_AVAILABLE:
+if OMEGACONF_AVAILABLE:
     from omegaconf import DictConfig, ListConfig, OmegaConf  # type: ignore
 
     @register_as_builtin_fn((DictConfig, ListConfig))
@@ -166,7 +166,7 @@ if _OMEGACONF_AVAILABLE:
         return as_builtin(OmegaConf.to_container(x, resolve=False, enum_to_str=True))  # type: ignore
 
 
-if _PANDAS_AVAILABLE:
+if PANDAS_AVAILABLE:
     import pandas as pd
     from pandas._libs.missing import NAType
 

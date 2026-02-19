@@ -9,7 +9,7 @@ import yaml
 from yaml import FullLoader, SafeLoader
 from yaml.constructor import ConstructorError
 
-from torchwrench.core.packaging import _YAML_AVAILABLE
+from torchwrench.core.packaging import YAML_AVAILABLE
 from torchwrench.extras.yaml import (
     IgnoreTagLoader,
     SplitTagLoader,
@@ -20,7 +20,7 @@ from torchwrench.extras.yaml import (
 
 class TestYaml(TestCase):
     def test_yaml_load_examples(self) -> None:
-        if not _YAML_AVAILABLE:
+        if not YAML_AVAILABLE:
             return None
 
         dumped = "a: !!python/tuple\n- 1\n- 2"

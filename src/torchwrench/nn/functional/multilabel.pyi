@@ -3,44 +3,20 @@ from typing import Hashable, Iterable, Literal, Mapping, Sequence, TypeVar, over
 from pythonwrench.typing import SupportsGetitemLen as SupportsGetitemLen
 from torch import Tensor
 
-from torchwrench.core.make import (
-    DeviceLike as DeviceLike,
-)
-from torchwrench.core.make import (
-    DTypeLike as DTypeLike,
-)
-from torchwrench.core.make import (
-    as_device as as_device,
-)
-from torchwrench.core.make import (
-    as_dtype as as_dtype,
-)
+from torchwrench.core.make import DeviceLike as DeviceLike
+from torchwrench.core.make import DTypeLike as DTypeLike
+from torchwrench.core.make import as_device as as_device
+from torchwrench.core.make import as_dtype as as_dtype
 from torchwrench.nn.functional.padding import pad_and_stack_rec as pad_and_stack_rec
 from torchwrench.nn.functional.predicate import is_stackable as is_stackable
-from torchwrench.nn.functional.transform import (
-    as_tensor as as_tensor,
-)
-from torchwrench.nn.functional.transform import (
-    to_item as to_item,
-)
-from torchwrench.types import (
-    BoolTensor1D as BoolTensor1D,
-)
-from torchwrench.types import (
-    BoolTensor2D as BoolTensor2D,
-)
-from torchwrench.types import (
-    LongTensor as LongTensor,
-)
-from torchwrench.types import (
-    LongTensor1D as LongTensor1D,
-)
-from torchwrench.types import (
-    is_number_like as is_number_like,
-)
-from torchwrench.types import (
-    is_tensor_or_array as is_tensor_or_array,
-)
+from torchwrench.nn.functional.transform import as_tensor as as_tensor
+from torchwrench.nn.functional.transform import to_item as to_item
+from torchwrench.types import BoolTensor1D as BoolTensor1D
+from torchwrench.types import BoolTensor2D as BoolTensor2D
+from torchwrench.types import LongTensor as LongTensor
+from torchwrench.types import LongTensor1D as LongTensor1D
+from torchwrench.types import is_number_like as is_number_like
+from torchwrench.types import is_tensor_or_array as is_tensor_or_array
 from torchwrench.types._typing import TensorOrArray as TensorOrArray
 
 T_Name = TypeVar("T_Name", bound=Hashable)

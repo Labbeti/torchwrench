@@ -3,12 +3,8 @@ from typing import Iterable, Literal
 from _typeshed import Incomplete
 from torch import Tensor as Tensor
 
-from torchwrench.core.make import (
-    GeneratorLike as GeneratorLike,
-)
-from torchwrench.core.make import (
-    as_generator as as_generator,
-)
+from torchwrench.core.make import GeneratorLike as GeneratorLike
+from torchwrench.core.make import as_generator as as_generator
 
 CropAlign: Incomplete
 

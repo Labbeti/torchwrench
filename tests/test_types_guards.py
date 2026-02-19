@@ -13,7 +13,7 @@ from pythonwrench.typing import (
     isinstance_generic,
 )
 
-from torchwrench.core.packaging import _NUMPY_AVAILABLE
+from torchwrench.core.packaging import NUMPY_AVAILABLE
 from torchwrench.extras.numpy import np
 from torchwrench.nn import functional as F
 from torchwrench.types import (
@@ -53,7 +53,7 @@ class TestGuards(TestCase):
         ]
         tests = [tuple_ + (False, False) for tuple_ in tests]
 
-        if _NUMPY_AVAILABLE:
+        if NUMPY_AVAILABLE:
             tests += [
                 (np.float64(random.random()), True, True, True),
                 (np.int64(random.randint(0, 100)), True, True, True),
@@ -82,7 +82,7 @@ class TestGuards(TestCase):
             assert not x_is_np_number or x_is_number
             assert not x_is_np_scalar or x_is_scalar
 
-            if _NUMPY_AVAILABLE:
+            if NUMPY_AVAILABLE:
                 np_x_is_scalar = np.isscalar(x)
                 # Impl: np_scalar => scalar
                 assert not np_x_is_scalar or x_is_scalar, f"{x=}"
@@ -98,7 +98,7 @@ class TestGuards(TestCase):
 
                 assert len(shape) == ndim, f"{type(x)=} ; {x=}"
 
-                if _NUMPY_AVAILABLE:
+                if NUMPY_AVAILABLE:
                     np_x = np.asarray(x)
                     assert shape == np_x.shape, f"{x=}"
 
@@ -125,7 +125,7 @@ class TestGuards(TestCase):
         assert is_builtin_scalar(i2, strict=False)
         assert not is_builtin_scalar(i2, strict=True)
 
-        if not _NUMPY_AVAILABLE:
+        if not NUMPY_AVAILABLE:
             return None
 
         s1 = "abc"

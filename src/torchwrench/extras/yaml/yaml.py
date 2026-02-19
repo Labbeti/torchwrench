@@ -10,10 +10,10 @@ from pythonwrench.functools import function_alias
 from pythonwrench.typing import DataclassInstance, NamedTupleInstance
 from typing_extensions import TypeAlias
 
-from torchwrench.core.packaging import _OMEGACONF_AVAILABLE, _YAML_AVAILABLE
+from torchwrench.core.packaging import OMEGACONF_AVAILABLE, YAML_AVAILABLE
 from torchwrench.serialization.common import as_builtin
 
-if not _YAML_AVAILABLE:
+if not YAML_AVAILABLE:
     from torchwrench.extras.yaml import _yaml_fallback as yaml
     from torchwrench.extras.yaml._yaml_fallback import (
         BaseLoader,
@@ -68,7 +68,7 @@ else:
         )
 
 
-if _OMEGACONF_AVAILABLE:
+if OMEGACONF_AVAILABLE:
     from omegaconf import OmegaConf  # type: ignore
 
 
@@ -109,11 +109,11 @@ def dump_yaml(
     **yaml_dump_kwds,
 ) -> str:
     """Dump content to yaml format."""
-    if not _YAML_AVAILABLE:
+    if not YAML_AVAILABLE:
         msg = f"Cannot use python module {__file__} since pyyaml package is not installed. Please install it with `pip install torchwrench[extras]`."
         raise ImportError(msg)
 
-    if not _OMEGACONF_AVAILABLE and resolve:
+    if not OMEGACONF_AVAILABLE and resolve:
         msg = (
             "Cannot resolve yaml config without omegaconf package."
             "Please use resolve=False or install omegaconf with `pip install torchwrench[extras]`."
@@ -162,7 +162,7 @@ def load_yaml(
     on_error: Literal["raise", "ignore"] = "raise",
 ) -> Any:
     """Load YAML from filepath or opened file."""
-    if not _YAML_AVAILABLE:
+    if not YAML_AVAILABLE:
         msg = f"Cannot use python module {__file__} since pyyaml package is not installed. Please install it with `pip install torchwrench[extras]`."
         raise ImportError(msg)
 
@@ -271,7 +271,7 @@ class SplitTagLoader(SafeLoader):  # type: ignore
         return result
 
 
-if _YAML_AVAILABLE:
+if YAML_AVAILABLE:
     IgnoreTagLoader.add_multi_constructor("!", IgnoreTagLoader.construct_with_tag)
     IgnoreTagLoader.add_multi_constructor("tag:", IgnoreTagLoader.construct_with_tag)
 

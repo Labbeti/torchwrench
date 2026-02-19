@@ -6,7 +6,7 @@ from typing import Union
 from torch import Tensor
 
 from torchwrench.core.make import DeviceLike, DTypeLike
-from torchwrench.core.packaging import _NUMPY_AVAILABLE
+from torchwrench.core.packaging import NUMPY_AVAILABLE
 from torchwrench.extras.numpy.definitions import np
 from torchwrench.extras.numpy.functional import (
     ndarray_to_tensor,
@@ -27,7 +27,7 @@ class ToNDArray(Module):
         dtype: Union[str, np.dtype, None] = None,
         force: bool = False,
     ) -> None:
-        if not _NUMPY_AVAILABLE:
+        if not NUMPY_AVAILABLE:
             msg = f"Cannot use {self.__class__.__name__} because numpy dependancy is not installed."
             raise RuntimeError(msg)
 
@@ -50,7 +50,7 @@ class TensorToNDArray(Module):
         dtype: Union[str, np.dtype, None] = None,
         force: bool = False,
     ) -> None:
-        if not _NUMPY_AVAILABLE:
+        if not NUMPY_AVAILABLE:
             msg = f"Cannot use {self.__class__.__name__} because numpy dependancy is not installed."
             raise RuntimeError(msg)
 
@@ -73,7 +73,7 @@ class NDArrayToTensor(Module):
         device: DeviceLike = None,
         dtype: DTypeLike = None,
     ) -> None:
-        if not _NUMPY_AVAILABLE:
+        if not NUMPY_AVAILABLE:
             msg = f"Cannot use {self.__class__.__name__} because numpy dependancy is not installed."
             raise RuntimeError(msg)
 
