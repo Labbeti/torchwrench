@@ -20,15 +20,6 @@ repos:
     - id: mixed-line-ending
       args: ['--fix=no']
 
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.6
-    hooks:
-    - id: ruff
-      types_or: [python, pyi]
-      args: [--select, I, --fix]
-    - id: ruff-format
-      types_or: [python, pyi]
-
   - repo: local
     hooks:
       - id: generate-stubs
@@ -42,3 +33,12 @@ repos:
           - -o
           - src
         pass_filenames: false
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.6
+    hooks:
+    - id: ruff
+      types_or: [python, pyi]
+      args: [--select, I, --fix]
+    - id: ruff-format
+      types_or: [python, pyi]
