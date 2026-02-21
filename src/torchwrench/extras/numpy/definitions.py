@@ -9,7 +9,7 @@ from torchwrench.core.packaging import _NUMPY_AVAILABLE
 
 if _NUMPY_AVAILABLE:
     import numpy  # noqa: F401  # type: ignore
-    import numpy as np  # type: ignore
+    import numpy as np  # noqa: F401  # type: ignore
 
     # Numpy dtypes that can be converted to tensor
     ACCEPTED_NUMPY_DTYPES = (
@@ -27,7 +27,12 @@ if _NUMPY_AVAILABLE:
     )
 
 else:
-    from torchwrench.extras.numpy import _numpy_fallback as np  # noqa: F401
+    from torchwrench.extras.numpy import (
+        _numpy_fallback as np,  # noqa: F401  # type: ignore
+    )
+    from torchwrench.extras.numpy import (
+        _numpy_fallback as numpy,  # noqa: F401  # type: ignore
+    )
 
     ACCEPTED_NUMPY_DTYPES = ()
 

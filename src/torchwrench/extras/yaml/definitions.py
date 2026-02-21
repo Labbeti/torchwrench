@@ -9,13 +9,19 @@ from torchwrench.core.packaging import _YAML_AVAILABLE
 
 if _YAML_AVAILABLE:
     import yaml  # noqa: F401
-    from yaml import (
+    from yaml import (  # noqa: F401
         BaseLoader,
         FullLoader,
         Loader,
+        MappingNode,
+        Node,
         SafeLoader,
+        ScalarNode,
+        SequenceNode,
         UnsafeLoader,
     )
+    from yaml.parser import ParserError  # noqa: F401
+    from yaml.scanner import ScannerError  # noqa: F401
 
     try:
         from yaml import (
@@ -36,7 +42,7 @@ if _YAML_AVAILABLE:
 
 else:
     from . import _yaml_fallback as yaml  # noqa: F401
-    from ._yaml_fallback import (
+    from ._yaml_fallback import (  # noqa: F401
         BaseLoader,
         CBaseLoader,
         CFullLoader,
@@ -45,7 +51,13 @@ else:
         CUnsafeLoader,
         FullLoader,
         Loader,
+        MappingNode,
+        Node,
+        ParserError,
         SafeLoader,
+        ScalarNode,
+        ScannerError,
+        SequenceNode,
         UnsafeLoader,
     )
 
