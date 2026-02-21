@@ -4,8 +4,8 @@
 from torchwrench.core.packaging import _SPEECHBRAIN_AVAILABLE
 
 if _SPEECHBRAIN_AVAILABLE:
-    from speechbrain.dataio.dataset import (
-        DynamicItemDataset,  # noqa: F401  # type: ignore
+    from speechbrain.dataio.dataset import (  # noqa: F401  # type: ignore
+        DynamicItemDataset,
     )
 else:
-    pass  # type: ignore
+    from ._speechbrain_fallback import DynamicItemDataset  # noqa: F401  # type: ignore
