@@ -85,14 +85,10 @@ required-environments = [
 ]
 
 [dependency-groups]
-dev = [
-    "torchwrench",
+all = [
+  {include-group = "extras"},
+  {include-group = "dev"}
 ]
-extras = [
-    "torchwrench",
-]
-
-[project.optional-dependencies]
 dev = [
     "coverage[toml]",
     "ipython",
@@ -106,20 +102,51 @@ dev = [
     "ipykernel",
     "numpy!=2.0.0,!=2.0.1,!=2.0.2",
     "sphinx-immaterial>=0.11.14",
+    "torchvision",
 ]
 extras = [
+  {include-group = "colorlog"},
+  {include-group = "h5py"},
+  {include-group = "numpy"},
+  {include-group = "omegaconf"},
+  {include-group = "pandas"},
+  {include-group = "yaml"},
+  {include-group = "safetensors"},
+  {include-group = "tensorboard"},
+  {include-group = "torchaudio"},
+  {include-group = "speechbrain"}
+]
+colorlog = [
     "colorlog",
+]
+h5py = [
     "h5py",
     "numpy!=2.0.0,!=2.0.1,!=2.0.2",
-    "omegaconf",
-    "pandas",
-    "pyyaml",
-    "safetensors",
-    "scipy",
-    "speechbrain==1.0.3; python_version < '3.14'",
-    "tensorboard",
-    "torchaudio<2.10,>=0.10.0",
-    "torchvision",
     "tqdm",
+]
+numpy = [
+    "numpy!=2.0.0,!=2.0.1,!=2.0.2",
+]
+omegaconf = [
+    "omegaconf",
+]
+pandas = [
+    "pandas",
+]
+yaml = [
+    "pyyaml",
+]
+safetensors = [
+    "safetensors",
+]
+tensorboard = [
+    "tensorboard",
+]
+torchaudio = [
+    "torchaudio>=0.10.0",
     "soundfile",
+]
+speechbrain = [
+    "speechbrain~=1.0.3",
+    "torchaudio<2.9,>=0.10.0",
 ]
