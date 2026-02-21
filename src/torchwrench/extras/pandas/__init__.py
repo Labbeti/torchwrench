@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .definitions import _PANDAS_AVAILABLE, pandas, pd  # noqa: F401  # type: ignore
+
 else:
     import lazy_loader as lazy
 

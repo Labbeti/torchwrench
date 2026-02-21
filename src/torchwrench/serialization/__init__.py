@@ -8,26 +8,16 @@ from torch.serialization import (
     LoadEndianness,
     SourceChangeWarning,
     StorageType,
-    add_safe_globals,
     check_module_version_greater_or_equal,
-    clear_safe_globals,
     default_restore_location,
-    get_crc32_options,
     get_default_load_endianness,
-    get_default_mmap_options,
-    get_safe_globals,
-    get_unsafe_globals_in_checkpoint,
     load,
     location_tag,
     mkdtemp,
     normalize_storage_type,
     register_package,
-    safe_globals,
     save,
-    set_crc32_options,
     set_default_load_endianness,
-    set_default_mmap_options,
-    skip_data,
     storage_to_tensor_type,
     validate_cuda_device,
     validate_hpu_device,
@@ -36,9 +26,9 @@ from torch.serialization import (
 if TYPE_CHECKING:
     from .common import as_builtin
     from .csv import dump_csv, load_csv
-    from .dump_fn import dump, save
+    from .dump_fn import dump_to, save_to
     from .json import dump_json, load_json
-    from .load_fn import load
+    from .load_fn import load_from, read_from
     from .pickle import dump_pickle, load_pickle
     from .torch import dump_torch, load_torch
 
@@ -51,9 +41,9 @@ else:
         submod_attrs={
             "common": ["as_builtin"],
             "csv": ["dump_csv", "load_csv"],
-            "dump_fn": ["dump_csv", "save"],
+            "dump_fn": ["dump_to", "save_to"],
             "json": ["dump_json", "loadload_json_csv"],
-            "load_fn": ["load"],
+            "load_fn": ["load_from", "read_from"],
             "pickle": ["dump_pickle", "load_pickle"],
             "torch": ["dump_torch", "load_torch"],
         },

@@ -3,10 +3,11 @@
 
 import os
 from pathlib import Path
-from typing import Any, BinaryIO, Callable, Dict, Optional, Union, overload
+from typing import Any, BinaryIO, Callable, Dict, Optional, Union
 
 from pythonwrench.functools import function_alias
 from pythonwrench.jsonl import dump_jsonl
+from pythonwrench.warnings import deprecated_alias
 from typing_extensions import TypeAlias
 
 from torchwrench.core.packaging import (
@@ -61,34 +62,14 @@ if _YAML_AVAILABLE:
     DUMP_FNS["yaml"] = dump_yaml
 
 
-@overload
-def dump(
-    obj: Any,
-    fpath: Union[None, BinaryIO] = None,
-    *args,
-    saving_backend: SavingBackend = "torch",
-    **kwargs,
-) -> Union[str, bytes]: ...
-
-
-@overload
-def dump(
-    obj: Any,
-    fpath: Union[str, Path, os.PathLike],
-    *args,
-    saving_backend: Optional[SavingBackend] = "torch",
-    **kwargs,
-) -> Union[str, bytes]: ...
-
-
-def dump(
+def dump_to(
     obj: Any,
     fpath: Union[str, Path, os.PathLike, None, BinaryIO] = None,
     *args,
     saving_backend: Optional[SavingBackend] = "torch",
     **kwargs,
 ) -> Union[str, bytes]:
-    """Load from file using the correct backend."""
+    """Save to file using the correct backend."""
     if isinstance(fpath, (str, os.PathLike)):
         fpath = Path(fpath)
 
@@ -108,5 +89,13 @@ def dump(
     return result
 
 
-@function_alias(dump)
+@function_alias(dump_to)
+def save_to(*args, **kwargs): ...
+
+
+@deprecated_alias(dump_to)
+def dump(*args, **kwargs): ...
+
+
+@deprecated_alias(dump_to)
 def save(*args, **kwargs): ...

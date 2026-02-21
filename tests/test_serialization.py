@@ -154,8 +154,8 @@ class TestSaving(TestCase):
                 data = pw.sorted_dict(data)
 
             fpath = get_tmp_dir().joinpath(f"tmp.{backend}")
-            tw.dump(data, fpath, saving_backend=backend, **dump_kwds)
-            result = tw.load(fpath, saving_backend=backend, **load_kwds)
+            tw.save_to(data, fpath, saving_backend=backend, **dump_kwds)
+            result = tw.load_from(fpath, saving_backend=backend, **load_kwds)
 
             assert deep_equal(data, result), f"{backend=}, {i=}/{len(tests)}"
 
