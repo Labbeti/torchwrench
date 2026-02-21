@@ -4,7 +4,34 @@
 from typing import TYPE_CHECKING
 
 from pythonwrench.jsonl import dump_jsonl, load_jsonl
-from torch.serialization import *  # type: ignore
+from torch.serialization import (
+    LoadEndianness,
+    SourceChangeWarning,
+    StorageType,
+    add_safe_globals,
+    check_module_version_greater_or_equal,
+    clear_safe_globals,
+    default_restore_location,
+    get_crc32_options,
+    get_default_load_endianness,
+    get_default_mmap_options,
+    get_safe_globals,
+    get_unsafe_globals_in_checkpoint,
+    load,
+    location_tag,
+    mkdtemp,
+    normalize_storage_type,
+    register_package,
+    safe_globals,
+    save,
+    set_crc32_options,
+    set_default_load_endianness,
+    set_default_mmap_options,
+    skip_data,
+    storage_to_tensor_type,
+    validate_cuda_device,
+    validate_hpu_device,
+)
 
 if TYPE_CHECKING:
     from .common import as_builtin

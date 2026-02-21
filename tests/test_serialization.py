@@ -41,7 +41,7 @@ class TestSaving(TestCase):
         expected = [[[list(range(3))], "a", "path", {"a": 3, "b": 1, "c": 1}, []]]
 
         if _PANDAS_AVAILABLE:
-            import pandas as pd
+            from torchwrench.extras.pandas import pd
 
             df = pd.DataFrame({"a": [1, 2]})
 
