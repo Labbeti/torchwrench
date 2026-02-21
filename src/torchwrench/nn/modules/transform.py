@@ -85,43 +85,6 @@ class AsTensor(Module):
         )
 
 
-class Flatten(Module):
-    def __init__(self, start_dim: int = 0, end_dim: Optional[int] = None) -> None:
-        """
-        For more information, see :func:`~torchwrench.nn.functional.transform.flatten`.
-        """
-        super().__init__()
-        self.start_dim = start_dim
-        self.end_dim = end_dim
-
-    @overload
-    def forward(self, x: Tensor) -> Tensor:  # type: ignore
-        ...
-
-    @overload
-    def forward(self, x: Union[np.ndarray, np.generic]) -> np.ndarray: ...
-
-    @overload
-    def forward(self, x: T_BuiltinScalar) -> List[T_BuiltinScalar]: ...
-
-    @overload
-    def forward(self, x: Iterable[T_BuiltinScalar]) -> List[T_BuiltinScalar]:  # type: ignore
-        ...
-
-    def forward(self, x: Any) -> Any:
-        return flatten(
-            x,
-            start_dim=self.start_dim,
-            end_dim=self.end_dim,
-        )
-
-    def extra_repr(self) -> str:
-        return dump_dict(
-            start_dim=self.start_dim,
-            end_dim=self.end_dim,
-        )
-
-
 class Identity(Module):
     def __init__(self, *args, **kwargs) -> None:
         """Identity class placeholder.
@@ -340,6 +303,43 @@ class Shuffled(Module):
         return dump_dict(dims=self.dims)
 
 
+class TFlatten(Module):
+    def __init__(self, start_dim: int = 0, end_dim: Optional[int] = None) -> None:
+        """
+        For more information, see :func:`~torchwrench.nn.functional.transform.flatten`.
+        """
+        super().__init__()
+        self.start_dim = start_dim
+        self.end_dim = end_dim
+
+    @overload
+    def forward(self, x: Tensor) -> Tensor:  # type: ignore
+        ...
+
+    @overload
+    def forward(self, x: Union[np.ndarray, np.generic]) -> np.ndarray: ...
+
+    @overload
+    def forward(self, x: T_BuiltinScalar) -> List[T_BuiltinScalar]: ...
+
+    @overload
+    def forward(self, x: Iterable[T_BuiltinScalar]) -> List[T_BuiltinScalar]:  # type: ignore
+        ...
+
+    def forward(self, x: Any) -> Any:
+        return flatten(
+            x,
+            start_dim=self.start_dim,
+            end_dim=self.end_dim,
+        )
+
+    def extra_repr(self) -> str:
+        return dump_dict(
+            start_dim=self.start_dim,
+            end_dim=self.end_dim,
+        )
+
+
 class ToItem(Module):
     """
     Module version of :func:`~torchwrench.to_item`.
@@ -350,76 +350,6 @@ class ToItem(Module):
         x: Union[ScalarLike, Tensor, np.ndarray, SupportsIterLen],
     ) -> BuiltinScalar:
         return to_item(x)  # type: ignore
-
-
-class TransformDrop(Generic[T], EModule[T, T]):
-    def __init__(
-        self,
-        transform: Callable[[T], T],
-        p: float,
-        generator: GeneratorLike = None,
-    ) -> None:
-        """
-        For more information, see :func:`~torchwrench.nn.functional.transform.transform_drop`.
-        """
-        super().__init__()
-        self.transform = transform
-        self.p = p
-        self.generator: GeneratorLike = generator
-
-    def forward(self, x: T) -> T:
-        return transform_drop(
-            transform=self.transform,
-            x=x,
-            p=self.p,
-            generator=self.generator,
-        )
-
-    def extra_repr(self) -> str:
-        return dump_dict(p=self.p)
-
-
-class Unsqueeze(Module):
-    """
-    Module version of :func:`~torchwrench.unsqueeze`.
-    """
-
-    def __init__(
-        self,
-        dim: Union[int, Iterable[int]],
-        mode: SqueezeMode = "view_if_possible",
-    ) -> None:
-        super().__init__()
-        self.dim = dim
-        self.mode: SqueezeMode = mode
-
-    def forward(self, x: T_TensorOrArray) -> T_TensorOrArray:
-        return unsqueeze(x, self.dim, self.mode)
-
-    def extra_repr(self) -> str:
-        return dump_dict(dim=self.dim, mode=self.mode)
-
-
-class ViewAsReal(Module):
-    """
-    Module version of :func:`~torchwrench.to_item`.
-    """
-
-    def forward(
-        self, x: Union[Tensor, np.ndarray, complex]
-    ) -> Union[Tensor, np.ndarray, Tuple[float, float]]:
-        return view_as_real(x)
-
-
-class ViewAsComplex(Module):
-    """
-    Module version of :func:`~torchwrench.to_item`.
-    """
-
-    def forward(
-        self, x: Union[Tensor, np.ndarray, Tuple[float, float]]
-    ) -> Union[ComplexFloatingTensor, np.ndarray, complex]:
-        return view_as_complex(x)
 
 
 class Topk(Module):
@@ -514,6 +444,76 @@ class TopP(Module):
             return_values=self.return_values,
             return_indices=self.return_indices,
         )
+
+
+class TransformDrop(Generic[T], EModule[T, T]):
+    def __init__(
+        self,
+        transform: Callable[[T], T],
+        p: float,
+        generator: GeneratorLike = None,
+    ) -> None:
+        """
+        For more information, see :func:`~torchwrench.nn.functional.transform.transform_drop`.
+        """
+        super().__init__()
+        self.transform = transform
+        self.p = p
+        self.generator: GeneratorLike = generator
+
+    def forward(self, x: T) -> T:
+        return transform_drop(
+            transform=self.transform,
+            x=x,
+            p=self.p,
+            generator=self.generator,
+        )
+
+    def extra_repr(self) -> str:
+        return dump_dict(p=self.p)
+
+
+class Unsqueeze(Module):
+    """
+    Module version of :func:`~torchwrench.unsqueeze`.
+    """
+
+    def __init__(
+        self,
+        dim: Union[int, Iterable[int]],
+        mode: SqueezeMode = "view_if_possible",
+    ) -> None:
+        super().__init__()
+        self.dim = dim
+        self.mode: SqueezeMode = mode
+
+    def forward(self, x: T_TensorOrArray) -> T_TensorOrArray:
+        return unsqueeze(x, self.dim, self.mode)
+
+    def extra_repr(self) -> str:
+        return dump_dict(dim=self.dim, mode=self.mode)
+
+
+class ViewAsReal(Module):
+    """
+    Module version of :func:`~torchwrench.to_item`.
+    """
+
+    def forward(
+        self, x: Union[Tensor, np.ndarray, complex]
+    ) -> Union[Tensor, np.ndarray, Tuple[float, float]]:
+        return view_as_real(x)
+
+
+class ViewAsComplex(Module):
+    """
+    Module version of :func:`~torchwrench.to_item`.
+    """
+
+    def forward(
+        self, x: Union[Tensor, np.ndarray, Tuple[float, float]]
+    ) -> Union[ComplexFloatingTensor, np.ndarray, complex]:
+        return view_as_complex(x)
 
 
 # Aliases

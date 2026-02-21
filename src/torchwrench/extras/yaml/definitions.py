@@ -7,7 +7,28 @@ from typing_extensions import TypeAlias
 
 from torchwrench.core.packaging import _YAML_AVAILABLE
 
-if _YAML_AVAILABLE:
+if not _YAML_AVAILABLE:
+    from . import _yaml_fallback as yaml  # noqa: F401
+    from ._yaml_fallback import (  # noqa: F401
+        BaseLoader,
+        CBaseLoader,
+        CFullLoader,
+        CLoader,
+        CSafeLoader,
+        CUnsafeLoader,
+        FullLoader,
+        Loader,
+        MappingNode,
+        Node,
+        ParserError,
+        SafeLoader,
+        ScalarNode,
+        ScannerError,
+        SequenceNode,
+        UnsafeLoader,
+    )
+
+else:
     import yaml  # noqa: F401
     from yaml import (  # noqa: F401
         BaseLoader,
@@ -39,27 +60,6 @@ if _YAML_AVAILABLE:
             CSafeLoader,
             CUnsafeLoader,
         )
-
-else:
-    from . import _yaml_fallback as yaml  # noqa: F401
-    from ._yaml_fallback import (  # noqa: F401
-        BaseLoader,
-        CBaseLoader,
-        CFullLoader,
-        CLoader,
-        CSafeLoader,
-        CUnsafeLoader,
-        FullLoader,
-        Loader,
-        MappingNode,
-        Node,
-        ParserError,
-        SafeLoader,
-        ScalarNode,
-        ScannerError,
-        SequenceNode,
-        UnsafeLoader,
-    )
 
 
 YamlLoaders: TypeAlias = Union[

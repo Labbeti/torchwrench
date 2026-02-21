@@ -242,7 +242,6 @@ if TYPE_CHECKING:
     )
     from .transform import (
         AsTensor,
-        Flatten,
         Identity,
         MoveToRec,
         PadAndCropDim,
@@ -252,6 +251,7 @@ if TYPE_CHECKING:
         ResampleNearestSteps,
         Shuffled,
         Squeeze,
+        TFlatten,
         ToItem,
         Topk,
         TopP,
@@ -356,7 +356,7 @@ else:
             ],
             "transform": [
                 "AsTensor",
-                "Flatten",
+                "TFlatten",
                 "Identity",
                 "MoveToRec",
                 "PadAndCropDim",

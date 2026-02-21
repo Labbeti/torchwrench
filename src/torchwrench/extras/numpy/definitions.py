@@ -7,7 +7,17 @@ from typing_extensions import TypeAlias
 
 from torchwrench.core.packaging import _NUMPY_AVAILABLE
 
-if _NUMPY_AVAILABLE:
+if not _NUMPY_AVAILABLE:
+    from torchwrench.extras.numpy import (
+        _numpy_fallback as np,  # noqa: F401  # type: ignore
+    )
+    from torchwrench.extras.numpy import (
+        _numpy_fallback as numpy,  # noqa: F401  # type: ignore
+    )
+
+    ACCEPTED_NUMPY_DTYPES = ()
+
+else:
     import numpy  # noqa: F401  # type: ignore
     import numpy as np  # noqa: F401  # type: ignore
 
@@ -25,16 +35,6 @@ if _NUMPY_AVAILABLE:
         np.uint8,
         bool,
     )
-
-else:
-    from torchwrench.extras.numpy import (
-        _numpy_fallback as np,  # noqa: F401  # type: ignore
-    )
-    from torchwrench.extras.numpy import (
-        _numpy_fallback as numpy,  # noqa: F401  # type: ignore
-    )
-
-    ACCEPTED_NUMPY_DTYPES = ()
 
 
 NumpyNumberLike: TypeAlias = Union[np.ndarray, np.number]

@@ -4,7 +4,10 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .definitions import _SPEECHBRAIN_AVAILABLE, DynamicItemDataset
+    from .definitions import (  # noqa: F401  # type: ignore
+        _SPEECHBRAIN_AVAILABLE,
+        DynamicItemDataset,
+    )
 
 else:
     import lazy_loader as lazy
