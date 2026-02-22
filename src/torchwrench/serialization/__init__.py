@@ -4,24 +4,6 @@
 from typing import TYPE_CHECKING
 
 from pythonwrench.jsonl import dump_jsonl, load_jsonl
-from torch.serialization import (
-    LoadEndianness,
-    SourceChangeWarning,
-    StorageType,
-    check_module_version_greater_or_equal,
-    default_restore_location,
-    get_default_load_endianness,
-    load,
-    location_tag,
-    mkdtemp,
-    normalize_storage_type,
-    register_package,
-    save,
-    set_default_load_endianness,
-    storage_to_tensor_type,
-    validate_cuda_device,
-    validate_hpu_device,
-)
 
 if TYPE_CHECKING:
     from .common import as_builtin
