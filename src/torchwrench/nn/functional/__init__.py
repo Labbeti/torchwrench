@@ -80,7 +80,6 @@ from torch.nn.functional import (
     prelu,
     relu,
     relu_,
-    rms_norm,
     rrelu,
     rrelu_,
     selu,
