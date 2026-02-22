@@ -32,7 +32,6 @@ from torch.nn.modules import (
     BCEWithLogitsLoss,
     Bilinear,
     ChannelShuffle,
-    CircularPad1d,
     CircularPad2d,
     CircularPad3d,
     ConstantPad1d,
