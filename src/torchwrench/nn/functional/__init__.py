@@ -71,7 +71,6 @@ from torch.nn.functional import (
     multi_margin_loss,
     multilabel_margin_loss,
     multilabel_soft_margin_loss,
-    native_channel_shuffle,
     pad,
     pairwise_distance,
     pdist,
