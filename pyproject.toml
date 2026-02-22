@@ -152,5 +152,5 @@ torchaudio = [
 ]
 speechbrain = [
     "speechbrain~=1.0.3",
-    "torchaudio<2.10,>=0.10.0",
+    "torchaudio<2.9,>=0.10.0",
 ]

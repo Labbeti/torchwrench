@@ -7347,7 +7347,7 @@ requires-dist = [
     { name = "sphinx-immaterial", marker = "extra == 'dev'", specifier = ">=0.11.14" },
     { name = "tensorboard", marker = "extra == 'tensorboard'" },
     { name = "torch", specifier = ">=1.10.0" },
-    { name = "torchaudio", marker = "extra == 'speechbrain'", specifier = ">=0.10.0,<2.10" },
+    { name = "torchaudio", marker = "extra == 'speechbrain'", specifier = ">=0.10.0,<2.9" },
     { name = "torchaudio", marker = "extra == 'torchaudio'", specifier = ">=0.10.0" },
     { name = "torchvision", marker = "extra == 'dev'" },
     { name = "torchwrench", extras = ["colorlog"], marker = "extra == 'extras'", editable = "." },
@@ -7366,7 +7366,7 @@ requires-dist = [
     { name = "twine", marker = "extra == 'dev'" },
     { name = "typing-extensions", specifier = ">=4.10.0" },
 ]
-provides-extras = ["dev", "extras", "colorlog", "h5py", "numpy", "omegaconf", "pandas", "yaml", "safetensors", "tensorboard", "torchaudio", "speechbrain"]
+provides-extras = ["colorlog", "dev", "extras", "h5py", "numpy", "omegaconf", "pandas", "safetensors", "speechbrain", "tensorboard", "torchaudio", "yaml"]
 
 [package.metadata.requires-dev]
 dev = [{ name = "torchwrench", extras = ["dev"], editable = "." }]
