@@ -28,8 +28,6 @@ from pythonwrench.typing.checks import (
 # Import global functions and classes from torch
 from torch import (
     Tensor,
-    TypedStorage,
-    UntypedStorage,
     are_deterministic_algorithms_enabled,
     autocast,
     chunk,
@@ -79,12 +77,6 @@ from torch import (
     short,
     split,
     stack,
-    sym_float,
-    sym_int,
-    sym_ite,
-    sym_max,
-    sym_min,
-    sym_not,
     typename,
     uint8,
     unravel_index,
