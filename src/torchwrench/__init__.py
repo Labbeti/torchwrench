@@ -102,6 +102,7 @@ from torch import (
     unravel_index,
     use_deterministic_algorithms,
     vmap,
+    where,
 )
 
 if TYPE_CHECKING:
