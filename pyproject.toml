@@ -83,12 +83,10 @@ torchwrench = { workspace = true }
 required-environments = [
     "sys_platform == 'darwin' and platform_machine == 'x86_64'",
 ]
+conflicts = []
+
 
 [dependency-groups]
-all = [
-  {include-group = "extras"},
-  {include-group = "dev"}
-]
 dev = [
     "coverage[toml]",
     "ipython",
@@ -98,31 +96,30 @@ dev = [
     "setuptools",
     "sphinx",
     "twine",
-    "typing-extensions>=4.10.0",
     "ipykernel",
-    "numpy!=2.0.0,!=2.0.1,!=2.0.2",
     "sphinx-immaterial>=0.11.14",
     "torchvision",
+    {include-group = "numpy"},
 ]
 extras = [
+  {include-group = "numpy"},
   {include-group = "colorlog"},
   {include-group = "h5py"},
-  {include-group = "numpy"},
   {include-group = "omegaconf"},
   {include-group = "pandas"},
   {include-group = "yaml"},
   {include-group = "safetensors"},
+  {include-group = "speechbrain"},
   {include-group = "tensorboard"},
   {include-group = "torchaudio"},
-  {include-group = "speechbrain"}
 ]
 colorlog = [
     "colorlog",
 ]
 h5py = [
     "h5py",
-    "numpy!=2.0.0,!=2.0.1,!=2.0.2",
     "tqdm",
+    {include-group = "numpy"},
 ]
 numpy = [
     "numpy!=2.0.0,!=2.0.1,!=2.0.2",
