@@ -27,17 +27,6 @@ from pythonwrench.typing.checks import (
 
 # Import global functions and classes from torch
 from torch import (
-    BoolStorage,
-    ByteStorage,
-    CharStorage,
-    DoubleStorage,
-    FloatStorage,
-    IntStorage,
-    LongStorage,
-    ShortStorage,
-    SymBool,
-    SymFloat,
-    SymInt,
     Tensor,
     TypedStorage,
     UntypedStorage,
@@ -47,7 +36,6 @@ from torch import (
     compile,
     complex64,
     complex128,
-    cond,
     double,
     enable_grad,
     equal,
