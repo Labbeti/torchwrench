@@ -487,9 +487,12 @@ def _deep_equal_binary(x: T, y: T) -> bool:
     if isinstance(x, pd.DataFrame) and isinstance(y, pd.DataFrame):
         if not (deep_equal(x.index, y.index) and deep_equal(x.columns, y.columns)):
             return False
-        return (x.isna() == y.isna()).all(None).item() and (
-            (x == y) | x.isna() | y.isna()
-        ).all(None).item()  # type: ignore
+
+        x_isna = x.isna()
+        y_isna = y.isna()
+        return (x_isna == y_isna).all(axis=None).item() and (
+            (x == y) | x_isna | y_isna
+        ).all(axis=None).item()  # type: ignore
 
     if isinstance(x, Mapping) and isinstance(y, Mapping):
         return deep_equal(list(x.items()), list(y.items()))
