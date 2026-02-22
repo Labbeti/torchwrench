@@ -7317,10 +7317,10 @@ yaml = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "torchwrench" },
+    { name = "torchwrench", extra = ["dev"] },
 ]
 extras = [
-    { name = "torchwrench" },
+    { name = "torchwrench", extra = ["extras"] },
 ]
 
 [package.metadata]
@@ -7347,7 +7347,7 @@ requires-dist = [
     { name = "sphinx-immaterial", marker = "extra == 'dev'", specifier = ">=0.11.14" },
     { name = "tensorboard", marker = "extra == 'tensorboard'" },
     { name = "torch", specifier = ">=1.10.0" },
-    { name = "torchaudio", marker = "extra == 'speechbrain'", specifier = ">=0.10.0,<2.9" },
+    { name = "torchaudio", marker = "extra == 'speechbrain'", specifier = ">=0.10.0,<2.10" },
     { name = "torchaudio", marker = "extra == 'torchaudio'", specifier = ">=0.10.0" },
     { name = "torchvision", marker = "extra == 'dev'" },
     { name = "torchwrench", extras = ["colorlog"], marker = "extra == 'extras'", editable = "." },
@@ -7369,8 +7369,8 @@ requires-dist = [
 provides-extras = ["dev", "extras", "colorlog", "h5py", "numpy", "omegaconf", "pandas", "yaml", "safetensors", "tensorboard", "torchaudio", "speechbrain"]
 
 [package.metadata.requires-dev]
-dev = [{ name = "torchwrench", editable = "." }]
-extras = [{ name = "torchwrench", editable = "." }]
+dev = [{ name = "torchwrench", extras = ["dev"], editable = "." }]
+extras = [{ name = "torchwrench", extras = ["extras"], editable = "." }]
 
 [[package]]
 name = "tornado"
