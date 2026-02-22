@@ -85,8 +85,15 @@ required-environments = [
 ]
 conflicts = []
 
-
 [dependency-groups]
+dev = [
+    "torchwrench",
+]
+extras = [
+    "torchwrench",
+]
+
+[project.optional-dependencies]
 dev = [
     "coverage[toml]",
     "ipython",
@@ -99,19 +106,19 @@ dev = [
     "ipykernel",
     "sphinx-immaterial>=0.11.14",
     "torchvision",
-    {include-group = "numpy"},
+    "torchwrench[numpy]",
 ]
 extras = [
-  {include-group = "numpy"},
-  {include-group = "colorlog"},
-  {include-group = "h5py"},
-  {include-group = "omegaconf"},
-  {include-group = "pandas"},
-  {include-group = "yaml"},
-  {include-group = "safetensors"},
-  {include-group = "speechbrain"},
-  {include-group = "tensorboard"},
-  {include-group = "torchaudio"},
+    "torchwrench[numpy]",
+    "torchwrench[colorlog]",
+    "torchwrench[h5py]",
+    "torchwrench[omegaconf]",
+    "torchwrench[pandas]",
+    "torchwrench[yaml]",
+    "torchwrench[safetensors]",
+    "torchwrench[speechbrain]",
+    "torchwrench[tensorboard]",
+    "torchwrench[torchaudio]",
 ]
 colorlog = [
     "colorlog",
@@ -119,7 +126,7 @@ colorlog = [
 h5py = [
     "h5py",
     "tqdm",
-    {include-group = "numpy"},
+    "torchwrench[numpy]",
 ]
 numpy = [
     "numpy!=2.0.0,!=2.0.1,!=2.0.2",
