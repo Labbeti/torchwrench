@@ -39,7 +39,6 @@ from torch.nn.functional import (
     cross_entropy,
     ctc_loss,
     dropout,
-    dropout1d,
     dropout2d,
     dropout3d,
     embedding,
