@@ -32,8 +32,6 @@ from torch.nn.modules import (
     BCEWithLogitsLoss,
     Bilinear,
     ChannelShuffle,
-    CircularPad2d,
-    CircularPad3d,
     ConstantPad1d,
     ConstantPad2d,
     ConstantPad3d,
@@ -49,7 +47,6 @@ from torch.nn.modules import (
     CrossMapLRN2d,
     CTCLoss,
     Dropout,
-    Dropout1d,
     Dropout2d,
     Dropout3d,
     Embedding,
@@ -159,9 +156,7 @@ from torch.nn.modules import (
     Upsample,
     UpsamplingBilinear2d,
     UpsamplingNearest2d,
-    ZeroPad1d,
     ZeroPad2d,
-    ZeroPad3d,
 )
 
 if TYPE_CHECKING:
