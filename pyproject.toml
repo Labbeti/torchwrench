@@ -98,7 +98,6 @@ dev = [
     "ipython",
     "pre-commit",
     "ruff~=0.14.9",
-    "setuptools",
     "twine",
     "ipykernel",
     "torchwrench[docs]",
