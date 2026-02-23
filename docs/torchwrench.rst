@@ -12,15 +12,12 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   torchwrench.core
    torchwrench.extras
    torchwrench.hub
    torchwrench.nn
    torchwrench.optim
    torchwrench.serialization
-   torchwrench.special
    torchwrench.types
-   torchwrench.utils
 
 Submodules
 ----------

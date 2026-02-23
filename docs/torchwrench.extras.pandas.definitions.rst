@@ -1,7 +1,7 @@
-torchwrench.utils.data.dataset.slicer module
+torchwrench.extras.pandas.definitions module
 ============================================
 
-.. automodule:: torchwrench.utils.data.dataset.slicer
+.. automodule:: torchwrench.extras.pandas.definitions
    :members:
    :show-inheritance:
    :undoc-members:
