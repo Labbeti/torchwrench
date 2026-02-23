@@ -165,24 +165,32 @@ if TYPE_CHECKING:
         probs_to_multihot,
         probs_to_multinames,
     )
-    from .new import arange, empty, full, ones, rand, randint, randperm, zeros
+    from .new import arange, empty, full, ones, rand, randint, randn, randperm, zeros
     from .others import (
         average_power,
         cat,
         concat,
         count_parameters,
         deep_equal,
+        equal,
         find,
         get_ndim,
         get_shape,
+        initial_seed,
+        manual_seed,
+        matmul,
         mse,
         ndim,
         nelement,
+        no_grad,
         prod,
         ranks,
         rmse,
+        seed,
         shape,
+        split,
         stack,
+        where,
     )
     from .padding import cat_padded_batch, pad_and_stack_rec, pad_dim, pad_dims
     from .powerset import multilabel_to_powerset, powerset_to_multilabel
@@ -195,6 +203,7 @@ if TYPE_CHECKING:
         is_full,
         is_sorted,
         is_stackable,
+        is_tensor,
         is_unique,
     )
     from .segments import (
@@ -331,6 +340,7 @@ else:
                 "full",
                 "ones",
                 "rand",
+                "randn",
                 "randint",
                 "randperm",
                 "zeros",
@@ -352,6 +362,14 @@ else:
                 "rmse",
                 "shape",
                 "stack",
+                "equal",
+                "initial_seed",
+                "manual_seed",
+                "matmul",
+                "no_grad",
+                "seed",
+                "split",
+                "where",
             ],
             "padding": ["cat_padded_batch", "pad_and_stack_rec", "pad_dim", "pad_dims"],
             "powerset": ["multilabel_to_powerset", "powerset_to_multilabel"],
@@ -364,6 +382,7 @@ else:
                 "is_full",
                 "is_sorted",
                 "is_stackable",
+                "is_tensor",
                 "is_unique",
             ],
             "segments": [

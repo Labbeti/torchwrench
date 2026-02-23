@@ -20,6 +20,7 @@ from typing import (
 import torch
 from pythonwrench.collections import prod
 from pythonwrench.functools import function_alias
+from pythonwrench.typing import SupportsIterLen
 from pythonwrench.warnings import warn_once
 from torch import Tensor
 from torch.nn import functional as F
@@ -32,7 +33,6 @@ from torchwrench.types import (
     BoolTensor2D,
     BoolTensor3D,
     LongTensor,
-    SupportsIterLen,
     is_number_like,
 )
 from torchwrench.types._typing import T_TensorOrArray, TensorOrArray

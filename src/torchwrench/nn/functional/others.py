@@ -25,7 +25,18 @@ from pythonwrench.functools import function_alias, identity
 from pythonwrench.semver import Version
 from pythonwrench.typing import BuiltinNumber, SupportsIterLen, T_BuiltinNumber
 from pythonwrench.warnings import warn_once
-from torch import Tensor, nn
+from torch import (  # noqa: F401
+    Tensor,
+    equal,
+    initial_seed,
+    manual_seed,
+    matmul,
+    nn,
+    no_grad,
+    seed,
+    split,
+    where,
+)
 
 from torchwrench.extras.numpy import np
 from torchwrench.extras.pandas import pd

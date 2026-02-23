@@ -3,8 +3,9 @@
 
 from typing import TYPE_CHECKING
 
-from pythonwrench.typing import *  # type: ignore
-from torch.types import *  # type: ignore
+from pythonwrench.typing.classes import BuiltinNumber
+from torch import Tensor
+from torch.types import Number
 
 from torchwrench.core.dtype_enum import DTypeEnum
 from torchwrench.core.make import DeviceLike, DTypeLike, GeneratorLike

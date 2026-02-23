@@ -47,6 +47,7 @@ __all__ = [
     "empty",
     "full",
     "rand",
+    "randn",
     "randint",
     "randperm",
     "ones",
@@ -1017,6 +1018,35 @@ def rand(
         device=device,
         requires_grad=requires_grad,
         **kwds,
+    )
+
+
+# ----------
+# randint
+# ----------
+
+
+def randn(
+    size: Sequence[int],
+    *,
+    generator: GeneratorLike = None,
+    dtype: DTypeLike = None,
+    layout: Optional[torch.layout] = None,
+    device: DeviceLike = None,
+    pin_memory: Union[bool, None] = False,
+    requires_grad: Union[bool, None] = False,
+) -> torch.Tensor:
+    dtype = as_dtype(dtype)
+    device = as_device(device)
+    generator = as_generator(generator)
+    return torch.randn(
+        size,
+        generator=generator,
+        dtype=dtype,
+        layout=layout,
+        device=device,
+        pin_memory=pin_memory,
+        requires_grad=requires_grad,
     )
 
 

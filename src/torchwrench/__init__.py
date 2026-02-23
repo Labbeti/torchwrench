@@ -13,54 +13,6 @@ __version__ = "0.7.7"
 
 from typing import TYPE_CHECKING
 
-# Imports from pythonwrench
-from pythonwrench.typing.checks import (
-    is_builtin_collection,
-    is_builtin_number,
-    is_builtin_obj,
-    is_builtin_scalar,
-    is_dataclass_instance,
-    is_namedtuple_instance,
-    is_typed_dict,
-    isinstance_generic,
-)
-
-# Import global functions and classes from torch
-from torch import (
-    Tensor,
-    complex64,
-    complex128,
-    double,
-    equal,
-    float,
-    float16,
-    float32,
-    float64,
-    half,
-    initial_seed,
-    int,
-    int8,
-    int16,
-    int32,
-    int64,
-    is_tensor,
-    load,
-    long,
-    manual_seed,
-    matmul,
-    no_grad,
-    rand,
-    randn,
-    save,
-    seed,
-    short,
-    split,
-    stack,
-    typename,
-    uint8,
-    where,
-)
-
 if TYPE_CHECKING:
     # Re-import torchwrench modules for language servers
     from . import core as core
@@ -71,7 +23,27 @@ if TYPE_CHECKING:
     from . import serialization as serialization
     from . import types as types
     from . import utils as utils
-    from .core.dtype_enum import DTypeEnum
+    from .core.dtype import (
+        complex64,
+        complex128,
+        double,
+        float,
+        float16,
+        float32,
+        float64,
+        half,
+        int,
+        int8,
+        int16,
+        int32,
+        int64,
+        long,
+        short,
+        uint8,
+    )
+    from .core.dtype_enum import (
+        DTypeEnum,
+    )
     from .core.make import (
         CUDA_IF_AVAILABLE,
         Device,
@@ -112,6 +84,7 @@ if TYPE_CHECKING:
         crop_dims,
         deep_equal,
         empty,
+        equal,
         find,
         flatten,
         full,
@@ -128,6 +101,7 @@ if TYPE_CHECKING:
         index_to_onehot,
         indices_to_multihot,
         indices_to_multinames,
+        initial_seed,
         insert_at_indices,
         is_complex,
         is_convertible_to_tensor,
@@ -135,14 +109,17 @@ if TYPE_CHECKING:
         is_full,
         is_sorted,
         is_stackable,
+        is_tensor,
         is_unique,
         lengths_to_non_pad_mask,
         lengths_to_pad_mask,
         lengths_to_ratios,
         log_softmax_multidim,
+        manual_seed,
         masked_equal,
         masked_mean,
         masked_sum,
+        matmul,
         move_to,
         move_to_rec,
         mse,
@@ -159,6 +136,7 @@ if TYPE_CHECKING:
         name_to_onehot,
         ndim,
         nelement,
+        no_grad,
         non_pad_mask_to_lengths,
         non_pad_mask_to_ratios,
         one_hot,
@@ -182,6 +160,7 @@ if TYPE_CHECKING:
         prod,
         rand,
         randint,
+        randn,
         randperm,
         randperm_diff,
         ranks,
@@ -195,6 +174,7 @@ if TYPE_CHECKING:
         resample_nearest_rates,
         resample_nearest_steps,
         rmse,
+        seed,
         segments_list_to_activity,
         segments_to_activity,
         segments_to_segments_list,
@@ -203,6 +183,7 @@ if TYPE_CHECKING:
         shape,
         shuffled,
         softmax_multidim,
+        split,
         squeeze,
         squeeze_,
         squeeze_copy,
@@ -223,6 +204,7 @@ if TYPE_CHECKING:
         unsqueeze_copy,
         view_as_complex,
         view_as_real,
+        where,
         zeros,
     )
     from .serialization.common import as_builtin
@@ -252,11 +234,20 @@ if TYPE_CHECKING:
         read_pickle,
         save_pickle,
     )
-    from .serialization.torch import dump_torch, load_torch
+    from .serialization.torch import dump_torch, load, load_torch, save
+    from .types import Tensor
     from .types.guards import (
+        is_builtin_collection,
+        is_builtin_number,
+        is_builtin_obj,
+        is_builtin_scalar,
+        is_dataclass_instance,
+        is_namedtuple_instance,
         is_number_like,
         is_scalar_like,
         is_tensor_or_array,
+        is_typed_dict,
+        isinstance_generic,
     )
     from .types.tensor_subclasses import (
         BoolTensor,
@@ -366,7 +357,27 @@ else:
             "utils",
         ],
         submod_attrs={
-            "core.dtype_enum": ["DTypeEnum"],
+            "core.dtype_enum": [
+                "DTypeEnum",
+            ],
+            "core.dtype": [
+                "complex64",
+                "complex128",
+                "double",
+                "float",
+                "float16",
+                "float32",
+                "float64",
+                "half",
+                "int",
+                "int8",
+                "int16",
+                "int32",
+                "int64",
+                "long",
+                "short",
+                "uint8",
+            ],
             "core.make": [
                 "CUDA_IF_AVAILABLE",
                 "Device",
@@ -454,6 +465,7 @@ else:
                 "full",
                 "ones",
                 "rand",
+                "randn",
                 "randint",
                 "randperm",
                 "zeros",
@@ -487,6 +499,7 @@ else:
                 "is_full",
                 "is_sorted",
                 "is_stackable",
+                "is_tensor",
                 "is_unique",
                 "activity_to_segments",
                 "activity_to_segments_list",
@@ -519,8 +532,18 @@ else:
                 "unsqueeze_copy",
                 "view_as_complex",
                 "view_as_real",
+                "equal",
+                "initial_seed",
+                "manual_seed",
+                "matmul",
+                "no_grad",
+                "seed",
+                "split",
+                "where",
             ],
-            "serialization.common": ["as_builtin"],
+            "serialization.common": [
+                "as_builtin",
+            ],
             "serialization.csv": [
                 "dump_csv",
                 "dumps_csv",
@@ -553,11 +576,22 @@ else:
                 "read_pickle",
                 "save_pickle",
             ],
-            "serialization.torch": ["dump_torch", "load_torch"],
+            "serialization.torch": ["dump_torch", "load_torch", "save", "load"],
+            "types": [
+                "Tensor",
+            ],
             "types.guards": [
                 "is_number_like",
                 "is_scalar_like",
                 "is_tensor_or_array",
+                "is_builtin_collection",
+                "is_builtin_number",
+                "is_builtin_obj",
+                "is_builtin_scalar",
+                "is_dataclass_instance",
+                "is_namedtuple_instance",
+                "is_typed_dict",
+                "isinstance_generic",
             ],
             "types.tensor_subclasses": [
                 "BoolTensor",
