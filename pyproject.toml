@@ -116,7 +116,6 @@ extras = [
     "torchwrench[pandas]",
     "torchwrench[yaml]",
     "torchwrench[safetensors]",
-    "torchwrench[speechbrain]",
     "torchwrench[tensorboard]",
     "torchwrench[torchaudio]",
 ]
