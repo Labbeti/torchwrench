@@ -7199,6 +7199,7 @@ dev = [
     { name = "pytest", version = "8.4.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.9.*'" },
     { name = "pytest", version = "9.0.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
     { name = "ruff" },
+    { name = "setuptools" },
     { name = "sphinx", version = "7.1.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
     { name = "sphinx", version = "7.4.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.9.*'" },
     { name = "sphinx", version = "8.1.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.10.*'" },
@@ -7238,7 +7239,6 @@ extras = [
     { name = "pyyaml" },
     { name = "safetensors", version = "0.5.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
     { name = "safetensors", version = "0.7.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
-    { name = "setuptools" },
     { name = "soundfile" },
     { name = "tensorboard", version = "2.14.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
     { name = "tensorboard", version = "2.20.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
@@ -7280,7 +7280,6 @@ speechbrain = [
     { name = "torchaudio", version = "2.8.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.9' and platform_machine != 'x86_64') or (python_full_version >= '3.9' and sys_platform != 'darwin')" },
 ]
 tensorboard = [
-    { name = "setuptools" },
     { name = "tensorboard", version = "2.14.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
     { name = "tensorboard", version = "2.20.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
 ]
@@ -7328,7 +7327,7 @@ requires-dist = [
     { name = "pyyaml", marker = "extra == 'yaml'" },
     { name = "ruff", marker = "extra == 'dev'", specifier = "~=0.14.9" },
     { name = "safetensors", marker = "extra == 'safetensors'" },
-    { name = "setuptools", marker = "extra == 'tensorboard'", specifier = ">=61.0,<82.0.0" },
+    { name = "setuptools", marker = "extra == 'dev'", specifier = ">=61.0,<82.0.0" },
     { name = "soundfile", marker = "extra == 'torchaudio'" },
     { name = "speechbrain", marker = "extra == 'speechbrain'", specifier = "~=1.0.3" },
     { name = "sphinx", marker = "extra == 'docs'" },
