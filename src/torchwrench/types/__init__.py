@@ -3,7 +3,7 @@
 
 from typing import TYPE_CHECKING
 
-from pythonwrench.typing.classes import BuiltinNumber
+from pythonwrench.typing.classes import BuiltinNumber, BuiltinScalar
 from torch import Tensor
 from torch.types import Number
 
