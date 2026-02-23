@@ -33,3 +33,5 @@ else:
             "split": ["balanced_monolabel_split", "random_split"],
         },
     )
+
+del TYPE_CHECKING

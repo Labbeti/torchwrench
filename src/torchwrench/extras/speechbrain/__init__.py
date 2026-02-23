@@ -22,3 +22,6 @@ else:
 
     x = __getattr__("_SPEECHBRAIN_AVAILABLE")
     print(f"{x=}")
+
+
+del TYPE_CHECKING

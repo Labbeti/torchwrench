@@ -30,3 +30,6 @@ else:
             "registry": ["RegistryEntry", "RegistryHub"],
         },
     )
+
+
+del TYPE_CHECKING

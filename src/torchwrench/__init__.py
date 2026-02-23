@@ -692,4 +692,4 @@ from pythonwrench.semver import Version
 version = __version__
 version_info = Version(__version__)
 
-del Version, TYPE_CHECKING
+del TYPE_CHECKING, Version

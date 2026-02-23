@@ -39,9 +39,6 @@ if TYPE_CHECKING:
         BCEWithLogitsLoss,
         Bilinear,
         ChannelShuffle,
-        CircularPad1d,
-        CircularPad2d,
-        CircularPad3d,
         ConstantPad1d,
         ConstantPad2d,
         ConstantPad3d,
@@ -59,7 +56,6 @@ if TYPE_CHECKING:
         CrossMapLRN2d,
         CTCLoss,
         Dropout,
-        Dropout1d,
         Dropout2d,
         Dropout3d,
         Embedding,
@@ -249,9 +245,7 @@ if TYPE_CHECKING:
         View,
         ViewAsComplex,
         ViewAsReal,
-        ZeroPad1d,
         ZeroPad2d,
-        ZeroPad3d,
     )
 
 else:
@@ -282,9 +276,6 @@ else:
                 "CELU",
                 "CTCLoss",
                 "ChannelShuffle",
-                "CircularPad1d",
-                "CircularPad2d",
-                "CircularPad3d",
                 "ConstantPad1d",
                 "ConstantPad2d",
                 "ConstantPad3d",
@@ -299,7 +290,6 @@ else:
                 "CrossEntropyLoss",
                 "CrossMapLRN2d",
                 "Dropout",
-                "Dropout1d",
                 "Dropout2d",
                 "Dropout3d",
                 "ELU",
@@ -416,9 +406,7 @@ else:
                 "Upsample",
                 "UpsamplingBilinear2d",
                 "UpsamplingNearest2d",
-                "ZeroPad1d",
                 "ZeroPad2d",
-                "ZeroPad3d",
                 "LogSoftmaxMultidim",
                 "SoftmaxMultidim",
                 "EModuleDict",
@@ -514,3 +502,6 @@ else:
             ],
         },
     )
+
+
+del TYPE_CHECKING

@@ -225,3 +225,5 @@ else:
             ],
         },
     )
+
+del TYPE_CHECKING

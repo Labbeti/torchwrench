@@ -18,3 +18,6 @@ else:
             "pack": ["pack_to_hdf"],
         },
     )
+
+
+del TYPE_CHECKING

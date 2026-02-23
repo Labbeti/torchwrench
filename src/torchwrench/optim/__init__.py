@@ -20,3 +20,6 @@ else:
             "utils": ["get_lr", "get_lrs", "create_params_groups_bias"],
         },
     )
+
+
+del TYPE_CHECKING

@@ -16,3 +16,6 @@ else:
             "definitions": ["_PANDAS_AVAILABLE", "pandas", "pd"],
         },
     )
+
+
+del TYPE_CHECKING

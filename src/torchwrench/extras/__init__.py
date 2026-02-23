@@ -22,3 +22,5 @@ else:
             "yaml": ["_YAML_AVAILABLE"],
         },
     )
+
+del TYPE_CHECKING
