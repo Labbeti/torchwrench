@@ -7245,6 +7245,16 @@ dev = [
     { name = "twine", version = "6.1.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
     { name = "twine", version = "6.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
 ]
+docs = [
+    { name = "sphinx", version = "7.1.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
+    { name = "sphinx", version = "7.4.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.9.*'" },
+    { name = "sphinx", version = "8.1.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.10.*'" },
+    { name = "sphinx", version = "9.0.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.11.*'" },
+    { name = "sphinx", version = "9.1.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "sphinx-immaterial", version = "0.11.14", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
+    { name = "sphinx-immaterial", version = "0.12.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.9.*'" },
+    { name = "sphinx-immaterial", version = "0.13.9", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
+]
 extras = [
     { name = "colorlog" },
     { name = "h5py", version = "3.11.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
@@ -7262,7 +7272,6 @@ extras = [
     { name = "safetensors", version = "0.5.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
     { name = "safetensors", version = "0.7.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
     { name = "soundfile" },
-    { name = "speechbrain" },
     { name = "tensorboard", version = "2.14.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
     { name = "tensorboard", version = "2.20.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
     { name = "torchaudio", version = "2.2.2", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.9' and platform_machine != 'x86_64') or (python_full_version < '3.9' and sys_platform != 'darwin') or (platform_machine == 'x86_64' and sys_platform == 'darwin')" },
@@ -7306,6 +7315,16 @@ tensorboard = [
     { name = "tensorboard", version = "2.14.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
     { name = "tensorboard", version = "2.20.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
 ]
+tests = [
+    { name = "coverage", version = "7.6.1", source = { registry = "https://pypi.org/simple" }, extra = ["toml"], marker = "python_full_version < '3.9'" },
+    { name = "coverage", version = "7.10.7", source = { registry = "https://pypi.org/simple" }, extra = ["toml"], marker = "python_full_version == '3.9.*'" },
+    { name = "coverage", version = "7.13.4", source = { registry = "https://pypi.org/simple" }, extra = ["toml"], marker = "python_full_version >= '3.10'" },
+    { name = "pytest", version = "8.3.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
+    { name = "pytest", version = "8.4.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version == '3.9.*'" },
+    { name = "pytest", version = "9.0.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
+    { name = "torchvision", version = "0.17.2", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.9' and platform_machine != 'x86_64') or (python_full_version < '3.9' and sys_platform != 'darwin') or (platform_machine == 'x86_64' and sys_platform == 'darwin')" },
+    { name = "torchvision", version = "0.23.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.9' and platform_machine != 'x86_64') or (python_full_version >= '3.9' and sys_platform != 'darwin')" },
+]
 torchaudio = [
     { name = "soundfile" },
     { name = "torchaudio", version = "2.2.2", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.9' and platform_machine != 'x86_64') or (python_full_version < '3.9' and sys_platform != 'darwin') or (platform_machine == 'x86_64' and sys_platform == 'darwin')" },
@@ -7326,7 +7345,7 @@ extras = [
 [package.metadata]
 requires-dist = [
     { name = "colorlog", marker = "extra == 'colorlog'" },
-    { name = "coverage", extras = ["toml"], marker = "extra == 'dev'" },
+    { name = "coverage", extras = ["toml"], marker = "extra == 'tests'" },
     { name = "h5py", marker = "extra == 'h5py'" },
     { name = "ipykernel", marker = "extra == 'dev'" },
     { name = "ipython", marker = "extra == 'dev'" },
@@ -7335,7 +7354,7 @@ requires-dist = [
     { name = "omegaconf", marker = "extra == 'omegaconf'" },
     { name = "pandas", marker = "extra == 'pandas'" },
     { name = "pre-commit", marker = "extra == 'dev'" },
-    { name = "pytest", marker = "extra == 'dev'" },
+    { name = "pytest", marker = "extra == 'tests'" },
     { name = "pythonwrench", specifier = ">=0.4.9,<0.5.0" },
     { name = "pyyaml", marker = "extra == 'yaml'" },
     { name = "ruff", marker = "extra == 'dev'", specifier = "~=0.14.9" },
@@ -7343,14 +7362,15 @@ requires-dist = [
     { name = "setuptools", marker = "extra == 'dev'" },
     { name = "soundfile", marker = "extra == 'torchaudio'" },
     { name = "speechbrain", marker = "extra == 'speechbrain'", specifier = "~=1.0.3" },
-    { name = "sphinx", marker = "extra == 'dev'" },
-    { name = "sphinx-immaterial", marker = "extra == 'dev'", specifier = ">=0.11.14" },
+    { name = "sphinx", marker = "extra == 'docs'" },
+    { name = "sphinx-immaterial", marker = "extra == 'docs'", specifier = ">=0.11.14" },
     { name = "tensorboard", marker = "extra == 'tensorboard'" },
     { name = "torch", specifier = ">=1.10.0" },
     { name = "torchaudio", marker = "extra == 'speechbrain'", specifier = ">=0.10.0,<2.9" },
     { name = "torchaudio", marker = "extra == 'torchaudio'", specifier = ">=0.10.0" },
-    { name = "torchvision", marker = "extra == 'dev'" },
+    { name = "torchvision", marker = "extra == 'tests'" },
     { name = "torchwrench", extras = ["colorlog"], marker = "extra == 'extras'", editable = "." },
+    { name = "torchwrench", extras = ["docs"], marker = "extra == 'dev'", editable = "." },
     { name = "torchwrench", extras = ["h5py"], marker = "extra == 'extras'", editable = "." },
     { name = "torchwrench", extras = ["numpy"], marker = "extra == 'dev'", editable = "." },
     { name = "torchwrench", extras = ["numpy"], marker = "extra == 'extras'", editable = "." },
@@ -7358,15 +7378,15 @@ requires-dist = [
     { name = "torchwrench", extras = ["omegaconf"], marker = "extra == 'extras'", editable = "." },
     { name = "torchwrench", extras = ["pandas"], marker = "extra == 'extras'", editable = "." },
     { name = "torchwrench", extras = ["safetensors"], marker = "extra == 'extras'", editable = "." },
-    { name = "torchwrench", extras = ["speechbrain"], marker = "extra == 'extras'", editable = "." },
     { name = "torchwrench", extras = ["tensorboard"], marker = "extra == 'extras'", editable = "." },
+    { name = "torchwrench", extras = ["tests"], marker = "extra == 'dev'", editable = "." },
     { name = "torchwrench", extras = ["torchaudio"], marker = "extra == 'extras'", editable = "." },
     { name = "torchwrench", extras = ["yaml"], marker = "extra == 'extras'", editable = "." },
     { name = "tqdm", marker = "extra == 'h5py'" },
     { name = "twine", marker = "extra == 'dev'" },
     { name = "typing-extensions", specifier = ">=4.10.0" },
 ]
-provides-extras = ["colorlog", "dev", "extras", "h5py", "numpy", "omegaconf", "pandas", "safetensors", "speechbrain", "tensorboard", "torchaudio", "yaml"]
+provides-extras = ["colorlog", "dev", "docs", "extras", "h5py", "numpy", "omegaconf", "pandas", "safetensors", "speechbrain", "tensorboard", "tests", "torchaudio", "yaml"]
 
 [package.metadata.requires-dev]
 dev = [{ name = "torchwrench", extras = ["dev"], editable = "." }]
