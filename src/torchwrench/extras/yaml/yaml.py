@@ -4,86 +4,31 @@
 import io
 from argparse import Namespace
 from pathlib import Path
-from typing import Any, Iterable, Literal, Mapping, Optional, Type, Union
+from typing import TYPE_CHECKING, Any, Iterable, Literal, Mapping, Optional, Union
 
+import lazy_loader as lazy
 from pythonwrench.functools import function_alias
 from pythonwrench.typing import DataclassInstance, NamedTupleInstance
-from typing_extensions import TypeAlias
 
 from torchwrench.core.packaging import _OMEGACONF_AVAILABLE, _YAML_AVAILABLE
 from torchwrench.serialization.common import as_builtin
 
-if not _YAML_AVAILABLE:
-    from torchwrench.extras.yaml import _yaml_fallback as yaml
-    from torchwrench.extras.yaml._yaml_fallback import (
-        BaseLoader,
-        CBaseLoader,
-        CFullLoader,
-        CLoader,
-        CSafeLoader,
-        CUnsafeLoader,
-        FullLoader,
-        Loader,
-        MappingNode,
-        Node,
-        ParserError,
-        SafeLoader,
-        ScalarNode,
-        ScannerError,
-        SequenceNode,
-        UnsafeLoader,
-    )
+from .definitions import (
+    MappingNode,
+    Node,
+    ParserError,
+    SafeLoader,
+    ScalarNode,
+    ScannerError,
+    SequenceNode,
+    YamlLoaders,
+    yaml,
+)
 
+if TYPE_CHECKING:
+    import omegaconf
 else:
-    import yaml
-    from yaml import (
-        BaseLoader,
-        FullLoader,
-        Loader,
-        MappingNode,
-        Node,
-        SafeLoader,
-        ScalarNode,
-        SequenceNode,
-        UnsafeLoader,
-    )
-    from yaml.parser import ParserError
-    from yaml.scanner import ScannerError
-
-    try:
-        from yaml import (
-            CBaseLoader,
-            CFullLoader,
-            CLoader,
-            CSafeLoader,
-            CUnsafeLoader,
-        )
-    except ImportError:
-        from torchwrench.extras.yaml._yaml_fallback import (
-            CBaseLoader,
-            CFullLoader,
-            CLoader,
-            CSafeLoader,
-            CUnsafeLoader,
-        )
-
-
-if _OMEGACONF_AVAILABLE:
-    from omegaconf import OmegaConf  # type: ignore
-
-
-YamlLoaders: TypeAlias = Union[
-    Type[Loader],
-    Type[BaseLoader],
-    Type[FullLoader],
-    Type[SafeLoader],
-    Type[UnsafeLoader],
-    Type[CLoader],
-    Type[CBaseLoader],
-    Type[CFullLoader],
-    Type[CSafeLoader],
-    Type[CUnsafeLoader],
-]
+    omegaconf = lazy.load("omegaconf", require="omegaconf")
 
 
 def dump_yaml(
@@ -128,6 +73,7 @@ def dump_yaml(
             fpath.parent.mkdir(parents=True, exist_ok=True)
 
     if resolve:
+        OmegaConf = omegaconf.OmegaConf
         data = OmegaConf.create(data)  # type: ignore
         data = OmegaConf.to_container(data, resolve=True)  # type: ignore
 
@@ -271,9 +217,8 @@ class SplitTagLoader(SafeLoader):  # type: ignore
         return result
 
 
-if _YAML_AVAILABLE:
-    IgnoreTagLoader.add_multi_constructor("!", IgnoreTagLoader.construct_with_tag)
-    IgnoreTagLoader.add_multi_constructor("tag:", IgnoreTagLoader.construct_with_tag)
+IgnoreTagLoader.add_multi_constructor("!", IgnoreTagLoader.construct_with_tag)  # type: ignore
+IgnoreTagLoader.add_multi_constructor("tag:", IgnoreTagLoader.construct_with_tag)  # type: ignore
 
-    SplitTagLoader.add_multi_constructor("!", SplitTagLoader.construct_with_tag)
-    SplitTagLoader.add_multi_constructor("tag:", SplitTagLoader.construct_with_tag)
+SplitTagLoader.add_multi_constructor("!", SplitTagLoader.construct_with_tag)  # type: ignore
+SplitTagLoader.add_multi_constructor("tag:", SplitTagLoader.construct_with_tag)  # type: ignore

@@ -18,7 +18,6 @@ Subpackages
    torchwrench.nn
    torchwrench.optim
    torchwrench.serialization
-   torchwrench.special
    torchwrench.types
    torchwrench.utils
 

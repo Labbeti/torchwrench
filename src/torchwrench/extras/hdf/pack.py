@@ -43,6 +43,7 @@ except ImportError:
 import pythonwrench as pw
 from pythonwrench.functools import Compose
 from pythonwrench.typing import (
+    BuiltinScalar,
     SupportsGetitemLen,
     SupportsIterLen,
     is_dataclass_instance,
@@ -67,7 +68,6 @@ from torchwrench.extras.numpy import (
     numpy_is_complex_dtype,
     scan_shape_dtypes,
 )
-from torchwrench.types import BuiltinScalar
 
 K = TypeVar("K", covariant=True, bound=Hashable)
 V = TypeVar("V", covariant=True)

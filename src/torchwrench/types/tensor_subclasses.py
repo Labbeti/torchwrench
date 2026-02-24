@@ -406,14 +406,14 @@ class _TensorNDBase(
         ...
 
     @overload
-    def __getitem__(self: "Tensor3D", idx: None, /) -> "Tensor":  # type: ignore
+    def __getitem__(self: "Tensor3D", idx: None, /) -> "TTensor":  # type: ignore
         ...
 
     @overload
     def __getitem__(self: T_Tensor, sl: slice, /) -> T_Tensor: ...
 
     @overload
-    def __getitem__(self, *args) -> "Tensor": ...
+    def __getitem__(self, *args) -> "TTensor": ...
 
     @overload
     def __ne__(self, other: Any) -> "BoolTensor":  # type: ignore
@@ -545,7 +545,7 @@ class _TensorNDBase(
         ...
 
     @overload
-    def mean(self, dim: _int) -> "Tensor":  # type: ignore
+    def mean(self, dim: _int) -> "TTensor":  # type: ignore
         ...
 
     @overload
@@ -563,7 +563,7 @@ class _TensorNDBase(
     def reshape(self, size: Tuple[_int, _int, _int]) -> "Tensor3D": ...
 
     @overload
-    def reshape(self, size: Tuple[_int, ...]) -> "Tensor": ...
+    def reshape(self, size: Tuple[_int, ...]) -> "TTensor": ...
 
     @overload
     def reshape(self, size0: _int) -> "Tensor1D": ...
@@ -580,7 +580,7 @@ class _TensorNDBase(
         ...
 
     @overload
-    def squeeze(self, dim: Optional[_int] = None) -> "Tensor":  # type: ignore
+    def squeeze(self, dim: Optional[_int] = None) -> "TTensor":  # type: ignore
         ...
 
     @overload
@@ -599,7 +599,7 @@ class _TensorNDBase(
         ...
 
     @overload
-    def sum(self, dim: Optional[_int] = None) -> "Tensor":  # type: ignore
+    def sum(self, dim: Optional[_int] = None) -> "TTensor":  # type: ignore
         ...
 
     @overload
@@ -650,7 +650,7 @@ class _TensorNDBase(
         ...
 
     @overload
-    def unsqueeze(self, dim: _int) -> "Tensor":  # type: ignore
+    def unsqueeze(self, dim: _int) -> "TTensor":  # type: ignore
         ...
 
     @overload
@@ -668,7 +668,7 @@ class _TensorNDBase(
     def view(self, size: Tuple[_int, _int, _int]) -> "Tensor3D": ...
 
     @overload
-    def view(self, size: Tuple[_int, ...]) -> "Tensor": ...
+    def view(self, size: Tuple[_int, ...]) -> "TTensor": ...
 
     @overload
     def view(self, size0: _int) -> "Tensor1D": ...
@@ -680,11 +680,11 @@ class _TensorNDBase(
     def view(self, size0: _int, size1: _int, size2: _int) -> "Tensor3D": ...
 
     @overload
-    def view(self, *size: _int) -> "Tensor":  # type: ignore
+    def view(self, *size: _int) -> "TTensor":  # type: ignore
         ...
 
     @overload
-    def view(self, dtype: torch.dtype) -> "Tensor":  # type: ignore
+    def view(self, dtype: torch.dtype) -> "TTensor":  # type: ignore
         ...
 
     ndim: T_NDim  # type: ignore
@@ -726,7 +726,7 @@ class _TensorNDBase(
     view = torch.Tensor.view  # noqa: F811  # type: ignore
 
 
-class Tensor(
+class TTensor(
     _TensorNDBase[Literal[None], _int, BuiltinNumber, _bool, _bool, _bool],
     metaclass=_TensorNDMeta[Literal[None], _int, BuiltinNumber, _bool, _bool, _bool],
 ): ...

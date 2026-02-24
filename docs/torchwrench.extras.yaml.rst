@@ -12,4 +12,5 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
+   torchwrench.extras.yaml.definitions
    torchwrench.extras.yaml.yaml

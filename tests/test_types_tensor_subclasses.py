@@ -34,9 +34,9 @@ from torchwrench.types.tensor_subclasses import (
     ShortTensor1D,
     SignedIntegerTensor,
     SignedIntegerTensor3D,
-    Tensor,
     Tensor0D,
     Tensor1D,
+    TTensor,
     UnsignedIntegerTensor,
     _TensorNDBase,
 )
@@ -222,7 +222,7 @@ class TestTensorTyping(TestCase):
             tensor = tensor_cls()
 
             assert isinstance(tensor, torch.Tensor)
-            assert isinstance(tensor, Tensor)
+            assert isinstance(tensor, TTensor)
 
         warnings.resetwarnings()
 
