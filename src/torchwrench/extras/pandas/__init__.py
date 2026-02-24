@@ -1,16 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from torchwrench.core.packaging import _PANDAS_AVAILABLE
+from typing import TYPE_CHECKING
 
-if not _PANDAS_AVAILABLE:
-    from torchwrench.extras.pandas import _pandas_fallback as pd
+if TYPE_CHECKING:
+    from .definitions import _PANDAS_AVAILABLE, pandas, pd  # noqa: F401  # type: ignore
 
 else:
-    import pandas as pd
+    import lazy_loader as lazy
+
+    __getattr__, __dir__, __all__ = lazy.attach(
+        __name__,
+        submodules=["definitions"],
+        submod_attrs={
+            "definitions": ["_PANDAS_AVAILABLE", "pandas", "pd"],
+        },
+    )
 
 
-__all__ = [
-    "_PANDAS_AVAILABLE",
-    "pd",
-]
+del TYPE_CHECKING

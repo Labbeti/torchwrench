@@ -9,7 +9,7 @@ from pythonwrench.collections import all_ne as builtin_all_ne
 from pythonwrench.collections import is_sorted as builtin_is_sorted
 from pythonwrench.functools import function_alias
 from pythonwrench.typing import is_builtin_number, isinstance_generic
-from torch import Tensor
+from torch import Tensor, is_tensor  # noqa: F401
 from typing_extensions import TypeGuard
 
 from torchwrench.extras.numpy import (

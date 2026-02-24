@@ -4,9 +4,15 @@
 from typing import Any
 
 import torch
-from pythonwrench.typing import (
+from pythonwrench.typing.checks import (  # noqa: F401
+    is_builtin_collection,
     is_builtin_number,
+    is_builtin_obj,
     is_builtin_scalar,
+    is_dataclass_instance,
+    is_namedtuple_instance,
+    is_typed_dict,
+    isinstance_generic,
 )
 from torch import Tensor
 from typing_extensions import TypeGuard, TypeIs

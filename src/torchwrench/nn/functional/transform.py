@@ -341,10 +341,11 @@ def flatten(
     elif isinstance(x, np.generic):
         return x.flatten()
     elif isinstance(x, np.ndarray):
-        if start_dim == 0 and (end_dim is None or end_dim >= x.ndim - 1):
+        ndim = x.size
+        if start_dim == 0 and (end_dim is None or end_dim >= ndim - 1):
             return x.flatten()
         else:
-            end_dim = end_dim if end_dim is not None else x.ndim - 1
+            end_dim = end_dim if end_dim is not None else ndim - 1
             shape = list(x.shape)
             shape = (
                 shape[:start_dim]

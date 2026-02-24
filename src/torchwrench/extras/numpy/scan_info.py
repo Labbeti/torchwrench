@@ -55,7 +55,7 @@ def scan_shape_dtypes(
     empty_np: T_EmptyNp = np.dtype("V"),
 ) -> ShapeDTypeInfo[InvalidTorchDType, T_EmptyTorch, T_EmptyNp]:
     """Returns the shape and the hdf_dtype for an input."""
-    valid_shape, shape = tw.get_shape(x, return_valid=True)
+    valid_shape, shape = tw.get_shape(x, return_indicator=True)
     if not accept_heterogeneous_shape and not valid_shape:
         msg = f"Invalid argument {x} for {get_current_fn_name()}. (cannot compute shape for heterogeneous data)"
         raise ValueError(msg)

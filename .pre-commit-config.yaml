@@ -21,10 +21,13 @@ repos:
       args: ['--fix=no']
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.6
+    rev: v0.14.9
     hooks:
     - id: ruff
       types_or: [python, pyi]
+      # Sort imports
       args: [--select, I, --fix]
     - id: ruff-format
       types_or: [python, pyi]
+    - id: ruff-check
+      args: [ --fix ]
