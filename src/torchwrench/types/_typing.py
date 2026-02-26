@@ -5,6 +5,7 @@ from typing import TypeVar, Union
 
 import torch
 from pythonwrench.typing.classes import BuiltinNumber, BuiltinScalar
+from torch.types import Number  # noqa: F401
 from typing_extensions import TypeAlias
 
 from torchwrench.extras.numpy.definitions import (  # noqa: F401

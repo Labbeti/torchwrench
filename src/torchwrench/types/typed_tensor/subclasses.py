@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from typing import Any, Generic
+from typing import Generic
 from typing import Literal as L
 
 from torchwrench.core import device_enum as devices
@@ -111,51 +111,3 @@ class SignedIntegerTensor(
     Generic[T_Shape, T_Device],
     TTensor[T_Shape, dtypes.DTypeBase[L[False], L[False], L[True]], T_Device],
 ): ...
-
-
-m = TTensor[_0DShape, dtypes.UInt32DType]()
-
-# is_signed = x.is_signed()
-is_signed = m.is_signed()
-is_complex = m.is_complex()
-is_floating_point = m.is_floating_point()
-
-n = m.bool().item()
-
-o = TTensor[Any, dtypes.BoolDType](1)
-p = o.item()
-q = o.int()
-
-print(isinstance(o, SignedIntegerTensor))
-print(isinstance(q, SignedIntegerTensor))
-
-
-# TODO: rm
-x = Tensor2D[dtypes.FloatDType, devices.CPUDeviceType]([[2, 3, 4], [5, 6, 7]])
-m = x.ndim
-z = x[0]
-p = z.shape
-a = z[0]
-q = a.shape
-
-y = x.view((3, 2, 1))
-s = y.shape
-n = y.ndim
-o = y[0]
-r = o[None]
-
-b = x[None] == y
-
-c = x.double()
-d = x.short()
-
-e = x.isfinite()
-f = x.isinf()
-
-g = x.mean()
-h = x.sum().isinf()
-
-i = g.ndim
-j = h.ndim
-
-k = x == c

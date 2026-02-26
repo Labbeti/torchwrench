@@ -16,7 +16,7 @@ else:
         __name__,
         submodules=["numpy", "pandas", "speechbrain", "yaml"],
         submod_attrs={
-            "numpy": ["NUMPY_AVAILABLE"],
+            "numpy": ["_NUMPY_AVAILABLE"],
             "pandas": ["_PANDAS_AVAILABLE"],
             "speechbrain": ["_SPEECHBRAIN_AVAILABLE"],
             "yaml": ["_YAML_AVAILABLE"],

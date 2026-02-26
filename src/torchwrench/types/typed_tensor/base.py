@@ -416,7 +416,7 @@ class TTensor(
         # return SpecializedTensor  # type: ignore
 
         # full_generics = _resolve_ttensors_generics(cls, args)
-        print(f"Class getitem:")
+        print("Class getitem:")
         print(f"{cls=}")
         print(f"{gen_args=}")
         # print(f"{full_generics=}")
@@ -450,17 +450,20 @@ class TTensor(
             if not hasattr(cls, "__gen_shape__") or isinstance(
                 cls.__gen_shape__, TypeVar
             ):
-                cls.__gen_shape__ = gen_shape
+                cls.__gen_shape__ = gen_shape  # type: ignore
+
             if not hasattr(cls, "__gen_dtype__") or isinstance(
                 cls.__gen_dtype__, TypeVar
             ):
-                cls.__gen_dtype__ = gen_dtype
+                cls.__gen_dtype__ = gen_dtype  # type: ignore
+
             if not hasattr(cls, "__gen_device__") or isinstance(
                 cls.__gen_device__, TypeVar
             ):
-                cls.__gen_device__ = gen_device
+                cls.__gen_device__ = gen_device  # type: ignore
 
-            return super().__class_getitem__(())  # type: ignore
+            return super().__class_getitem__((gen_args,))  # type: ignore
+
         else:
             for arg in gen_args:
                 if (
@@ -515,12 +518,12 @@ class TTensor(
         cls_device = gen.device
 
         # TODO: rm
-        print(f"New tensor:")
+        print("New tensor:")
         print(f"{cls=}")
         print(f"{gen=}")
-        print(f"{cls.__gen_shape__=}")
-        print(f"{cls.__gen_dtype__=}")
-        print(f"{cls.__gen_device__=}")
+        print(f"{getattr(cls, '__gen_shape__', None)=}")
+        print(f"{getattr(cls, '__gen_dtype__', None)=}")
+        print(f"{getattr(cls, '__gen_device__', None)=}")
         # breakpoint()
 
         # Sanity checks for dtype

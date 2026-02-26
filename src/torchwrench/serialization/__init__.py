@@ -24,7 +24,7 @@ else:
             "common": ["as_builtin"],
             "csv": ["dump_csv", "load_csv"],
             "dump_fn": ["dump_to", "save_to"],
-            "json": ["dump_json", "loadload_json_csv"],
+            "json": ["dump_json", "load_json"],
             "load_fn": ["load_from", "read_from"],
             "pickle": ["dump_pickle", "load_pickle"],
             "torch": ["dump_torch", "load_torch"],

@@ -3,15 +3,20 @@
 
 from typing import TYPE_CHECKING
 
-from pythonwrench.typing.classes import BuiltinNumber, BuiltinScalar
 from torch import Tensor
-from torch.types import Number
 
 from torchwrench.core.dtype_enum import DTypeEnum
 from torchwrench.core.make import DeviceLike, DTypeLike, GeneratorLike
 
 if TYPE_CHECKING:
-    from ._typing import T_Tensor, T_TensorOrArray, TensorOrArray
+    from ._typing import (
+        BuiltinNumber,
+        BuiltinScalar,
+        Number,
+        T_Tensor,
+        T_TensorOrArray,
+        TensorOrArray,
+    )
     from .guards import (
         is_builtin_number,
         is_builtin_scalar,
@@ -121,7 +126,14 @@ else:
         __name__,
         submodules=["guards", "tensor_subclasses", "variable_fns"],
         submod_attrs={
-            "_typing": ["T_Tensor", "T_TensorOrArray", "TensorOrArray"],
+            "_typing": [
+                "T_Tensor",
+                "T_TensorOrArray",
+                "TensorOrArray",
+                "BuiltinNumber",
+                "BuiltinScalar",
+                "Number",
+            ],
             "guards": [
                 "is_builtin_number",
                 "is_builtin_scalar",
