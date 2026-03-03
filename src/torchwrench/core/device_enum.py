@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from typing import Type
+
 import torch
 
 # from enum import auto
@@ -31,7 +33,7 @@ class CPUDeviceType(DeviceBase): ...
 #     cpu = CPUDeviceType
 
 
-def device_cls_to_torch_device(device_cls: DeviceBase) -> torch.device:
+def device_cls_to_torch_device(device_cls: Type[DeviceBase]) -> torch.device:
     if device_cls is CUDADeviceType:
         return torch.device("cuda")
     elif device_cls is CPUDeviceType:
