@@ -629,7 +629,7 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
             result = hdf_values
 
         elif self._cast == "to_torch_or_builtin":
-            valid = tw.get_shape(hdf_values, return_valid=True).valid
+            valid = tw.get_shape(hdf_values, return_indicator=True).valid
             if valid and hdf_dtype.kind not in ("V", "S", "O"):
                 result = tw.as_tensor(hdf_values)
             elif isinstance(hdf_values, np.ndarray):
@@ -638,7 +638,7 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
                 result = as_builtin(hdf_values)
 
         elif self._cast == "to_torch_or_numpy":
-            valid = tw.get_shape(hdf_values, return_valid=True).valid
+            valid = tw.get_shape(hdf_values, return_indicator=True).valid
             if valid and hdf_dtype.kind not in ("V", "S", "O"):
                 result = tw.as_tensor(hdf_values)
             else:
@@ -649,7 +649,7 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
 
         elif self._cast == "to_numpy_src":
             assert isinstance(hdf_values, np.ndarray), f"{type(hdf_values)=}"
-            valid = tw.get_shape(hdf_values, return_valid=True).valid
+            valid = tw.get_shape(hdf_values, return_indicator=True).valid
             src_np_dtypes = self.attrs["src_np_dtypes"]
             target_np_dtype = src_np_dtypes.get(column, hdf_values.dtype)
 
@@ -662,7 +662,7 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
 
         elif self._cast == "to_torch_src":
             assert isinstance(hdf_values, np.ndarray), f"{type(hdf_values)=}"
-            valid = tw.get_shape(hdf_values, return_valid=True).valid
+            valid = tw.get_shape(hdf_values, return_indicator=True).valid
             src_np_dtypes = self.attrs["src_np_dtypes"]
             target_np_dtype = src_np_dtypes.get(column, hdf_values.dtype)
             target_pt_dtype = numpy_dtype_to_torch_dtype(target_np_dtype, invalid=None)

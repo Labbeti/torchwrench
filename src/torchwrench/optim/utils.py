@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
-from typing import Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 from torch import nn
 from torch.nn.parameter import Parameter
@@ -33,8 +33,9 @@ def get_lrs(optim: Optimizer, key: str = "lr") -> List[float]:
 
 
 def create_params_groups_bias(
-    model: Union[nn.Module, Iterable[Tuple[str, Parameter]]],
+    model_or_params: Union[nn.Module, Iterable[Tuple[str, Parameter]]],
     weight_decay: float,
+    *,
     skip_list: Optional[Iterable[str]] = (),
     verbose: int = 2,
 ) -> List[Dict[str, Union[List[Parameter], float]]]:
@@ -49,11 +50,14 @@ def create_params_groups_bias(
     >>> optimizer = AdamW(params_groups, weight_decay=weight_decay)
     ```
     """
-    if isinstance(model, nn.Module):
-        params = model.named_parameters()
+    named_params: Iterable[Tuple[str, Parameter]]
+    if isinstance(model_or_params, nn.Module):
+        # trick to avoid named_parameters() typing error
+        x: Any = model_or_params.named_parameters()
+        named_params = x  # type: ignore
     else:
-        params = model
-    del model
+        named_params = model_or_params
+    del model_or_params
 
     decay: List[Parameter] = []
     no_decay: List[Parameter] = []
@@ -63,7 +67,7 @@ def create_params_groups_bias(
     else:
         skip_list = dict.fromkeys(skip_list)
 
-    for name, param in params:
+    for name, param in named_params:
         if not param.requires_grad:
             continue
         if len(param.shape) == 1 or name.endswith(".bias") or name in skip_list:

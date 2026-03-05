@@ -12,7 +12,7 @@ class TestCollate(TestCase):
     def test_advanced_example_1(self) -> None:
         pipe = nn.ESequential(
             nn.AsTensor(),
-            nn.Flatten(),
+            nn.TFlatten(),
             nn.Unsqueeze(dim=0),
             nn.Topk(k=2, dim=-1, return_indices=False),
             nn.Shuffled(dims=(0, 1)),
@@ -24,7 +24,7 @@ class TestCollate(TestCase):
         x = [[1, 2], [3, 4]]
         expected = tw.as_tensor([4, 3, 0])
         result = pipe(x)
-        assert (result == expected).all()
+        assert (result == expected).all(), f"{result=}, {expected=}"
 
 
 if __name__ == "__main__":

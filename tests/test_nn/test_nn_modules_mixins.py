@@ -5,9 +5,10 @@ import unittest
 from unittest import TestCase
 
 import torch
+from torch import Tensor
 
 import torchwrench as tw
-from torchwrench import Tensor, nn
+from torchwrench import nn
 from torchwrench.hub.paths import get_tmp_dir
 from torchwrench.nn.modules._mixins import _DEFAULT_DEVICE_DETECT_MODE
 

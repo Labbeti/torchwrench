@@ -145,7 +145,9 @@ def segments_list_to_activity(
     elif (
         ndim > 2
         and F.get_shape(
-            segments_list, return_indicator=True, return_default_on_invalid=True
+            segments_list,
+            return_indicator=True,
+            return_default_on_invalid=True,
         ).valid
     ):
         segments_list = F.as_tensor(segments_list)

@@ -18,6 +18,7 @@ from typing import (
 
 from pythonwrench.functools import function_alias
 from pythonwrench.jsonl import load_jsonl
+from pythonwrench.warnings import deprecated_alias
 from typing_extensions import TypeAlias
 
 from torchwrench.core.packaging import (
@@ -80,7 +81,7 @@ if _YAML_AVAILABLE:
 
 
 @overload
-def load(
+def load_from(
     fpath: Union[TextIO, BinaryIO],
     *args,
     saving_backend: SavingBackend = "torch",
@@ -89,7 +90,7 @@ def load(
 
 
 @overload
-def load(
+def load_from(
     fpath: Union[str, Path, os.PathLike],
     *args,
     saving_backend: Optional[SavingBackend] = "torch",
@@ -97,7 +98,7 @@ def load(
 ) -> Any: ...
 
 
-def load(
+def load_from(
     fpath: Union[str, Path, os.PathLike, TextIO, BinaryIO],
     *args,
     saving_backend: Optional[SavingBackend] = "torch",
@@ -123,5 +124,13 @@ def load(
     return result
 
 
-@function_alias(load)
+@function_alias(load_from)
+def read_from(*args, **kwargs): ...
+
+
+@deprecated_alias(load_from)
+def load(*args, **kwargs): ...
+
+
+@deprecated_alias(load_from)
 def read(*args, **kwargs): ...

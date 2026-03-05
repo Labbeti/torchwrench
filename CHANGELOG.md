@@ -3,6 +3,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.0] 2026-03-05
+### Modified
+- Lazily load imports with `lazy-loader` package.
+- Restraint torch function and modules imports.
+- Rename `torchwrench.nn.Flatten` to `torchwrench.nn.TFlatten` to avoid shadowing `torch.nn.Flatten`.
+
 ## [0.7.7] 2026-02-06
 ### Added
 - Re-introduce `TabularDataset` class.
