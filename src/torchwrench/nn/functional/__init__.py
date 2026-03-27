@@ -97,7 +97,7 @@ from torch.nn.functional import (
 
 if TYPE_CHECKING:
     from .activation import log_softmax_multidim, softmax_multidim
-    from .checksum import checksum_any
+    from .checksum import checksum_any, checksum_object
     from .cropping import crop_dim, crop_dims
     from .indices import (
         get_inverse_perm,
@@ -266,7 +266,7 @@ else:
         ],
         submod_attrs={
             "activation": ["log_softmax_multidim", "softmax_multidim"],
-            "checksum": ["checksum_any"],
+            "checksum": ["checksum_any", "checksum_object"],
             "cropping": ["crop_dim", "crop_dims"],
             "indices": [
                 "get_inverse_perm",
