@@ -15,6 +15,7 @@ from pythonwrench.checksum import (
     checksum_dict,
     checksum_float,
     checksum_list_tuple,
+    checksum_object,  # noqa: F401
     checksum_str,
     register_checksum_fn,
 )

@@ -9,7 +9,7 @@ __author_email__ = "labbeti.pub@gmail.com"
 __license__ = "MIT"
 __maintainer__ = "Étienne Labbé (Labbeti)"
 __status__ = "Development"
-__version__ = "0.7.7"
+__version__ = "0.8.0"
 
 from typing import TYPE_CHECKING
 
@@ -78,6 +78,7 @@ if TYPE_CHECKING:
         cat,
         cat_padded_batch,
         checksum_any,
+        checksum_object,
         concat,
         count_parameters,
         crop_dim,
@@ -402,6 +403,7 @@ else:
                 "log_softmax_multidim",
                 "softmax_multidim",
                 "checksum_any",
+                "checksum_object",
                 "crop_dim",
                 "crop_dims",
                 "get_inverse_perm",

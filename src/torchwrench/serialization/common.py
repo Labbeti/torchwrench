@@ -27,6 +27,8 @@ from torchwrench.core.packaging import (
     _TORCHAUDIO_AVAILABLE,
     _YAML_AVAILABLE,
 )
+from torchwrench.extras.numpy import np
+from torchwrench.extras.pandas import pd
 
 T = TypeVar("T")
 
@@ -142,20 +144,29 @@ def _torch_dtype_to_builtin(x: torch.dtype) -> Any:
     return str(x)
 
 
-if _NUMPY_AVAILABLE:
-    import numpy as np
+@register_as_builtin_fn(np.ndarray)
+def _np_ndarray_to_builtin(x: np.ndarray) -> Any:
+    return x.tolist()
 
-    @register_as_builtin_fn(np.ndarray)
-    def _np_ndarray_to_builtin(x: np.ndarray) -> Any:
-        return x.tolist()
 
-    @register_as_builtin_fn(np.generic)
-    def _np_generic_to_builtin(x: np.generic) -> Any:
-        return x.item()
+@register_as_builtin_fn(np.generic)
+def _np_generic_to_builtin(x: np.generic) -> Any:
+    return x.item()
 
-    @register_as_builtin_fn(np.dtype)
-    def _np_dtype_to_builtin(x: np.dtype) -> Any:
-        return str(x)
+
+@register_as_builtin_fn(np.dtype)
+def _np_dtype_to_builtin(x: np.dtype) -> Any:
+    return str(x)
+
+
+@register_as_builtin_fn(pd.DataFrame)
+def _dataframe_to_builtin(x: pd.DataFrame) -> Any:
+    return as_builtin(x.to_dict("list"))
+
+
+@register_as_builtin_fn(pd.Series)
+def _series_to_builtin(x: pd.Series) -> Any:
+    return as_builtin(x.to_list())
 
 
 if _OMEGACONF_AVAILABLE:
@@ -167,16 +178,7 @@ if _OMEGACONF_AVAILABLE:
 
 
 if _PANDAS_AVAILABLE:
-    import pandas as pd
     from pandas._libs.missing import NAType
-
-    @register_as_builtin_fn(pd.DataFrame)
-    def _dataframe_to_builtin(x: pd.DataFrame) -> Any:
-        return as_builtin(x.to_dict("list"))
-
-    @register_as_builtin_fn(pd.Series)
-    def _series_to_builtin(x: pd.Series) -> Any:
-        return as_builtin(x.to_list())
 
     @register_as_builtin_fn(NAType)
     def _na_to_builtin(x: NAType) -> float:
