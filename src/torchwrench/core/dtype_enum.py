@@ -163,7 +163,12 @@ def torch_dtype_to_str(dtype: torch.dtype) -> str:
 
 
 def str_to_torch_dtype(dtype: str) -> torch.dtype:
-    return _NAME_TO_DTYPE[_removeprefix(dtype, "torch.")]
+    name = _removeprefix(dtype, "torch.")
+    if name not in _NAME_TO_DTYPE:
+        msg = f"Invalid argument {dtype=}. (expected one of {tuple(_NAME_TO_DTYPE.keys())})"
+        raise KeyError(msg)
+    dtype = _NAME_TO_DTYPE[name]
+    return dtype
 
 
 def torch_dtype_to_enum_dtype(dtype: torch.dtype) -> DTypeEnum:
