@@ -3,6 +3,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.1] UNRELEASED
+### Modified
+- `as_dtype` and `as_device` now supports 'none' and 'null' strings.
+
 ## [0.8.0] 2026-03-05
 ### Modified
 - Lazily load imports with `lazy-loader` package.
