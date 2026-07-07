@@ -99,7 +99,7 @@ dev = [
     "pre-commit",
     "ruff~=0.14.9",
     # >= 61 for build backend
-    # < 82 for pkg_resources for older pkgs versions
+    # < 82 for pkg_resources for older pkgs versions (tensorboard)
     "setuptools>=61.0,<82.0.0",
     "twine",
     "ipykernel",
