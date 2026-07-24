@@ -41,9 +41,7 @@ if TYPE_CHECKING:
         short,
         uint8,
     )
-    from .core.dtype_enum import (
-        DTypeEnum,
-    )
+    from .core.dtype_enum import DTypeEnum
     from .core.make import (
         CUDA_IF_AVAILABLE,
         Device,

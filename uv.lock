@@ -7324,7 +7324,7 @@ requires-dist = [
     { name = "pandas", marker = "extra == 'pandas'" },
     { name = "pre-commit", marker = "extra == 'dev'" },
     { name = "pytest", marker = "extra == 'tests'" },
-    { name = "pythonwrench", specifier = ">=0.5.0,<0.6.0" },
+    { name = "pythonwrench", specifier = ">=0.5.0,<0.6.1" },
     { name = "pyyaml", marker = "extra == 'yaml'" },
     { name = "ruff", marker = "extra == 'dev'", specifier = "~=0.14.9" },
     { name = "safetensors", marker = "extra == 'safetensors'" },
