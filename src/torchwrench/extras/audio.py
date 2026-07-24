@@ -8,8 +8,8 @@ from pathlib import Path
 from typing import BinaryIO, Optional, Tuple, TypedDict, Union
 
 import pythonwrench as pw
-from pythonwrench._core import _setup_output_fpath
 from pythonwrench.importlib import Placeholder
+from pythonwrench.serialization._core import _setup_output_fpath
 from torch import Tensor
 
 from torchwrench.core.packaging import _TORCHAUDIO_AVAILABLE
