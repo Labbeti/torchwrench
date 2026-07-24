@@ -11,6 +11,7 @@ from safetensors import safe_open
 from safetensors.torch import save
 from torch import Tensor
 
+from torchwrench.core.packaging import safetensors_is_available  # noqa: F401
 from torchwrench.nn import functional as F
 
 

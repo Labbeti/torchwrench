@@ -13,10 +13,10 @@ import torch
 
 import torchwrench as tw
 from torchwrench.core.packaging import (
-    _NUMPY_AVAILABLE,
-    _PANDAS_AVAILABLE,
-    _SAFETENSORS_AVAILABLE,
-    _YAML_AVAILABLE,
+    numpy_is_available,
+    pandas_is_available,
+    safetensors_is_available,
+    yaml_is_available,
 )
 from torchwrench.hub.paths import get_tmp_dir
 from torchwrench.nn.functional import deep_equal
@@ -40,7 +40,7 @@ class TestSaving(TestCase):
         ]
         expected = [[[list(range(3))], "a", "path", {"a": 3, "b": 1, "c": 1}, []]]
 
-        if _PANDAS_AVAILABLE:
+        if pandas_is_available():
             from torchwrench.extras.pandas import pd
 
             df = pd.DataFrame({"a": [1, 2]})
@@ -68,7 +68,7 @@ class TestSaving(TestCase):
             ("test.json", "json"),
             ("test.yaml.json", "json"),
         ]
-        if _YAML_AVAILABLE:
+        if yaml_is_available():
             tests += [
                 ("test.json.yaml", "yaml"),
                 ("test.yml", "yaml"),
@@ -90,7 +90,7 @@ class TestSaving(TestCase):
 
         assert result == data
 
-        if _NUMPY_AVAILABLE and _PANDAS_AVAILABLE:
+        if numpy_is_available() and pandas_is_available():
             import numpy as np
 
             n = 10
@@ -123,7 +123,7 @@ class TestSaving(TestCase):
             ("pickle", data_objs, False, dict(), dict()),
         ]
 
-        if _NUMPY_AVAILABLE:
+        if numpy_is_available():
             from torchwrench.extras.numpy import to_ndarray
 
             tests += [
@@ -131,12 +131,12 @@ class TestSaving(TestCase):
                 for k, v in data_objs.items()
             ]
 
-        if _SAFETENSORS_AVAILABLE:
+        if safetensors_is_available():
             tests += [
                 ("safetensors", data_tensors, False, dict(), dict()),
             ]
 
-        if _YAML_AVAILABLE:
+        if yaml_is_available():
             tests += [
                 ("yaml", data_tensors, True, dict(), dict()),
                 ("yaml", data_objs, True, dict(), dict()),

@@ -8,7 +8,7 @@ import pythonwrench as pw
 import torch
 
 import torchwrench as tw
-from torchwrench.core.packaging import _NUMPY_AVAILABLE
+from torchwrench.core.packaging import numpy_is_available
 from torchwrench.extras.numpy import np
 from torchwrench.nn.functional.others import deep_equal
 from torchwrench.nn.functional.transform import (
@@ -105,7 +105,7 @@ class TestResampleNearest(TestCase):
 
 class TestFlatten(TestCase):
     def test_example_1(self) -> None:
-        if not _NUMPY_AVAILABLE:
+        if not numpy_is_available():
             return None
 
         x = [
@@ -126,7 +126,7 @@ class TestFlatten(TestCase):
             assert result_i == expected_i
 
     def test_example_2_between_dims(self) -> None:
-        if not _NUMPY_AVAILABLE:
+        if not numpy_is_available():
             return None
 
         shape = (10, 3, 4, 5)

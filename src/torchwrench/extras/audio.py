@@ -12,9 +12,9 @@ from pythonwrench.importlib import Placeholder
 from pythonwrench.serialization._core import _setup_output_fpath
 from torch import Tensor
 
-from torchwrench.core.packaging import _TORCHAUDIO_AVAILABLE
+from torchwrench.core.packaging import torchaudio_is_available
 
-if not _TORCHAUDIO_AVAILABLE:
+if not torchaudio_is_available():
     msg = f"Cannot use python module {__file__} since torchaudio package is not installed."
     raise ImportError(msg)
 

@@ -6,6 +6,8 @@ from typing import Any, Dict, List, Literal, Tuple, TypedDict, TypeVar
 import h5py
 import numpy as np
 
+from torchwrench.core.packaging import h5py_is_available  # noqa: F401
+
 T = TypeVar("T", covariant=True)
 
 HDFItemType = Literal["dict", "tuple"]

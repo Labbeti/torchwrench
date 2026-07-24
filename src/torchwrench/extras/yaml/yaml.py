@@ -10,7 +10,7 @@ import lazy_loader as lazy
 from pythonwrench.functools import function_alias
 from pythonwrench.typing import DataclassInstance, NamedTupleInstance
 
-from torchwrench.core.packaging import _OMEGACONF_AVAILABLE, _YAML_AVAILABLE
+from torchwrench.core.packaging import omegaconf_is_available, yaml_is_available
 from torchwrench.serialization.common import as_builtin
 
 from .definitions import (
@@ -26,7 +26,7 @@ from .definitions import (
 )
 
 if TYPE_CHECKING:
-    import omegaconf
+    import omegaconf  # type: ignore
 else:
     omegaconf = lazy.load("omegaconf", require="omegaconf")
 
@@ -54,11 +54,11 @@ def dump_yaml(
     **yaml_dump_kwds,
 ) -> str:
     """Dump content to yaml format."""
-    if not _YAML_AVAILABLE:
+    if not yaml_is_available():
         msg = f"Cannot use python module {__file__} since pyyaml package is not installed. Please install it with `pip install torchwrench[extras]`."
         raise ImportError(msg)
 
-    if not _OMEGACONF_AVAILABLE and resolve:
+    if not omegaconf_is_available() and resolve:
         msg = (
             "Cannot resolve yaml config without omegaconf package."
             "Please use resolve=False or install omegaconf with `pip install torchwrench[extras]`."
@@ -108,7 +108,7 @@ def load_yaml(
     on_error: Literal["raise", "ignore"] = "raise",
 ) -> Any:
     """Load YAML from filepath or opened file."""
-    if not _YAML_AVAILABLE:
+    if not yaml_is_available():
         msg = f"Cannot use python module {__file__} since pyyaml package is not installed. Please install it with `pip install torchwrench[extras]`."
         raise ImportError(msg)
 

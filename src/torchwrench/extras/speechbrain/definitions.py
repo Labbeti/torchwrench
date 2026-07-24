@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from torchwrench.core.packaging import _SPEECHBRAIN_AVAILABLE
+from torchwrench.core.packaging import speechbrain_is_available
 
-if not _SPEECHBRAIN_AVAILABLE:
+if not speechbrain_is_available():
     from ._speechbrain_fallback import DynamicItemDataset  # noqa: F401  # type: ignore
-
 else:
-    from speechbrain.dataio.dataset import (  # noqa: F401  # type: ignore
-        DynamicItemDataset,
+    from speechbrain.dataio.dataset import (
+        DynamicItemDataset,  # noqa: F401  # type: ignore
     )

@@ -8,9 +8,9 @@ from typing import Any, Dict, Iterable, List, TypedDict, Union
 
 from typing_extensions import NotRequired
 
-from torchwrench.core.packaging import _TENSORBOARD_AVAILABLE
+from torchwrench.core.packaging import tensorboard_is_available
 
-if not _TENSORBOARD_AVAILABLE:
+if not tensorboard_is_available():
     msg = "Cannot import tensorboard objects because optional dependency 'tensorboard' is not installed. Please install it using 'pip install torchwrench[extras]'"
     raise ImportError(msg)
 

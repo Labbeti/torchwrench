@@ -4,7 +4,11 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .definitions import _PANDAS_AVAILABLE, pandas, pd  # noqa: F401  # type: ignore
+    from .definitions import (  # noqa: F401  # type: ignore
+        pandas,
+        pandas_is_available,
+        pd,
+    )
 
 else:
     import lazy_loader as lazy
@@ -13,7 +17,7 @@ else:
         __name__,
         submodules=["definitions"],
         submod_attrs={
-            "definitions": ["_PANDAS_AVAILABLE", "pandas", "pd"],
+            "definitions": ["pandas_is_available", "pandas", "pd"],
         },
     )
 

@@ -4,7 +4,7 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .definitions import _YAML_AVAILABLE, YamlLoaders, yaml
+    from .definitions import YamlLoaders, yaml, yaml_is_available
     from .yaml import (
         IgnoreTagLoader,
         SplitTagLoader,
@@ -23,7 +23,7 @@ else:
         __name__,
         submodules=["definitions", "yaml"],
         submod_attrs={
-            "definitions": ["_YAML_AVAILABLE", "YamlLoaders", "yaml"],
+            "definitions": ["yaml_is_available", "YamlLoaders", "yaml"],
             "yaml": [
                 "IgnoreTagLoader",
                 "SplitTagLoader",

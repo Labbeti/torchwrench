@@ -4,9 +4,9 @@
 import logging
 import os
 
-from torchwrench.core.packaging import _COLORLOG_AVAILABLE
+from torchwrench.core.packaging import colorlog_is_available
 
-if not _COLORLOG_AVAILABLE:
+if not colorlog_is_available():
     msg = "Cannot import colorlog objects because optional dependency 'colorlog' is not installed. Please install it using 'pip install torchwrench[extras]'"
     raise ImportError(msg)
 
@@ -25,20 +25,12 @@ LOG_COLORS = {
 
 
 def get_colored_formatter(slurm_rank: bool = False) -> ColoredFormatter:
-    if not _COLORLOG_AVAILABLE:
-        msg = "Cannot call function get_colored_formatter because optional dependency 'colorlog' is not installed. Please install it using 'pip install torchwrench[extras]'"
-        raise RuntimeError(msg)
-
     fmt = get_colored_format(slurm_rank=slurm_rank)
     formatter = ColoredFormatter(fmt=fmt, log_colors=LOG_COLORS)
     return formatter
 
 
 def get_colored_format(slurm_rank: bool = False) -> str:
-    if not _COLORLOG_AVAILABLE:
-        msg = "Cannot call function get_colored_formatter because optional dependency 'colorlog' is not installed. Please install it using 'pip install torchwrench[extras]'"
-        raise RuntimeError(msg)
-
     if slurm_rank:
         rank = os.getenv("SLURM_PROCID", "0")
         rank_fmt = f"[%(purple)sRANK{rank}%(reset)s]"

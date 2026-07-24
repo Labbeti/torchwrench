@@ -5,9 +5,9 @@ from typing import Type, Union
 
 from typing_extensions import TypeAlias
 
-from torchwrench.core.packaging import _YAML_AVAILABLE
+from torchwrench.core.packaging import yaml_is_available
 
-if not _YAML_AVAILABLE:
+if not yaml_is_available():
     from . import _yaml_fallback as yaml  # noqa: F401
     from ._yaml_fallback import (  # noqa: F401
         BaseLoader,
