@@ -46,8 +46,9 @@ Changelog = "https://github.com/Labbeti/torchwrench/blob/main/CHANGELOG.md"
 Tracker = "https://github.com/Labbeti/torchwrench/issues"
 
 [project.scripts]
-torchwrench-info = "torchwrench.entries:print_install_info"
-tw-info = "torchwrench.entries:print_install_info"
+torchwrench-info = "torchwrench.entrypoints.info:main_info"
+tow-info = "torchwrench.entrypoints.info:main_info"
+tw-info = "torchwrench.entrypoints.info:main_info"
 
 [build-system]
 requires = ["setuptools>=61.0,<82.0.0"]
@@ -95,17 +96,17 @@ extras = [
 
 [project.optional-dependencies]
 dev = [
-    "ipython",
-    "pre-commit",
+    "ipykernel>=6.29.5",
+    "ipython>=8.12.3",
+    "pre-commit>=3.5.0",
     "ruff~=0.14.9",
     # >= 61 for build backend
     # < 82 for pkg_resources for older pkgs versions (tensorboard)
     "setuptools>=61.0,<82.0.0",
-    "twine",
-    "ipykernel",
     "torchwrench[docs]",
     "torchwrench[numpy]",
     "torchwrench[tests]",
+    "twine>=6.1.0",
 ]
 extras = [
     "torchwrench[numpy]",
@@ -119,44 +120,44 @@ extras = [
     "torchwrench[torchaudio]",
 ]
 tests = [
-    "pytest",
-    "torchvision",
-    "coverage[toml]",
+    "coverage[toml]>=7.6.1",
+    "pytest>=8.3.5",
+    "torchvision>=0.20.1",
 ]
 docs = [
-    "sphinx",
+    "sphinx>=7.1.2",
     "sphinx-immaterial>=0.11.14",
 ]
 colorlog = [
-    "colorlog",
+    "colorlog>=6.12.0",
 ]
 h5py = [
-    "h5py",
-    "tqdm",
+    "h5py>=3.11.0",
     "torchwrench[numpy]",
+    "tqdm>=4.69.0",
 ]
 numpy = [
     "numpy!=2.0.0,!=2.0.1,!=2.0.2",
 ]
 omegaconf = [
-    "omegaconf",
+    "omegaconf>=2.3.1",
 ]
 pandas = [
-    "pandas",
+    "pandas>=2.0.3",
 ]
 yaml = [
-    "pyyaml",
+    "pyyaml>=6.0.3",
 ]
 safetensors = [
-    "safetensors",
+    "safetensors>=0.5.3",
 ]
 tensorboard = [
-    "tensorboard",
+    "tensorboard>=2.14.0",
 ]
 torchaudio = [
+    "soundfile>=0.13.1",
     "torchaudio>=0.10.0",
-    "soundfile",
-    'torchcodec; python_version >= "3.10" and sys_platform != "darwin"',
+    "torchcodec>=0.15.0 ; python_full_version >= '3.10' and sys_platform != 'darwin'",
 ]
 speechbrain = [
     "speechbrain~=1.0.3",

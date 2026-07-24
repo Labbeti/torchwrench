@@ -19,10 +19,11 @@ from typing_extensions import TypeGuard
 
 from torchwrench.core.make import DeviceLike, DTypeLike, as_device, as_dtype
 from torchwrench.extras.numpy.definitions import NumpyNumberLike, NumpyScalarLike, np
+from torchwrench.extras.pandas import pd
 
 
 def to_ndarray(
-    x: Union[Tensor, np.ndarray, Iterable, BuiltinScalar],
+    x: Union[Tensor, np.ndarray, Iterable, BuiltinScalar, pd.Series, pd.DataFrame],
     *,
     dtype: Union[str, np.dtype, None] = None,
     force: bool = False,
@@ -30,6 +31,8 @@ def to_ndarray(
     """Convert input to numpy array. Works with any arbitrary object."""
     if isinstance(x, Tensor):
         return tensor_to_ndarray(x, dtype=dtype, force=force)
+    elif isinstance(x, (pd.Series, pd.DataFrame)):
+        return x.to_numpy()
     else:
         return np.array(x, dtype=dtype)  # type: ignore
 
@@ -122,7 +125,7 @@ def is_numpy_str_array(x: Any) -> TypeGuard[Union[np.str_, np.ndarray]]:
 
 
 def is_numpy_integral_array(x: Any) -> TypeGuard[Union[np.ndarray, np.generic]]:
-    return isinstance(x, (np.generic, np.ndarray)) and issubclass(x.dtype, np.integer)
+    return isinstance(x, (np.generic, np.ndarray)) and issubclass(x.dtype, np.integer)  # type: ignore
 
 
 def is_numpy_number_like(x: Any) -> TypeGuard[NumpyNumberLike]:

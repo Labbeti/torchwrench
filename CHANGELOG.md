@@ -3,9 +3,10 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.8.1] UNRELEASED
+## [0.9.0] 2026-07-24
 ### Modified
 - `as_dtype` and `as_device` now supports 'none' and 'null' strings.
+- Upgrade pythonwrench dependancy to `>=0.6.0,<0.7.0`.
 
 ## [0.8.0] 2026-03-05
 ### Modified

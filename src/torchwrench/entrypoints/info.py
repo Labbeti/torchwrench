@@ -15,9 +15,11 @@ from torchwrench.hub.paths import get_cache_dir, get_dir, get_tmp_dir
 from torchwrench.utils.data.dataloader import get_auto_num_cpus, get_auto_num_gpus
 
 
-def get_package_repository_path() -> str:
-    """Return the absolute path where the source code of this package is installed."""
-    return str(Path(__file__).parent.parent.parent)
+def main_info() -> None:
+    """Show main packages versions."""
+    install_info = get_install_info()
+    dumped = dump_json(install_info, to_builtins=True)
+    print(dumped)
 
 
 def get_install_info() -> Dict[str, Union[str, int]]:
@@ -38,12 +40,10 @@ def get_install_info() -> Dict[str, Union[str, int]]:
     return install_info
 
 
-def print_install_info() -> None:
-    """Show main packages versions."""
-    install_info = get_install_info()
-    dumped = dump_json(install_info)
-    print(dumped)
+def get_package_repository_path() -> str:
+    """Return the absolute path where the source code of this package is installed."""
+    return str(Path(__file__).parent.parent.parent)
 
 
 if __name__ == "__main__":
-    print_install_info()
+    main_info()
