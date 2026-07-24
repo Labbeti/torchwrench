@@ -30,6 +30,8 @@ _EXTRAS_PACKAGES = (
     "speechbrain",
     "tensorboard",
     "torchaudio",
+    "torchcodec",
+    "torchvision",
     "tqdm",
     "yaml",
 )
@@ -48,6 +50,8 @@ _SCIPY_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["scipy"]
 _SPEECHBRAIN_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["speechbrain"]
 _TENSORBOARD_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["tensorboard"]
 _TORCHAUDIO_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["torchaudio"]
+_TORCHCODEC_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["torchcodec"]
+_TORCHVISION_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["torchvision"]
 _TQDM_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["tqdm"]
 _YAML_AVAILABLE: Final[bool] = _EXTRA_AVAILABLE["yaml"]
 
