@@ -8091,7 +8091,7 @@ requires-dist = [
     { name = "torchaudio", marker = "extra == 'speechbrain'", specifier = ">=0.10.0,<2.9" },
     { name = "torchaudio", marker = "extra == 'torchaudio'", specifier = ">=0.10.0" },
     { name = "torchcodec", marker = "python_full_version >= '3.10' and sys_platform != 'darwin' and extra == 'torchaudio'", specifier = ">=0.15.0" },
-    { name = "torchvision", marker = "extra == 'tests'", specifier = ">=0.20.1" },
+    { name = "torchvision", marker = "extra == 'tests'", specifier = ">=0.11.1" },
     { name = "torchwrench", extras = ["colorlog"], marker = "extra == 'extras'", editable = "." },
     { name = "torchwrench", extras = ["docs"], marker = "extra == 'dev'", editable = "." },
     { name = "torchwrench", extras = ["h5py"], marker = "extra == 'extras'", editable = "." },
