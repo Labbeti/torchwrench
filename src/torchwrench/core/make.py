@@ -70,6 +70,8 @@ def as_device(device: DeviceLike = CUDA_IF_AVAILABLE) -> Optional[torch.device]:
         return get_default_device()
     elif device == CUDA_IF_AVAILABLE:
         return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    elif isinstance(device, str) and device.lower() in ("none", "null"):
+        return None
     elif isinstance(device, (str, int)):
         return torch.device(device)
     else:
@@ -91,6 +93,8 @@ def as_dtype(dtype: DTypeLike = None) -> Optional[torch.dtype]:
         return dtype
     elif dtype == "default":
         return get_default_dtype()
+    elif isinstance(dtype, str) and dtype.lower() in ("none", "null"):
+        return None
     elif isinstance(dtype, DTypeEnum):
         return enum_dtype_to_torch_dtype(dtype)
     elif isinstance(dtype, str):

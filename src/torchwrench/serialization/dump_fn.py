@@ -52,9 +52,9 @@ if _SAFETENSORS_AVAILABLE:
     DUMP_FNS["safetensors"] = dump_safetensors
 
 if _TORCHAUDIO_AVAILABLE:
-    from .torchaudio import dump_with_torchaudio
+    from torchwrench.extras.audio import dump_audio
 
-    DUMP_FNS["torchaudio"] = dump_with_torchaudio
+    DUMP_FNS["torchaudio"] = dump_audio
 
 if _YAML_AVAILABLE:
     from .yaml import dump_yaml

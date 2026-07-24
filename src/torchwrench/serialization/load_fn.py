@@ -69,9 +69,9 @@ if _SAFETENSORS_AVAILABLE:
 
 
 if _TORCHAUDIO_AVAILABLE:
-    from .torchaudio import load_with_torchaudio
+    from torchwrench.extras.audio import load_audio
 
-    LOAD_FNS["torchaudio"] = load_with_torchaudio
+    LOAD_FNS["torchaudio"] = load_audio
 
 
 if _YAML_AVAILABLE:
