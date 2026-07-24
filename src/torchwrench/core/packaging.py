@@ -8,6 +8,13 @@ from pythonwrench.importlib import is_available_package
 from pythonwrench.semver import Version
 
 
+def _is_available_package_catch_all_errors(package: str) -> bool:
+    try:
+        return is_available_package(package)
+    except Exception:
+        return False
+
+
 def _get_extra_version(name: str) -> str:
     try:
         module = __import__(name)
@@ -35,7 +42,9 @@ _EXTRAS_PACKAGES = (
     "tqdm",
     "yaml",
 )
-_EXTRA_AVAILABLE = {name: is_available_package(name) for name in _EXTRAS_PACKAGES}
+_EXTRA_AVAILABLE = {
+    name: _is_available_package_catch_all_errors(name) for name in _EXTRAS_PACKAGES
+}
 _EXTRA_VERSION = {name: _get_extra_version(name) for name in _EXTRAS_PACKAGES}
 
 
