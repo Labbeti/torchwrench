@@ -339,6 +339,7 @@ if TYPE_CHECKING:
         UnsignedIntegerTensor2D,
         UnsignedIntegerTensor3D,
     )
+    from .utils.disk_cache import register_hooks
     from .utils.rng import set_seed
 
 else:
@@ -685,6 +686,7 @@ else:
                 "UnsignedIntegerTensor2D",
                 "UnsignedIntegerTensor3D",
             ],
+            "utils.disk_cache": ["register_hooks"],
             "utils.rng": ["set_seed"],
         },
     )
