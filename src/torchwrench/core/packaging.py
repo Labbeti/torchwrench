@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from functools import cache
+from functools import lru_cache
 from typing import Dict
 
 import torch
@@ -16,11 +16,12 @@ def _is_available_package_catch_all_errors(package: str) -> bool:
         return False
 
 
-@cache
+@lru_cache(1)
 def _cached_is_available_package_catch_all_errors(package: str) -> bool:
     return _is_available_package_catch_all_errors(package)
 
 
+@lru_cache(1)
 def _get_extra_version(name: str) -> str:
     try:
         module = __import__(name)
@@ -57,7 +58,6 @@ def get_extra_available_dict() -> Dict[str, bool]:
     }
 
 
-@cache
 def get_extra_version_dict() -> Dict[str, str]:
     return {name: _get_extra_version(name) for name in _EXTRAS_PACKAGES}
 
