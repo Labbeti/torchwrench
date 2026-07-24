@@ -339,6 +339,7 @@ if TYPE_CHECKING:
         UnsignedIntegerTensor2D,
         UnsignedIntegerTensor3D,
     )
+    from .utils.rng import set_seed
 
 else:
     import lazy_loader as lazy
@@ -684,6 +685,7 @@ else:
                 "UnsignedIntegerTensor2D",
                 "UnsignedIntegerTensor3D",
             ],
+            "utils.rng": ["set_seed"],
         },
     )
 
@@ -692,4 +694,4 @@ from pythonwrench.semver import Version
 version = __version__
 version_info = Version(__version__)
 
-del TYPE_CHECKING, Version
+del TYPE_CHECKING

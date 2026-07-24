@@ -4,6 +4,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [0.9.0] 2026-07-24
+### Added
+- `set_seed` function.
+
 ### Modified
 - `as_dtype` and `as_device` now supports 'none' and 'null' strings.
 - Upgrade pythonwrench dependancy to `>=0.6.0,<0.7.0`.
