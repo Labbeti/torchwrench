@@ -22,11 +22,11 @@ from pythonwrench.warnings import deprecated_alias
 from typing_extensions import TypeAlias
 
 from torchwrench.core.packaging import (
-    _H5PY_AVAILABLE,
-    _NUMPY_AVAILABLE,
-    _SAFETENSORS_AVAILABLE,
-    _TORCHAUDIO_AVAILABLE,
-    _YAML_AVAILABLE,
+    h5py_is_available,
+    numpy_is_available,
+    safetensors_is_available,
+    torchaudio_is_available,
+    yaml_is_available,
 )
 
 from .common import SavingBackend, _fpath_to_saving_backend
@@ -50,31 +50,31 @@ LOAD_FNS: Dict[SavingBackend, LoadFn[Any]] = {
     "torch": load_torch,
 }
 
-if _H5PY_AVAILABLE:
+if h5py_is_available():
     from .hdf import load_hdf
 
     LOAD_FNS["h5py"] = load_hdf
 
 
-if _NUMPY_AVAILABLE:
+if numpy_is_available():
     from .numpy import load_ndarray
 
     LOAD_FNS["numpy"] = load_ndarray
 
 
-if _SAFETENSORS_AVAILABLE:
+if safetensors_is_available():
     from torchwrench.extras.safetensors import load_safetensors
 
     LOAD_FNS["safetensors"] = load_safetensors
 
 
-if _TORCHAUDIO_AVAILABLE:
-    from .torchaudio import load_with_torchaudio
+if torchaudio_is_available():
+    from torchwrench.extras.audio import load_audio
 
-    LOAD_FNS["torchaudio"] = load_with_torchaudio
+    LOAD_FNS["torchaudio"] = load_audio
 
 
-if _YAML_AVAILABLE:
+if yaml_is_available():
     from .yaml import load_yaml
 
     LOAD_FNS["yaml"] = load_yaml

@@ -4,13 +4,14 @@
 from pathlib import Path
 from typing import Any, Dict, Literal, Optional, Tuple, Union, overload
 
-from pythonwrench._core import _setup_output_fpath
 from pythonwrench.inspect import get_fullname
+from pythonwrench.serialization._core import _setup_output_fpath
 from pythonwrench.typing.checks import isinstance_generic
 from safetensors import safe_open
 from safetensors.torch import save
 from torch import Tensor
 
+from torchwrench.core.packaging import safetensors_is_available  # noqa: F401
 from torchwrench.nn import functional as F
 
 

@@ -24,7 +24,7 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
+   torchwrench.extras.audio
    torchwrench.extras.colorlog
    torchwrench.extras.safetensors
    torchwrench.extras.tensorboard
-   torchwrench.extras.torchaudio

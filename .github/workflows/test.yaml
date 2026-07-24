@@ -11,6 +11,7 @@ on:
 env:
   CACHE_NUMBER: 0  # increase to reset cache manually
   TORCHWRENCH_TMPDIR: "./tmp"
+  UV_NO_SYNC: 1
 
 # Cancel workflow if a new push occurs
 concurrency:
@@ -46,10 +47,10 @@ jobs:
     steps:
     # --- INSTALLATIONS ---
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Install uv and set Python ${{ matrix.python-version }}
-      uses: astral-sh/setup-uv@v5
+      uses: astral-sh/setup-uv@v9.0.0
       with:
         python-version: ${{ matrix.python-version }}
         enable-cache: true
@@ -59,12 +60,14 @@ jobs:
       if: matrix.torch-version == 'torch-latest'
       shell: bash
       run: |
+        uv venv --python ${{ matrix.python-version }}
         uv pip install .[dev,extras]
 
     - name: Install package with PyTorch ${{ matrix.torch-version }}
       if: matrix.torch-version != 'torch-latest'
       shell: bash
       run: |
+        uv venv --python ${{ matrix.python-version }}
         uv pip install torch==${{ matrix.torch-version }} -e .[dev,extras]
 
     - name: Additional install soundfile (Ubuntu)
@@ -77,7 +80,75 @@ jobs:
       run: |
         brew install libsndfile
 
+    # Linux
+    - name: Install FFmpeg on Linux
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install --yes ffmpeg
+
+    # macOS
+    - name: Install FFmpeg on macOS
+      if: runner.os == 'macOS'
+      shell: bash
+      run: |
+        brew install ffmpeg
+
+        # Help native extensions find Homebrew libraries.
+        echo "$(brew --prefix ffmpeg)/bin" >> "$GITHUB_PATH"
+        echo "DYLD_FALLBACK_LIBRARY_PATH=$(brew --prefix ffmpeg)/lib" >> "$GITHUB_ENV"
+
+    # Windows: TorchCodec needs a shared FFmpeg build, not only ffmpeg.exe.
+    - name: Install shared FFmpeg on Windows
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        $ErrorActionPreference = "Stop"
+
+        $version = "7.1.1"
+        $archive = Join-Path $env:RUNNER_TEMP "ffmpeg.zip"
+        $installDir = Join-Path $env:RUNNER_TEMP "ffmpeg"
+
+        # Use a full shared build containing avcodec/avformat DLLs.
+        $url = "https://github.com/GyanD/codexffmpeg/releases/download/$version/ffmpeg-$version-full_build-shared.zip"
+
+        Invoke-WebRequest `
+          -Uri $url `
+          -OutFile $archive
+
+        Expand-Archive `
+          -Path $archive `
+          -DestinationPath $installDir
+
+        $bin = Get-ChildItem `
+          -Path $installDir `
+          -Directory `
+          -Recurse |
+          Where-Object {
+            Test-Path (Join-Path $_.FullName "ffmpeg.exe")
+          } |
+          Select-Object -First 1 -ExpandProperty FullName
+
+        if (-not $bin) {
+          throw "Could not locate the extracted FFmpeg bin directory."
+        }
+
+        $bin | Out-File `
+          -FilePath $env:GITHUB_PATH `
+          -Encoding utf8 `
+          -Append
+
+        "FFMPEG_BIN=$bin" | Out-File `
+          -FilePath $env:GITHUB_ENV `
+          -Encoding utf8 `
+          -Append
+
     # --- TESTS ---
+    - name: Verify FFmpeg
+      run: |
+        ffmpeg -version
+
     - name: Print install info
       run: |
         uv run --no-sync torchwrench-info
@@ -162,10 +233,10 @@ jobs:
     steps:
     # --- INSTALLATIONS ---
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Install uv and set Python ${{ matrix.python-version }}
-      uses: astral-sh/setup-uv@v5
+      uses: astral-sh/setup-uv@v6
       with:
         python-version: ${{ matrix.python-version }}
         enable-cache: true
@@ -175,12 +246,14 @@ jobs:
       if: matrix.torch-version == 'torch-latest'
       shell: bash
       run: |
+        uv venv --python ${{ matrix.python-version }}
         uv pip install .[dev]
 
     - name: Install package with PyTorch ${{ matrix.torch-version }}
       if: matrix.torch-version != 'torch-latest'
       shell: bash
       run: |
+        uv venv --python ${{ matrix.python-version }}
         uv pip install torch==${{ matrix.torch-version }} -e .[dev]
 
     - name: Additional install soundfile (Ubuntu)

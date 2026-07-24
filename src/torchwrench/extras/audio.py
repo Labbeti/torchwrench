@@ -7,27 +7,30 @@ from io import BufferedWriter
 from pathlib import Path
 from typing import BinaryIO, Optional, Tuple, TypedDict, Union
 
-from pythonwrench._core import _setup_output_fpath
-from pythonwrench.functools import function_alias
+import pythonwrench as pw
 from pythonwrench.importlib import Placeholder
+from pythonwrench.serialization._core import _setup_output_fpath
 from torch import Tensor
 
-from torchwrench.core.packaging import _TORCHAUDIO_AVAILABLE
+from torchwrench.core.packaging import torchaudio_is_available
 
-if not _TORCHAUDIO_AVAILABLE:
+if not torchaudio_is_available():
     msg = f"Cannot use python module {__file__} since torchaudio package is not installed."
     raise ImportError(msg)
 
 import torchaudio
 
 try:
-    from torchaudio import _AudioMetaData
+    from torchaudio import _AudioMetaData  # type: ignore
     from torchaudio.io import CodecConfig  # type: ignore
 except (ImportError, AttributeError):
 
     class CodecConfig(Placeholder): ...
 
     class _AudioMetaData(Placeholder): ...
+
+
+AudioMetaData = _AudioMetaData
 
 
 class AudioMetaDataDict(TypedDict):
@@ -38,7 +41,7 @@ class AudioMetaDataDict(TypedDict):
     encoding: str
 
 
-def audio_metadata_to_dict(meta: _AudioMetaData) -> AudioMetaDataDict:
+def audio_metadata_to_dict(meta: AudioMetaData) -> AudioMetaDataDict:
     return {
         "sample_rate": meta.sample_rate,
         "num_frames": meta.num_frames,
@@ -48,7 +51,7 @@ def audio_metadata_to_dict(meta: _AudioMetaData) -> AudioMetaDataDict:
     }
 
 
-def dump_with_torchaudio(
+def dump_audio(
     src: Tensor,
     uri: Union[BinaryIO, str, Path, os.PathLike, None],
     sample_rate: int,
@@ -95,7 +98,7 @@ def dump_with_torchaudio(
     return content
 
 
-def load_with_torchaudio(
+def load_audio(
     uri: Union[BinaryIO, str, os.PathLike, Path],
     frame_offset: int = 0,
     num_frames: int = -1,
@@ -117,9 +120,23 @@ def load_with_torchaudio(
     )
 
 
-@function_alias(dump_with_torchaudio)
-def dump_audio(*args, **kwargs): ...
+def info_audio(
+    uri: Union[BinaryIO, str, os.PathLike, Path],
+    **kwargs,
+) -> AudioMetaData:
+    return torchaudio.info(
+        uri,
+        **kwargs,
+    )
 
 
-@function_alias(load_with_torchaudio)
-def load_audio(*args, **kwargs): ...
+@pw.function_alias(dump_audio)
+def save_audio(*args, **kwargs): ...
+
+
+@pw.deprecated_alias(dump_audio)
+def dump_with_torchaudio(*args, **kwargs): ...
+
+
+@pw.deprecated_alias(load_audio)
+def load_with_torchaudio(*args, **kwargs): ...

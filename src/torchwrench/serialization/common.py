@@ -19,14 +19,16 @@ from pythonwrench.cast import as_builtin, register_as_builtin_fn
 from torch import Tensor
 
 from torchwrench.core.packaging import (
-    _H5PY_AVAILABLE,
-    _NUMPY_AVAILABLE,
-    _OMEGACONF_AVAILABLE,
-    _PANDAS_AVAILABLE,
-    _SAFETENSORS_AVAILABLE,
-    _TORCHAUDIO_AVAILABLE,
-    _YAML_AVAILABLE,
+    h5py_is_available,
+    numpy_is_available,
+    omegaconf_is_available,
+    pandas_is_available,
+    safetensors_is_available,
+    torchaudio_is_available,
+    yaml_is_available,
 )
+from torchwrench.extras.numpy import np
+from torchwrench.extras.pandas import pd
 
 T = TypeVar("T")
 
@@ -58,7 +60,7 @@ PATTERN_TO_BACKEND: Dict[str, SavingBackend] = {
     r"^.+\.pt$": "torch",
 }
 
-if _H5PY_AVAILABLE:
+if h5py_is_available():
     PATTERN_TO_BACKEND.update(
         {
             r"^.+\.h5$": "h5py",
@@ -68,7 +70,7 @@ if _H5PY_AVAILABLE:
     )
 
 
-if _NUMPY_AVAILABLE:
+if numpy_is_available():
     import numpy as np
 
     PATTERN_TO_BACKEND.update(
@@ -78,14 +80,14 @@ if _NUMPY_AVAILABLE:
         }
     )
 
-if _SAFETENSORS_AVAILABLE:
+if safetensors_is_available():
     PATTERN_TO_BACKEND.update(
         {
             r"^.+\.safetensors$": "safetensors",
         }
     )
 
-if _TORCHAUDIO_AVAILABLE:
+if torchaudio_is_available():
     PATTERN_TO_BACKEND.update(
         {
             r"^.+\.mp3$": "torchaudio",
@@ -96,7 +98,7 @@ if _TORCHAUDIO_AVAILABLE:
         }
     )
 
-if _YAML_AVAILABLE:
+if yaml_is_available():
     PATTERN_TO_BACKEND.update(
         {
             r".+\.yml$": "yaml",
@@ -142,23 +144,32 @@ def _torch_dtype_to_builtin(x: torch.dtype) -> Any:
     return str(x)
 
 
-if _NUMPY_AVAILABLE:
-    import numpy as np
-
-    @register_as_builtin_fn(np.ndarray)
-    def _np_ndarray_to_builtin(x: np.ndarray) -> Any:
-        return x.tolist()
-
-    @register_as_builtin_fn(np.generic)
-    def _np_generic_to_builtin(x: np.generic) -> Any:
-        return x.item()
-
-    @register_as_builtin_fn(np.dtype)
-    def _np_dtype_to_builtin(x: np.dtype) -> Any:
-        return str(x)
+@register_as_builtin_fn(np.ndarray)
+def _np_ndarray_to_builtin(x: np.ndarray) -> Any:
+    return x.tolist()
 
 
-if _OMEGACONF_AVAILABLE:
+@register_as_builtin_fn(np.generic)
+def _np_generic_to_builtin(x: np.generic) -> Any:
+    return x.item()
+
+
+@register_as_builtin_fn(np.dtype)
+def _np_dtype_to_builtin(x: np.dtype) -> Any:
+    return str(x)
+
+
+@register_as_builtin_fn(pd.DataFrame)
+def _dataframe_to_builtin(x: pd.DataFrame) -> Any:
+    return as_builtin(x.to_dict("list"))
+
+
+@register_as_builtin_fn(pd.Series)
+def _series_to_builtin(x: pd.Series) -> Any:
+    return as_builtin(x.to_list())
+
+
+if omegaconf_is_available():
     from omegaconf import DictConfig, ListConfig, OmegaConf  # type: ignore
 
     @register_as_builtin_fn((DictConfig, ListConfig))
@@ -166,17 +177,8 @@ if _OMEGACONF_AVAILABLE:
         return as_builtin(OmegaConf.to_container(x, resolve=False, enum_to_str=True))  # type: ignore
 
 
-if _PANDAS_AVAILABLE:
-    import pandas as pd
+if pandas_is_available():
     from pandas._libs.missing import NAType
-
-    @register_as_builtin_fn(pd.DataFrame)
-    def _dataframe_to_builtin(x: pd.DataFrame) -> Any:
-        return as_builtin(x.to_dict("list"))
-
-    @register_as_builtin_fn(pd.Series)
-    def _series_to_builtin(x: pd.Series) -> Any:
-        return as_builtin(x.to_list())
 
     @register_as_builtin_fn(NAType)
     def _na_to_builtin(x: NAType) -> float:

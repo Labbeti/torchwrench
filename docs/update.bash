@@ -6,7 +6,18 @@ pkg_name="torchwrench"
 docs_dpath=`dirname $0`
 cd "$docs_dpath"
 
-rm ${pkg_name}.*rst
-sphinx-apidoc -e -M -o . ../src/${pkg_name} && make clean && make html
+if LC_ALL=C.UTF-8 locale >/dev/null 2>&1; then
+    locale_name=C.UTF-8
+elif LC_ALL=C.utf8 locale >/dev/null 2>&1; then
+    locale_name=C.utf8
+else
+    locale_name=C
+fi
 
-exit 0
+export LANG="$locale_name"
+export LC_ALL="$locale_name"
+
+rm ${pkg_name}.*rst 2> /dev/null
+uv run sphinx-apidoc -e -M -o . ../src/${pkg_name} && uv run make clean && uv run make html
+
+exit $?

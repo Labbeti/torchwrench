@@ -32,6 +32,7 @@ class TestHDF(TestCase):
         tmpdir.mkdir(parents=True, exist_ok=True)
         cls.tmpdir = tmpdir
 
+    @unittest.skip("CIFAR10 too slow to dl each unittest.")
     def test_cifar10_pack_to_hdf(self) -> None:
         cls = self.__class__
         tmpdir = cls.tmpdir
@@ -260,7 +261,8 @@ class TestHDF(TestCase):
                 eq = eq.all()
             assert eq, f"{k=}, {hdf_col=} != {ds_col=}"
 
-    def test_string_comp(self) -> None:
+    @unittest.skip("This test is no longer relevant for speed comparison.")
+    def test_string_read_compression(self) -> None:
         num_data = 10000
         max_string_len = 100
         max_sublst = 5

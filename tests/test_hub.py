@@ -15,6 +15,9 @@ from torchwrench.hub.registry import RegistryHub
 
 
 class TestFilename(TestCase):
+    @unittest.skip(
+        "Disabled for now because it required internet connection that slows down tests."
+    )
     def test_filename_from_url(self) -> None:
         tests = [
             (

@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from . import data as data
+    from . import rng as rng
 
 else:
     import lazy_loader as lazy
@@ -13,6 +14,7 @@ else:
         __name__,
         submodules=[
             "data",
+            "rng",
         ],
         submod_attrs={},
     )

@@ -4,7 +4,7 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .definitions import _NUMPY_AVAILABLE, ACCEPTED_NUMPY_DTYPES, np, numpy
+    from .definitions import ACCEPTED_NUMPY_DTYPES, np, numpy, numpy_is_available
     from .functional import (
         is_numpy_bool_array,
         is_numpy_integral_array,
@@ -51,7 +51,12 @@ else:
         __name__,
         submodules=["definitions", "functional", "scan_info"],
         submod_attrs={
-            "definitions": ["_NUMPY_AVAILABLE", "ACCEPTED_NUMPY_DTYPES", "np", "numpy"],
+            "definitions": [
+                "numpy_is_available",
+                "ACCEPTED_NUMPY_DTYPES",
+                "np",
+                "numpy",
+            ],
             "functional": [
                 "is_numpy_bool_array",
                 "is_numpy_integral_array",

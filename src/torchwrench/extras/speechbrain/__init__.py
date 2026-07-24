@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .definitions import (  # noqa: F401
-        _SPEECHBRAIN_AVAILABLE,
         DynamicItemDataset,
+        speechbrain_is_available,
     )
 
 else:
@@ -16,12 +16,8 @@ else:
         __name__,
         submodules=["definitions"],
         submod_attrs={
-            "definitions": ["_SPEECHBRAIN_AVAILABLE", "DynamicItemDataset"],
+            "definitions": ["speechbrain_is_available", "DynamicItemDataset"],
         },
     )
-
-    x = __getattr__("_SPEECHBRAIN_AVAILABLE")
-    print(f"{x=}")
-
 
 del TYPE_CHECKING

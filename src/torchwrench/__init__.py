@@ -9,7 +9,7 @@ __author_email__ = "labbeti.pub@gmail.com"
 __license__ = "MIT"
 __maintainer__ = "Étienne Labbé (Labbeti)"
 __status__ = "Development"
-__version__ = "0.8.0"
+__version__ = "0.9.0"
 
 from typing import TYPE_CHECKING
 
@@ -41,9 +41,7 @@ if TYPE_CHECKING:
         short,
         uint8,
     )
-    from .core.dtype_enum import (
-        DTypeEnum,
-    )
+    from .core.dtype_enum import DTypeEnum
     from .core.make import (
         CUDA_IF_AVAILABLE,
         Device,
@@ -78,6 +76,7 @@ if TYPE_CHECKING:
         cat,
         cat_padded_batch,
         checksum_any,
+        checksum_object,
         concat,
         count_parameters,
         crop_dim,
@@ -340,6 +339,7 @@ if TYPE_CHECKING:
         UnsignedIntegerTensor2D,
         UnsignedIntegerTensor3D,
     )
+    from .utils.rng import set_seed
 
 else:
     import lazy_loader as lazy
@@ -402,6 +402,7 @@ else:
                 "log_softmax_multidim",
                 "softmax_multidim",
                 "checksum_any",
+                "checksum_object",
                 "crop_dim",
                 "crop_dims",
                 "get_inverse_perm",
@@ -684,6 +685,7 @@ else:
                 "UnsignedIntegerTensor2D",
                 "UnsignedIntegerTensor3D",
             ],
+            "utils.rng": ["set_seed"],
         },
     )
 
@@ -692,4 +694,4 @@ from pythonwrench.semver import Version
 version = __version__
 version_info = Version(__version__)
 
-del TYPE_CHECKING, Version
+del TYPE_CHECKING
