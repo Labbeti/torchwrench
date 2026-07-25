@@ -5529,13 +5529,13 @@ wheels = [
 
 [[package]]
 name = "pythonwrench"
-version = "0.6.0"
+version = "0.6.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "typing-extensions", version = "4.13.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.9'" },
     { name = "typing-extensions", version = "4.16.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.9'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5c/ae/bfaf854ab7e3163c2983896bd227c15486048e7f25655a472d4a9bfb6c0f/pythonwrench-0.6.0.tar.gz", hash = "sha256:cafa0bb60cdd283a7bcca4ec6f660dde33f11d02752c351ebdc0809867e9bf3a", size = 65814, upload_time = "2026-07-24T12:30:55.535Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/8d/e5/3a3499258359cce57c83bf42f401586dd83c730663d6477b39198a5faf35/pythonwrench-0.6.1.tar.gz", hash = "sha256:62444f59ba137bdd2c5d3da0f8494a733766b4f87ddbe4ad5013f1a346307be1", size = 66872, upload_time = "2026-07-25T15:04:14.375Z" }
 
 [[package]]
 name = "pytz"
@@ -8077,7 +8077,7 @@ requires-dist = [
     { name = "pandas", marker = "extra == 'pandas'", specifier = ">=2.0.3" },
     { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=3.5.0" },
     { name = "pytest", marker = "extra == 'tests'", specifier = ">=8.3.5" },
-    { name = "pythonwrench", specifier = ">=0.6.0,<0.7.0" },
+    { name = "pythonwrench", specifier = ">=0.6.1,<0.7.0" },
     { name = "pyyaml", marker = "extra == 'yaml'", specifier = ">=6.0.3" },
     { name = "ruff", marker = "extra == 'dev'", specifier = "~=0.14.9" },
     { name = "safetensors", marker = "extra == 'safetensors'", specifier = ">=0.5.3" },

@@ -68,7 +68,7 @@ def load_torch(
     map_location: MapLocationLike = None,
     pickle_module: Any = None,
     *,
-    weights_only: bool = ...,
+    weights_only: bool = ...,  # type: ignore
     mmap: Optional[bool] = None,
     **pickle_load_args: Any,
 ) -> Any:

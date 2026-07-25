@@ -271,7 +271,7 @@ def _load_csv_with_pandas(
         msg = f"Invalid arguments {csv_backend_kwds=} with {backend=}."
         raise ValueError(msg)
 
-    df = pd.read_csv(fpath, delimiter=delimiter)
+    df = pd.read_csv(fpath, delimiter=delimiter)  # type: ignore
 
     if orient == "list":
         return df.to_dict("records")  # type: ignore
