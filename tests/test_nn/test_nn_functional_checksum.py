@@ -5,9 +5,9 @@ import math
 import unittest
 from unittest import TestCase
 
-import pythonwrench as pw
 import torch
 
+import torchwrench as tw
 from torchwrench.core.packaging import numpy_is_available
 from torchwrench.extras.numpy import np
 
@@ -47,35 +47,35 @@ class TestChecksum(TestCase):
                 np.int64(100),
             ]
 
-        csums = [pw.checksum_any(xi) for xi in x]
-        assert pw.all_ne(csums), f"{csums=}"
+        csums = [tw.checksum_any(xi) for xi in x]
+        assert tw.all_ne(csums), f"{csums=}"
 
     def test_large_arrays(self) -> None:
         x0 = torch.rand(10000, 100)
         x1 = torch.rand(10000, 100)
-        assert pw.checksum_any(x0) != pw.checksum_any(x1)
+        assert tw.checksum_any(x0) != tw.checksum_any(x1)
 
     def test_large_arrays_numpy(self) -> None:
         if not numpy_is_available():
             return None
         x0 = np.random.rand(10000, 100)
         x1 = np.random.rand(10000, 100)
-        assert pw.checksum_any(x0) != pw.checksum_any(x1)
+        assert tw.checksum_any(x0) != tw.checksum_any(x1)
 
     def test_deterministic(self) -> None:
         x0 = torch.arange(10)
         x1 = torch.arange(10)
         assert id(x0) != id(x1)
-        assert pw.checksum_any(x0) == pw.checksum_any(x1)
+        assert tw.checksum_any(x0) == tw.checksum_any(x1)
 
     def test_nan(self) -> None:
-        # NaN pw.checksum_any are equal but nan itself can be different
+        # NaN tw.checksum_any are equal but nan itself can be different
         if not numpy_is_available():
             return None
         x0 = math.nan
         x1 = np.nan
         assert id(x0) != id(x1)
-        assert pw.checksum_any(x0) == pw.checksum_any(x1)
+        assert tw.checksum_any(x0) == tw.checksum_any(x1)
 
 
 if __name__ == "__main__":
