@@ -3,8 +3,8 @@ torchwrench.utils.data.dataset package
 
 .. automodule:: torchwrench.utils.data.dataset
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 Submodules
 ----------

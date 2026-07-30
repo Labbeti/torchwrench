@@ -3,8 +3,8 @@ torchwrench.extras.hdf package
 
 .. automodule:: torchwrench.extras.hdf
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 Submodules
 ----------

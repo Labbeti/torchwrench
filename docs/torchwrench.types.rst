@@ -3,8 +3,8 @@ torchwrench.types package
 
 .. automodule:: torchwrench.types
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 Submodules
 ----------

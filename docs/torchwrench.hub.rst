@@ -3,8 +3,8 @@ torchwrench.hub package
 
 .. automodule:: torchwrench.hub
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 Submodules
 ----------
