@@ -9,6 +9,9 @@ from pythonwrench.importlib import Placeholder
 from pythonwrench.inspect import get_current_fn_name
 
 
+class random(Placeholder): ...
+
+
 class generic(Placeholder): ...
 
 
@@ -83,3 +86,6 @@ class int64(dtype): ...
 
 
 class uint8(dtype): ...
+
+
+class integer(dtype): ...

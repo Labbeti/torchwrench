@@ -193,7 +193,6 @@ class TestDeepEqual(TestCase):
                 },
                 True,
             ),
-            (np.random.rand(10), 0, False),
         ]
 
         if numpy_is_available():
@@ -205,6 +204,7 @@ class TestDeepEqual(TestCase):
                     np.array([[1.507782, np.nan]], dtype=np.float32),
                     True,
                 ),
+                (np.random.rand(10), 0, False),
             ]
 
         for x, y, expected in tests:
