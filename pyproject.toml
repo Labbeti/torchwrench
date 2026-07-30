@@ -85,14 +85,24 @@ dev = [
     "ipykernel>=6.29.5",
     "ipython>=8.12.3",
     "pre-commit>=3.5.0",
-    "ruff~=0.14.9",
+    "twine>=6.1.0",
     # >= 61 for build backend
     # < 82 for pkg_resources for older pkgs versions (tensorboard)
-    "setuptools>=61.0,<82.0.0",
+    # TODO: rm
+    # "setuptools>=61.0,<82.0.0",
     "torchwrench[docs]",
     "torchwrench[numpy]",
     "torchwrench[tests]",
-    "twine>=6.1.0",
+]
+tests = [
+    "ruff~=0.14.9",
+    "coverage[toml]>=7.6.1",
+    "pytest>=8.3.5",
+    "torchvision>=0.11.1",
+]
+docs = [
+    "sphinx>=7.1.2,<9.0.0",
+    "sphinx-immaterial>=0.11.14",
 ]
 extras = [
     "torchwrench[numpy]",
@@ -104,15 +114,6 @@ extras = [
     "torchwrench[safetensors]",
     "torchwrench[tensorboard]",
     "torchwrench[torchaudio]",
-]
-tests = [
-    "coverage[toml]>=7.6.1",
-    "pytest>=8.3.5",
-    "torchvision>=0.11.1",
-]
-docs = [
-    "sphinx>=7.1.2",
-    "sphinx-immaterial>=0.11.14",
 ]
 colorlog = [
     "colorlog>=6.12.0",
