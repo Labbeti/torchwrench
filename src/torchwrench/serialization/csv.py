@@ -234,7 +234,7 @@ def _dump_csv_with_pandas(
     content = file.getvalue()
     file.close()
 
-    fpath = _setup_output_fpath(fpath, overwrite, make_parents)
+    fpath = _setup_output_fpath(fpath, overwrite=overwrite, make_parents=make_parents)
     if fpath is not None:
         fpath.write_text(content)
 

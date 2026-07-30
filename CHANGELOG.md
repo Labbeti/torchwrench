@@ -3,6 +3,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.1] 2026-07-30
+### Modified
+- Replace build backend `setuptools` by `hatchling`.
+
+### Fixed
+- Fixed disk_cache decorators typing.
+- Serialization functions with newest pythonwrench version.
+
+
 ## [0.9.0] 2026-07-24
 ### Added
 - `set_seed` function.

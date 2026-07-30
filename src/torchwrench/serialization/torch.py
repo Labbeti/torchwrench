@@ -52,7 +52,7 @@ def dump_torch(
     buffer.close()
 
     if isinstance(f, (str, Path, os.PathLike)) or f is None:
-        f = _setup_output_fpath(f, overwrite, make_parents)
+        f = _setup_output_fpath(f, overwrite=overwrite, make_parents=make_parents)
 
     if isinstance(f, Path):
         f.write_bytes(content)
@@ -68,7 +68,7 @@ def load_torch(
     map_location: MapLocationLike = None,
     pickle_module: Any = None,
     *,
-    weights_only: bool = ...,  # type: ignore
+    weights_only: Optional[bool] = None,
     mmap: Optional[bool] = None,
     **pickle_load_args: Any,
 ) -> Any:
@@ -77,7 +77,7 @@ def load_torch(
     if Version(torch.__version__) < Version("2.1.0"):
         pickle_module = pickle
     else:
-        if weights_only is ...:
+        if weights_only is None or weights_only is ...:
             weights_only = Version(torch.__version__) >= "2.6.0"
 
         kwds.update(

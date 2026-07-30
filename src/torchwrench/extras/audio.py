@@ -72,7 +72,7 @@ def dump_audio(
         raise ValueError(msg)
 
     if isinstance(uri, (str, Path, os.PathLike)) or uri is None:
-        uri = _setup_output_fpath(uri, overwrite, make_parents)
+        uri = _setup_output_fpath(uri, overwrite=overwrite, make_parents=make_parents)
 
     buffer = io.BytesIO()
     torchaudio.save(  # type: ignore

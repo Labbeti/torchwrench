@@ -33,7 +33,7 @@ maintainers = [
 dynamic = ["version"]
 dependencies = [
     "lazy-loader>=0.4",
-    "pythonwrench>=0.6.1,<0.7.0",
+    "pythonwrench>=0.6.2,<0.7.0",
     "torch>=1.10.0",
     "typing-extensions>=4.10.0",
 ]
@@ -49,19 +49,6 @@ Tracker = "https://github.com/Labbeti/torchwrench/issues"
 torchwrench-info = "torchwrench.entrypoints.info:main_info"
 tow-info = "torchwrench.entrypoints.info:main_info"
 tw-info = "torchwrench.entrypoints.info:main_info"
-
-[build-system]
-requires = ["setuptools>=61.0,<82.0.0"]
-build-backend = "setuptools.build_meta"
-
-[tool.setuptools.packages.find]
-where = ["src"]  # list of folders that contain the packages (["."] by default)
-# package names should match these glob patterns (["*"] by default)
-# note: star after package names is required to work
-include = ["torchwrench*"]
-
-[tool.setuptools.dynamic]
-version = {attr = "torchwrench.__version__"}
 
 [tool.pyright]
 include = ["src"]
@@ -83,9 +70,6 @@ source = ["src"]
 torchwrench = { workspace = true }
 
 [tool.uv]
-# required-environments = [
-#     "sys_platform == 'darwin' and platform_machine == 'x86_64'",
-# ]
 conflicts = []
 
 [dependency-groups]
@@ -165,3 +149,19 @@ speechbrain = [
     "speechbrain~=1.0.3",
     "torchaudio<2.9,>=0.10.0",
 ]
+
+# --- Build backend
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+# This tells Hatch to find 'chicasr' inside the 'src' directory
+packages = ["src/torchwrench"]
+
+[tool.hatch.build.targets.wheel.sources]
+# Ensure the 'src' directory itself is treated as the root
+"src" = ""
+
+[tool.hatch.version]
+path = "src/torchwrench/__init__.py"
