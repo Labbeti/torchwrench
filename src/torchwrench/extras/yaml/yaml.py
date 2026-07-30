@@ -66,7 +66,7 @@ def dump_yaml(
         )
         raise ValueError(msg)
 
-    _setup_output_fpath(fpath, overwrite=overwrite, make_parents=make_parents)
+    fpath = _setup_output_fpath(fpath, overwrite=overwrite, make_parents=make_parents)
 
     if resolve:
         OmegaConf = omegaconf.OmegaConf
