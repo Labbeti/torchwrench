@@ -20,11 +20,13 @@ All notable changes to this project will be documented in this file.
 - `as_dtype` and `as_device` now supports 'none' and 'null' strings.
 - Upgrade pythonwrench dependancy to `>=0.6.0,<0.7.0`.
 
+
 ## [0.8.0] 2026-03-05
 ### Modified
 - Lazily load imports with `lazy-loader` package.
 - Restraint torch function and modules imports.
 - Rename `torchwrench.nn.Flatten` to `torchwrench.nn.TFlatten` to avoid shadowing `torch.nn.Flatten`.
+
 
 ## [0.7.7] 2026-02-06
 ### Added
@@ -38,6 +40,7 @@ All notable changes to this project will be documented in this file.
 ### Modified
 - `move_to` function now supports dataclasses.
 
+
 ## [0.7.6] 2025-10-16
 ### Added
 - Option `dims` in `pad_dims` now accepts `None` or `"auto"` value.
@@ -49,6 +52,7 @@ All notable changes to this project will be documented in this file.
 - `HDFDataset` repr when file is not open.
 - `pad_dims` now use correct default value for `aligns` when multiple target lengths are used.
 
+
 ## [0.7.5] 2025-09-11
 ### Added
 - `is_numpy_str_array` and `is_numpy_integral_array` functions.
@@ -58,9 +62,11 @@ All notable changes to this project will be documented in this file.
 - Args for `__exit__` method in `HDFDataset`.
 - `get_githash_short` and `get_githash_full` now catch FileNotFoundError exception.
 
+
 ## [0.7.4] 2025-07-24
 ### Added
 - `col_kwds` args in `pack_to_hdf` function to add opts like 'compression' in hdf file.
+
 
 ## [0.7.3] 2025-07-18
 ### Added
@@ -70,14 +76,17 @@ All notable changes to this project will be documented in this file.
 ### Modified
 - `torchwrench.nn.Module` no longer uses `torchwrench.nn.EModule` by default to avoid isinstance errors like `isinstance(torch.nn.Module(), torchwrench.nn.Module) == False`.
 
+
 ## [0.7.2] 2025-06-29
 ### Fixed
 - Global import when `pyyaml` is not installed.
+
 
 ## [0.7.1] 2025-06-26
 ### Added
 - Support for Python 3.8.
 - `dump_yaml` and `load_yaml` are now in global context.
+
 
 ## [0.7.0] 2025-06-23
 Rename project `torchwrench` and split python utilities into `pythonwrench` repository.
@@ -88,6 +97,7 @@ Rename project `torchwrench` and split python utilities into `pythonwrench` repo
 ### Fixed
 - `checksum` with `np.generic` instances.
 - Move serializations functions aliases in global context.
+
 
 ## [0.6.0] 2025-04-09
 ### Added
@@ -110,6 +120,7 @@ Rename project `torchwrench` and split python utilities into `pythonwrench` repo
 - `pack_custom` function and classes.
 
 
+
 ## [0.5.0] 2024-11-28
 Major rework of `torchoutil` project folders.
 
@@ -129,6 +140,7 @@ Major rework of `torchoutil` project folders.
 ### Modified
 - Rename `is_pickle_root` to `is_packed_root` (old name was kept for backward compatibility).
 - Split python functions into a separate directory called `pyoutil`.
+
 
 
 ## [0.4.0] 2024-05-27
@@ -153,6 +165,7 @@ Major rework of `torchoutil` project folders.
 - `can_be_stacked` now returns False with an empty sequence.
 
 
+
 ## [0.3.1] 2024-04-25
 ### Added
 - Method `count_parameters` to `TModule`.
@@ -165,6 +178,7 @@ Major rework of `torchoutil` project folders.
 ### Fixed
 - Remove invalid test file.
 - Function `is_scalar` now returns True for numpy scalars when numpy package is installed.
+
 
 
 ## [0.3.0] 2024-04-17
@@ -184,10 +198,12 @@ Major rework of `torchoutil` project folders.
 - `can_be_converted_to_tensor` now returns True if input is a Tensor.
 
 
+
 ## [0.2.2] 2024-03-08
 ### Fixed
 - `ModelCheckpointRegister` now creates intermediate directories before download.
 - `MaskedMean` and `MaskedSum` dim argument.
+
 
 
 ## [0.2.1] 2024-03-07
@@ -197,6 +213,7 @@ Major rework of `torchoutil` project folders.
 ### Modified
 - `pack_to_hdf` now supports existing shape column.
 - `SizedDatasetLike` is now compatible with `Sequence`-like objects.
+
 
 
 ## [0.2.0] 2024-03-04
@@ -209,6 +226,7 @@ Major rework of `torchoutil` project folders.
 ### Modified
 - Use Literal for pad and crop functions typing.
 - Minimal torch version is now 1.10.
+
 
 
 ## [0.1.0] 2024-01-29
