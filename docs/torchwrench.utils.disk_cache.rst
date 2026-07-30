@@ -1,7 +1,7 @@
-torchwrench.serialization.hdf module
+torchwrench.utils.disk\_cache module
 ====================================
 
-.. automodule:: torchwrench.serialization.hdf
+.. automodule:: torchwrench.utils.disk_cache
    :members:
    :undoc-members:
    :show-inheritance:

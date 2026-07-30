@@ -9,7 +9,7 @@ __author_email__ = "labbeti.pub@gmail.com"
 __license__ = "MIT"
 __maintainer__ = "Étienne Labbé (Labbeti)"
 __status__ = "Development"
-__version__ = "0.9.0"
+__version__ = "0.9.1"
 
 from typing import TYPE_CHECKING
 
@@ -339,6 +339,7 @@ if TYPE_CHECKING:
         UnsignedIntegerTensor2D,
         UnsignedIntegerTensor3D,
     )
+    from .utils.disk_cache import disk_cache_call, disk_cache_decorator, register_hooks
     from .utils.rng import set_seed
 
 else:
@@ -684,6 +685,11 @@ else:
                 "UnsignedIntegerTensor1D",
                 "UnsignedIntegerTensor2D",
                 "UnsignedIntegerTensor3D",
+            ],
+            "utils.disk_cache": [
+                "register_hooks",
+                "disk_cache_call",
+                "disk_cache_decorator",
             ],
             "utils.rng": ["set_seed"],
         },

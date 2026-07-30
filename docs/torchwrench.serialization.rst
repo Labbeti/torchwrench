@@ -3,8 +3,8 @@ torchwrench.serialization package
 
 .. automodule:: torchwrench.serialization
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 Submodules
 ----------

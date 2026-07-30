@@ -14,8 +14,9 @@ from typing import (
     Union,
 )
 
+import pythonwrench as pw
 import torch
-from pythonwrench.cast import as_builtin, register_as_builtin_fn
+from pythonwrench.cast import as_builtin  # noqa: F401
 from torch import Tensor
 
 from torchwrench.core.packaging import (
@@ -134,52 +135,52 @@ BACKEND_TO_PATTERN: Dict[SavingBackend, str] = {
 }
 
 
-@register_as_builtin_fn(Tensor)
+@pw.register_as_builtin_fn(Tensor)
 def _tensor_to_builtin(x: Tensor) -> Any:
     return x.tolist()
 
 
-@register_as_builtin_fn(torch.dtype)
+@pw.register_as_builtin_fn(torch.dtype)
 def _torch_dtype_to_builtin(x: torch.dtype) -> Any:
     return str(x)
 
 
-@register_as_builtin_fn(np.ndarray)
+@pw.register_as_builtin_fn(np.ndarray)
 def _np_ndarray_to_builtin(x: np.ndarray) -> Any:
     return x.tolist()
 
 
-@register_as_builtin_fn(np.generic)
+@pw.register_as_builtin_fn(np.generic)
 def _np_generic_to_builtin(x: np.generic) -> Any:
     return x.item()
 
 
-@register_as_builtin_fn(np.dtype)
+@pw.register_as_builtin_fn(np.dtype)
 def _np_dtype_to_builtin(x: np.dtype) -> Any:
     return str(x)
 
 
-@register_as_builtin_fn(pd.DataFrame)
+@pw.register_as_builtin_fn(pd.DataFrame)
 def _dataframe_to_builtin(x: pd.DataFrame) -> Any:
-    return as_builtin(x.to_dict("list"))
+    return pw.as_builtin(x.to_dict("list"))
 
 
-@register_as_builtin_fn(pd.Series)
+@pw.register_as_builtin_fn(pd.Series)
 def _series_to_builtin(x: pd.Series) -> Any:
-    return as_builtin(x.to_list())
+    return pw.as_builtin(x.to_list())
 
 
 if omegaconf_is_available():
     from omegaconf import DictConfig, ListConfig, OmegaConf  # type: ignore
 
-    @register_as_builtin_fn((DictConfig, ListConfig))
+    @pw.register_as_builtin_fn((DictConfig, ListConfig))
     def _omegaconf_to_builtin(x: Union[DictConfig, ListConfig]) -> Any:
         return as_builtin(OmegaConf.to_container(x, resolve=False, enum_to_str=True))  # type: ignore
 
 
 if pandas_is_available():
-    from pandas._libs.missing import NAType
+    from pandas._libs.missing import NAType  # type: ignore
 
-    @register_as_builtin_fn(NAType)
+    @pw.register_as_builtin_fn(NAType)
     def _na_to_builtin(x: NAType) -> float:
         return math.nan

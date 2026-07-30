@@ -3,8 +3,8 @@ torchwrench.utils package
 
 .. automodule:: torchwrench.utils
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 Subpackages
 -----------
@@ -20,5 +20,6 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
+   torchwrench.utils.disk_cache
    torchwrench.utils.return_types
    torchwrench.utils.rng

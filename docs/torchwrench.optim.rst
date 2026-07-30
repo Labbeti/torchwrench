@@ -3,8 +3,8 @@ torchwrench.optim package
 
 .. automodule:: torchwrench.optim
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 Submodules
 ----------

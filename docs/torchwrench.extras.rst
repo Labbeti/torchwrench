@@ -3,8 +3,8 @@ torchwrench.extras package
 
 .. automodule:: torchwrench.extras
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 Subpackages
 -----------

@@ -7,6 +7,7 @@ from typing import Dict
 import torch
 from pythonwrench.importlib import is_available_package
 from pythonwrench.semver import Version
+from pythonwrench.warnings import warn_once
 
 
 def _is_available_package_catch_all_errors(package: str) -> bool:
@@ -75,7 +76,16 @@ def h5py_is_available() -> bool:
 
 
 def numpy_is_available() -> bool:
-    return _cached_is_available_package_catch_all_errors("numpy")
+    if not _cached_is_available_package_catch_all_errors("numpy"):
+        return False
+    np_version = Version(_get_extra_version("numpy"))
+
+    unsupported_versions = ["2.0.0", "2.0.1", "2.0.2"]
+    pin = "numpy!=" + ",!=".join(unsupported_versions)
+    msg = f"Found numpy {np_version} but it is incompatible with torchwrench. Install correct version with torchwrench[numpy] or pin numpy to a different version: '{pin}'"
+    warn_once(msg, UserWarning)
+
+    return all(np_version != Version(version) for version in unsupported_versions)
 
 
 def omegaconf_is_available() -> bool:

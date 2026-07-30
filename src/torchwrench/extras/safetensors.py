@@ -93,7 +93,7 @@ def dump_safetensors(
         msg = f"Invalid argument type {type(tensors)}. (expected dict[str, Tensor] but found {get_fullname(type(tensors))})"
         raise TypeError(msg)
 
-    fpath = _setup_output_fpath(fpath, overwrite, make_parents)
+    fpath = _setup_output_fpath(fpath, overwrite=overwrite, make_parents=make_parents)
     content = save(tensors, metadata)
     if fpath is not None:
         fpath.write_bytes(content)

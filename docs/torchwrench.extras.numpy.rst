@@ -3,8 +3,8 @@ torchwrench.extras.numpy package
 
 .. automodule:: torchwrench.extras.numpy
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 Submodules
 ----------

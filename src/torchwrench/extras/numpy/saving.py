@@ -24,7 +24,7 @@ def dump_ndarray(
     make_parents: bool = True,
     **kwargs,
 ) -> bytes:
-    fpath = _setup_output_fpath(fpath, overwrite, make_parents)
+    fpath = _setup_output_fpath(fpath, overwrite=overwrite, make_parents=make_parents)
 
     if np_format is not None:
         pass

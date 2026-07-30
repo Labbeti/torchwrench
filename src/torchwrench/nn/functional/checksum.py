@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import ctypes
 import itertools
 import math
-import struct
 from typing import Callable, Union
 
 import torch
@@ -169,7 +169,10 @@ def _checksum_tensor_array_like(
 
 
 def _serialize_tensor_to_bytes(x: Tensor) -> bytes:
-    """Convert tensor data to bytes, but very slow compare to numpy' tobytes() method."""
-    x = x.view(torch.int8).view(-1)
-    xbytes = struct.pack(f"{len(x)}b", *x)
-    return xbytes
+    """Serialize tensor data using its contiguous in-memory representation."""
+    x = x.detach().cpu().contiguous()
+    nbytes = x.numel() * x.element_size()
+    if nbytes == 0:
+        return b""
+    else:
+        return ctypes.string_at(x.data_ptr(), nbytes)
