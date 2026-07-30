@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any, Iterable, Literal, Mapping, Optional, Uni
 
 import lazy_loader as lazy
 from pythonwrench.functools import function_alias
+from pythonwrench.serialization._core import _setup_output_fpath
 from pythonwrench.typing import DataclassInstance, NamedTupleInstance
 
 from torchwrench.core.packaging import omegaconf_is_available, yaml_is_available
@@ -65,12 +66,7 @@ def dump_yaml(
         )
         raise ValueError(msg)
 
-    if fpath is not None:
-        fpath = Path(fpath).resolve().expanduser()
-        if not overwrite and fpath.exists():
-            raise FileExistsError(f"File {fpath} already exists.")
-        elif make_parents:
-            fpath.parent.mkdir(parents=True, exist_ok=True)
+    _setup_output_fpath(fpath, overwrite=overwrite, make_parents=make_parents)
 
     if resolve:
         OmegaConf = omegaconf.OmegaConf
