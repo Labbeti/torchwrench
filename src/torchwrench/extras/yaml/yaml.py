@@ -217,8 +217,9 @@ class SplitTagLoader(SafeLoader):  # type: ignore
         return result
 
 
-IgnoreTagLoader.add_multi_constructor("!", IgnoreTagLoader.construct_with_tag)  # type: ignore
-IgnoreTagLoader.add_multi_constructor("tag:", IgnoreTagLoader.construct_with_tag)  # type: ignore
+if yaml_is_available():
+    IgnoreTagLoader.add_multi_constructor("!", IgnoreTagLoader.construct_with_tag)  # type: ignore
+    IgnoreTagLoader.add_multi_constructor("tag:", IgnoreTagLoader.construct_with_tag)  # type: ignore
 
-SplitTagLoader.add_multi_constructor("!", SplitTagLoader.construct_with_tag)  # type: ignore
-SplitTagLoader.add_multi_constructor("tag:", SplitTagLoader.construct_with_tag)  # type: ignore
+    SplitTagLoader.add_multi_constructor("!", SplitTagLoader.construct_with_tag)  # type: ignore
+    SplitTagLoader.add_multi_constructor("tag:", SplitTagLoader.construct_with_tag)  # type: ignore
