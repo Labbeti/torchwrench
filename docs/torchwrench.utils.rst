@@ -20,5 +20,6 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
+   torchwrench.utils.disk_cache
    torchwrench.utils.return_types
    torchwrench.utils.rng
