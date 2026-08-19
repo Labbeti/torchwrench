@@ -3,6 +3,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.2] UNRELEASED
+### Fixed
+- Warning message about numpy version.
+
+
 ## [0.9.1] 2026-07-30
 ### Modified
 - Replace build backend `setuptools` by `hatchling`.

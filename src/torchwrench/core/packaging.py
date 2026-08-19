@@ -81,11 +81,16 @@ def numpy_is_available() -> bool:
     np_version = Version(_get_extra_version("numpy"))
 
     unsupported_versions = ["2.0.0", "2.0.1", "2.0.2"]
-    pin = "numpy!=" + ",!=".join(unsupported_versions)
-    msg = f"Found numpy {np_version} but it is incompatible with torchwrench. Install correct version with torchwrench[numpy] or pin numpy to a different version: '{pin}'"
-    warn_once(msg, UserWarning)
+    valid_np_version = all(
+        np_version != Version(version) for version in unsupported_versions
+    )
 
-    return all(np_version != Version(version) for version in unsupported_versions)
+    if not valid_np_version:
+        pin = "numpy!=" + ",!=".join(unsupported_versions)
+        msg = f"Found numpy {np_version} but it is incompatible with torchwrench. Install correct version with torchwrench[numpy] or pin numpy to a different version: '{pin}'"
+        warn_once(msg, UserWarning)
+
+    return valid_np_version
 
 
 def omegaconf_is_available() -> bool:
