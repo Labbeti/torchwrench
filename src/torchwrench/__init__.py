@@ -52,14 +52,6 @@ if TYPE_CHECKING:
     )
     from .core.version import get_githash_full, get_githash_short
     from .extras.numpy import ndarray_to_tensor, tensor_to_ndarray, to_ndarray
-    from .extras.yaml.yaml import (
-        dump_yaml,
-        dumps_yaml,
-        load_yaml,
-        loads_yaml,
-        read_yaml,
-        save_yaml,
-    )
     from .hub.download import download_file
     from .hub.paths import get_cache_dir, get_tmp_dir
     from .nn.functional import (
@@ -234,6 +226,14 @@ if TYPE_CHECKING:
         save_pickle,
     )
     from .serialization.torch import dump_torch, load, load_torch, save
+    from .serialization.yaml import (
+        dump_yaml,
+        dumps_yaml,
+        load_yaml,
+        loads_yaml,
+        read_yaml,
+        save_yaml,
+    )
     from .types import Tensor
     from .types.guards import (
         is_builtin_collection,
@@ -389,14 +389,6 @@ else:
             ],
             "core.version": ["get_githash_full", "get_githash_short"],
             "extras.numpy": ["ndarray_to_tensor", "tensor_to_ndarray", "to_ndarray"],
-            "extras.yaml.yaml": [
-                "dump_yaml",
-                "dumps_yaml",
-                "load_yaml",
-                "loads_yaml",
-                "read_yaml",
-                "save_yaml",
-            ],
             "hub.download": ["download_file"],
             "hub.paths": ["get_cache_dir", "get_tmp_dir"],
             "nn.functional": [
@@ -579,6 +571,14 @@ else:
                 "save_pickle",
             ],
             "serialization.torch": ["dump_torch", "load_torch", "save", "load"],
+            "serialization.yaml": [
+                "dump_yaml",
+                "dumps_yaml",
+                "load_yaml",
+                "loads_yaml",
+                "read_yaml",
+                "save_yaml",
+            ],
             "types": [
                 "Tensor",
             ],

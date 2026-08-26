@@ -160,16 +160,6 @@ def _np_dtype_to_builtin(x: np.dtype) -> Any:
     return str(x)
 
 
-@pw.register_as_builtin_fn(pd.DataFrame)
-def _dataframe_to_builtin(x: pd.DataFrame) -> Any:
-    return pw.as_builtin(x.to_dict("list"))
-
-
-@pw.register_as_builtin_fn(pd.Series)
-def _series_to_builtin(x: pd.Series) -> Any:
-    return pw.as_builtin(x.to_list())
-
-
 if omegaconf_is_available():
     from omegaconf import DictConfig, ListConfig, OmegaConf  # type: ignore
 
@@ -180,6 +170,14 @@ if omegaconf_is_available():
 
 if pandas_is_available():
     from pandas._libs.missing import NAType  # type: ignore
+
+    @pw.register_as_builtin_fn(pd.DataFrame)
+    def _dataframe_to_builtin(x: pd.DataFrame) -> Any:
+        return pw.as_builtin(x.to_dict("list"))
+
+    @pw.register_as_builtin_fn(pd.Series)
+    def _series_to_builtin(x: pd.Series) -> Any:
+        return pw.as_builtin(x.to_list())
 
     @pw.register_as_builtin_fn(NAType)
     def _na_to_builtin(x: NAType) -> float:
