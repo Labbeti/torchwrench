@@ -163,8 +163,8 @@ class TestSaving(TestCase):
 class TestSerializationHooks(TestCase):
     def test_hook(self) -> None:
         x = torch.as_tensor([1, 2, 3])
-        dumped = tw.dumps_yaml(x, to_builtins=True)
-        list_dumped = tw.dumps_yaml(x.tolist(), to_builtins=True)
+        dumped = tw.dumps_json(x, to_builtins=True)
+        list_dumped = tw.dumps_json(x.tolist(), to_builtins=True)
         assert dumped == list_dumped
 
 
