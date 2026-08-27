@@ -3,7 +3,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.9.2] 2026-08-26
+## [0.9.2] 2026-08-27
 ### Fixed
 - Warning message about numpy version.
 - Serialization mode for json and pickle formats.
