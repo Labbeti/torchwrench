@@ -7,6 +7,7 @@ if TYPE_CHECKING:
     from .definitions import YamlLoaders, yaml, yaml_is_available
     from .yaml import (
         IgnoreTagLoader,
+        SafeLoader,
         SplitTagLoader,
         dump_yaml,
         dumps_yaml,
@@ -26,6 +27,7 @@ else:
             "definitions": ["yaml_is_available", "YamlLoaders", "yaml"],
             "yaml": [
                 "IgnoreTagLoader",
+                "SafeLoader",
                 "SplitTagLoader",
                 "dump_yaml",
                 "dumps_yaml",

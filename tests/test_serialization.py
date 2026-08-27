@@ -160,5 +160,13 @@ class TestSaving(TestCase):
             assert deep_equal(data, result), f"{backend=}, {i=}/{len(tests)}"
 
 
+class TestSerializationHooks(TestCase):
+    def test_hook(self) -> None:
+        x = torch.as_tensor([1, 2, 3])
+        dumped = tw.dumps_json(x, to_builtins=True)
+        list_dumped = tw.dumps_json(x.tolist(), to_builtins=True)
+        assert dumped == list_dumped
+
+
 if __name__ == "__main__":
     unittest.main()
