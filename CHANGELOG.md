@@ -3,6 +3,12 @@
 
 All notable changes to this project will be documented in this file.
 
+
+## [0.9.3] UNRELEASED
+### Added
+- pandas functions in extras.
+
+
 ## [0.9.2] 2026-08-27
 ### Fixed
 - Warning message about numpy version.
