@@ -180,7 +180,7 @@ def onehot_to_index(
     index = onehot.argmax(dim)
 
     if padding_idx is not None:
-        empty = (onehot == False).all(dim)  # noqa: E712
+        empty = (onehot == False).all(dim)
         if isinstance(empty, Tensor):
             index = torch.where(empty, padding_idx, index)
         elif isinstance(empty, np.ndarray):

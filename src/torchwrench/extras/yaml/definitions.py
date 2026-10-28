@@ -8,8 +8,8 @@ from typing_extensions import TypeAlias
 from torchwrench.core.packaging import yaml_is_available
 
 if not yaml_is_available():
-    from . import _yaml_fallback as yaml  # noqa: F401
-    from ._yaml_fallback import (  # noqa: F401
+    from . import _yaml_fallback as yaml
+    from ._yaml_fallback import (
         BaseLoader,
         CBaseLoader,
         CFullLoader,

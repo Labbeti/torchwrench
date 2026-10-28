@@ -4,7 +4,7 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .definitions import (  # noqa: F401  # type: ignore
+    from .definitions import (  # type: ignore
         pandas,
         pandas_is_available,
         pd,

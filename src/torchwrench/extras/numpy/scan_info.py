@@ -2,19 +2,16 @@
 # -*- coding: utf-8 -*-
 
 from dataclasses import dataclass
-from typing import Any, Generic, Iterable, Tuple, TypeVar, Union
+from typing import Any, Generic, Iterable, Tuple, Union
 
 import pythonwrench as pw
 import torch
 from pythonwrench import BuiltinScalar, get_current_fn_name
 from torch import Tensor
+from typing_extensions import TypeVar
 
 import torchwrench as tw
 from torchwrench.extras.numpy.definitions import ACCEPTED_NUMPY_DTYPES, np
-
-T_Invalid = TypeVar("T_Invalid", covariant=True)
-T_EmptyNp = TypeVar("T_EmptyNp", covariant=True)
-T_EmptyTorch = TypeVar("T_EmptyTorch", covariant=True)
 
 
 class InvalidTorchDType(metaclass=pw.Singleton):
@@ -22,6 +19,11 @@ class InvalidTorchDType(metaclass=pw.Singleton):
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}()"
+
+
+T_Invalid = TypeVar("T_Invalid", covariant=True, default=InvalidTorchDType)
+T_EmptyNp = TypeVar("T_EmptyNp", covariant=True, default=np.dtype)
+T_EmptyTorch = TypeVar("T_EmptyTorch", covariant=True, default=InvalidTorchDType)
 
 
 @dataclass(frozen=True)
@@ -52,9 +54,12 @@ def scan_shape_dtypes(
     *,
     accept_heterogeneous_shape: bool = False,
     empty_torch: T_EmptyTorch = None,
-    empty_np: T_EmptyNp = np.dtype("V"),
+    empty_np: T_EmptyNp = ...,
 ) -> ShapeDTypeInfo[InvalidTorchDType, T_EmptyTorch, T_EmptyNp]:
     """Returns the shape and the hdf_dtype for an input."""
+    if empty_np is ...:
+        empty_np = np.dtype("V")
+
     valid_shape, shape = tw.get_shape(x, return_indicator=True)
     if not accept_heterogeneous_shape and not valid_shape:
         msg = f"Invalid argument {x} for {get_current_fn_name()}. (cannot compute shape for heterogeneous data)"
@@ -75,10 +80,13 @@ def scan_shape_dtypes(
 def scan_torch_dtype(
     x: Any,
     *,
-    invalid: T_Invalid = InvalidTorchDType(),
+    invalid: T_Invalid = ...,
     empty: T_EmptyTorch = None,
 ) -> Union[torch.dtype, T_Invalid, T_EmptyTorch]:
     """Returns torch dtype of an arbitrary object. Works recursively on tuples and lists. An instance of InvalidTorchDType can be returned if a str is passed."""
+    if empty is ...:
+        empty = InvalidTorchDType()
+
     if isinstance(x, (int, float, bool, complex)):
         torch_dtype = torch.as_tensor(x).dtype
         return torch_dtype
@@ -109,8 +117,11 @@ def scan_torch_dtype(
 def scan_numpy_dtype(
     x: Any,
     *,
-    empty: T_EmptyNp = np.dtype("V"),
+    empty: T_EmptyNp = ...,
 ) -> Union[np.dtype, T_EmptyNp]:
+    if empty is ...:
+        empty = np.dtype("V")
+
     if isinstance(x, (int, float, bool, complex)):
         numpy_dtype = np.array(x).dtype
         return numpy_dtype
@@ -148,8 +159,10 @@ def torch_dtype_to_numpy_dtype(dtype: torch.dtype) -> np.dtype:
 def numpy_dtype_to_torch_dtype(
     dtype: np.dtype,
     *,
-    invalid: T_Invalid = InvalidTorchDType(),
+    invalid: T_Invalid = ...,
 ) -> Union[torch.dtype, T_Invalid]:
+    if invalid is ...:
+        invalid = InvalidTorchDType()
     if dtype in ACCEPTED_NUMPY_DTYPES:
         x = np.empty((0,), dtype=dtype)
         x = tw.ndarray_to_tensor(x)
@@ -182,8 +195,10 @@ def numpy_dtype_to_fill_value(dtype: Any) -> BuiltinScalar:
 def merge_numpy_dtypes(
     dtypes: Iterable[Union[np.dtype, T_EmptyNp]],
     *,
-    empty: T_EmptyNp = np.dtype("V"),
+    empty: T_EmptyNp = ...,
 ) -> Union[np.dtype, T_EmptyNp]:
+    if empty is ...:
+        empty = np.dtype("V")  # type: ignore
     dtypes = list(dict.fromkeys(dtypes))
     dtypes = [dtype for dtype in dtypes if dtype != empty]
     if len(dtypes) == 0:
@@ -197,9 +212,11 @@ def merge_numpy_dtypes(
 def merge_torch_dtypes(
     dtypes: Iterable[Union[torch.dtype, T_Invalid, T_EmptyNp]],
     *,
-    invalid: T_Invalid = InvalidTorchDType(),
+    invalid: T_Invalid = ...,
     empty: T_EmptyNp = None,
 ) -> Union[torch.dtype, T_Invalid, T_EmptyNp]:
+    if invalid is ...:
+        invalid = InvalidTorchDType()
     dtypes = list(dict.fromkeys(dtypes))
     dtypes = [dtype for dtype in dtypes if dtype != empty]
     if len(dtypes) == 0:

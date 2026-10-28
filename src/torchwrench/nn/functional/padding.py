@@ -138,7 +138,7 @@ def pad_dims(
 
 
 def pad_and_stack_rec(
-    sequence: Union[Tensor, int, float, tuple, list],
+    sequence: Union[Tensor, float, tuple, list],
     pad_value: Number = 0,
     *,
     align: PadAlign = "left",
@@ -171,7 +171,7 @@ def pad_and_stack_rec(
     device = as_device(device)
     dtype = as_dtype(dtype)
 
-    def _impl(sequence: Union[Tensor, int, float, tuple, list]) -> Tensor:
+    def _impl(sequence: Union[Tensor, float, tuple, list]) -> Tensor:
         if isinstance(sequence, Tensor):
             return sequence.to(dtype=dtype, device=device)
 
@@ -256,7 +256,7 @@ def cat_padded_batch(
     sum_size_12 = x1.shape[seq_dim] + x2.shape[seq_dim]
 
     x12 = pad_dim(x1, sum_size_12, dim=seq_dim)
-    kwd: Dict[str, Any] = dict(device=x1.device, dtype=torch.long)
+    kwd: Dict[str, Any] = {"device": x1.device, "dtype": torch.long}
     indices = torch.arange(x2_lens.max().item(), **kwd)
 
     unsq_x1_lens = x1_lens

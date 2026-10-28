@@ -4,7 +4,7 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .definitions import (  # noqa: F401
+    from .definitions import (
         DynamicItemDataset,  # type: ignore
         speechbrain_is_available,
     )

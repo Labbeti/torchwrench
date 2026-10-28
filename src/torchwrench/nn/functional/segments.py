@@ -44,7 +44,7 @@ def activity_to_segments(x: Tensor) -> LongTensor:
     """
     if not isinstance(x, BoolTensor):
         msg = f"Invalid argument {x=}. (expected BoolTensor)"
-        raise ValueError(msg)
+        raise TypeError(msg)
 
     x = x.int()
     x = pad_dim(x, x.shape[-1] + 2, align="center", pad_value=0, dim=-1)
@@ -138,11 +138,7 @@ def segments_list_to_activity(
         activity = F.full((num_elems,), False, dtype=torch.bool, device=device)
         return activity  # type: ignore
 
-    elif ndim == 2:
-        segments_list = F.as_tensor(segments_list)
-        return _segments_list_tensor_to_activity(segments_list, maxsize, device)
-
-    elif (
+    elif ndim == 2 or (
         ndim > 2
         and F.get_shape(
             segments_list,
@@ -178,7 +174,7 @@ def _segments_list_tensor_to_activity(
     assert segments_list.ndim >= 2 and segments_list.shape[-1] == 2, (
         f"{segments_list.shape=}"
     )
-    starts, ends = segments_list.permute(-1, *range(0, segments_list.ndim - 1))
+    starts, ends = segments_list.permute(-1, *range(segments_list.ndim - 1))
 
     if maxsize is None:
         num_elems = ends.max().item()

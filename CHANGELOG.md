@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - `log_completion_time` function helper in utils.
 
 ### Modified
+- Update code format with ruff 0.16.10.
 - Update optimizers imported in optim init file.
 
 

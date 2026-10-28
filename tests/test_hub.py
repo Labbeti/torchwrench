@@ -68,7 +68,7 @@ class TestRegistryHub(TestCase):
                 if i + 1 < num_tries:
                     msg = f"Failed to download {i + 1} times."
                     warnings.warn(msg)
-                    raise err
+                    raise
                 else:
                     msg = f"Found error {err} at try number {i + 1}/{num_tries}, retrying..."
                     warnings.warn(msg)
@@ -77,11 +77,11 @@ class TestRegistryHub(TestCase):
         state_dict = register.load_state_dict(
             model_name,
             offline=True,
-            load_kwds=dict(map_location="cpu", weights_only=False),
+            load_kwds={"map_location": "cpu", "weights_only": False},
         )
 
         assert isinstance(state_dict, dict)
-        assert all(isinstance(k, str) for k in state_dict.keys())
+        assert all(isinstance(k, str) for k in state_dict)
         assert all(isinstance(v, Tensor) for v in state_dict.values())
 
 

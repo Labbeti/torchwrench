@@ -84,7 +84,11 @@ def randperm_diff(
     device = as_device(device)
     dtype = as_dtype(dtype)
 
-    perm_kws: Dict[str, Any] = dict(generator=generator, device=device, dtype=dtype)
+    perm_kws: Dict[str, Any] = {
+        "generator": generator,
+        "device": device,
+        "dtype": dtype,
+    }
     arange = F.arange(size, device=device, dtype=dtype)
     perm = F.randperm(size, **perm_kws)
 

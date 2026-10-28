@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import annotations
+
 from collections.abc import Iterable
-from typing import Sequence, Union
+from typing import Sequence
 
 import numpy as np
 import pandas as pd
@@ -12,7 +14,7 @@ from pandas._typing import DropKeep
 
 def empty_dataframe(
     num_rows: int = 0,
-    columns: Union[Sequence[str], pd.Series, None] = None,
+    columns: Sequence[str] | pd.Series | None = None,
 ) -> pd.DataFrame:
     columns = pd.Series(columns) if columns is not None else None
     df = pd.DataFrame.from_records([{}] * num_rows, columns=columns)
@@ -75,7 +77,7 @@ def __sanity_check(
         for df in dfs:
             if col not in df.columns:
                 continue
-            values_i: Union[pd.Series, pd.DataFrame] = df[col]
+            values_i: pd.Series | pd.DataFrame = df[col]
 
             if isinstance(values_i, pd.Series):
                 values.append(values_i)

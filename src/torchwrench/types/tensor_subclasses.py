@@ -135,9 +135,7 @@ def _get_generics(
         orig = cls.__orig_class__  # type: ignore
         if orig.__origin__ is not _TensorNDMeta:
             return _GenericsValues()
-
         generic_args = orig.__args__  # type: ignore
-        generic_args = generic_args  # currently only check dtype and ndim
 
     elif get_origin(cls) is not None:
         args = get_args(cls)
@@ -378,7 +376,7 @@ class _TensorNDBase(
     ) -> None: ...
 
     @overload
-    def __eq__(self, other: Any) -> "BoolTensor":  # type: ignore
+    def __eq__(self, other: object) -> "BoolTensor":  # type: ignore
         ...
 
     @overload
@@ -416,7 +414,7 @@ class _TensorNDBase(
     def __getitem__(self, *args) -> "TTensor": ...
 
     @overload
-    def __ne__(self, other: Any) -> "BoolTensor":  # type: ignore
+    def __ne__(self, other: object) -> "BoolTensor":  # type: ignore
         ...
 
     @overload
@@ -689,41 +687,41 @@ class _TensorNDBase(
 
     ndim: T_NDim  # type: ignore
 
-    __eq__ = torch.Tensor.__eq__  # noqa: F811  # type: ignore
-    __getitem__ = torch.Tensor.__getitem__  # noqa: F811  # type: ignore
-    __ne__ = torch.Tensor.__ne__  # noqa: F811  # type: ignore
-    abs = torch.Tensor.abs  # noqa: F811  # type: ignore
-    absolute = torch.Tensor.absolute  # noqa: F811  # type: ignore
-    acos = torch.Tensor.acos  # noqa: F811  # type: ignore
-    all = torch.Tensor.all  # noqa: F811  # type: ignore
-    any = torch.Tensor.any  # noqa: F811  # type: ignore
-    bool = torch.Tensor.bool  # noqa: F811  # type: ignore
-    contiguous = torch.Tensor.contiguous  # noqa: F811  # type: ignore
-    cpu = torch.Tensor.cpu  # noqa: F811  # type: ignore
-    cuda = torch.Tensor.cuda  # noqa: F811  # type: ignore
-    double = torch.Tensor.double  # noqa: F811  # type: ignore
-    eq = torch.Tensor.eq  # noqa: F811  # type: ignore
-    equal = torch.Tensor.equal  # noqa: F811  # type: ignore
-    float = torch.Tensor.float  # noqa: F811  # type: ignore
-    half = torch.Tensor.half  # noqa: F811  # type: ignore
-    is_complex = torch.Tensor.is_complex  # noqa: F811  # type: ignore
-    is_floating_point = torch.Tensor.is_floating_point  # noqa: F811  # type: ignore
-    is_signed = torch.Tensor.is_signed  # noqa: F811  # type: ignore
-    isfinite = torch.Tensor.isfinite  # noqa: F811  # type: ignore
-    isinf = torch.Tensor.isinf  # noqa: F811  # type: ignore
-    isnan = torch.Tensor.isnan  # noqa: F811  # type: ignore
-    int = torch.Tensor.int  # noqa: F811  # type: ignore
-    item = torch.Tensor.item  # noqa: F811  # type: ignore
-    long = torch.Tensor.long  # noqa: F811  # type: ignore
-    mean = torch.Tensor.mean  # noqa: F811  # type: ignore
-    reshape = torch.Tensor.reshape  # noqa: F811  # type: ignore
-    short = torch.Tensor.short  # noqa: F811  # type: ignore
-    squeeze = torch.Tensor.squeeze  # noqa: F811  # type: ignore
-    sum = torch.Tensor.sum  # noqa: F811  # type: ignore
-    to = torch.Tensor.to  # noqa: F811  # type: ignore
-    tolist = torch.Tensor.tolist  # noqa: F811  # type: ignore
-    unsqueeze = torch.Tensor.unsqueeze  # noqa: F811  # type: ignore
-    view = torch.Tensor.view  # noqa: F811  # type: ignore
+    __eq__ = torch.Tensor.__eq__  # type: ignore
+    __getitem__ = torch.Tensor.__getitem__  # type: ignore
+    __ne__ = torch.Tensor.__ne__  # type: ignore
+    abs = torch.Tensor.abs  # type: ignore
+    absolute = torch.Tensor.absolute  # type: ignore
+    acos = torch.Tensor.acos  # type: ignore
+    all = torch.Tensor.all  # type: ignore
+    any = torch.Tensor.any  # type: ignore
+    bool = torch.Tensor.bool  # type: ignore
+    contiguous = torch.Tensor.contiguous  # type: ignore
+    cpu = torch.Tensor.cpu  # type: ignore
+    cuda = torch.Tensor.cuda  # type: ignore
+    double = torch.Tensor.double  # type: ignore
+    eq = torch.Tensor.eq  # type: ignore
+    equal = torch.Tensor.equal  # type: ignore
+    float = torch.Tensor.float  # type: ignore
+    half = torch.Tensor.half  # type: ignore
+    is_complex = torch.Tensor.is_complex  # type: ignore
+    is_floating_point = torch.Tensor.is_floating_point  # type: ignore
+    is_signed = torch.Tensor.is_signed  # type: ignore
+    isfinite = torch.Tensor.isfinite  # type: ignore
+    isinf = torch.Tensor.isinf  # type: ignore
+    isnan = torch.Tensor.isnan  # type: ignore
+    int = torch.Tensor.int  # type: ignore
+    item = torch.Tensor.item  # type: ignore
+    long = torch.Tensor.long  # type: ignore
+    mean = torch.Tensor.mean  # type: ignore
+    reshape = torch.Tensor.reshape  # type: ignore
+    short = torch.Tensor.short  # type: ignore
+    squeeze = torch.Tensor.squeeze  # type: ignore
+    sum = torch.Tensor.sum  # type: ignore
+    to = torch.Tensor.to  # type: ignore
+    tolist = torch.Tensor.tolist  # type: ignore
+    unsqueeze = torch.Tensor.unsqueeze  # type: ignore
+    view = torch.Tensor.view  # type: ignore
 
 
 class TTensor(

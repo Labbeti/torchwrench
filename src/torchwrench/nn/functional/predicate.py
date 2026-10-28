@@ -85,11 +85,12 @@ def __can_be_converted_to_tensor_list_tuple(x: Union[List, Tuple]) -> bool:
 def __can_be_converted_to_tensor_nested(
     x: Any,
 ) -> bool:
-    if is_builtin_number(x):
-        return True
-    elif isinstance(x, Tensor0D):
-        return True
-    elif isinstance(x, (np.ndarray, np.generic)) and x.dtype in ACCEPTED_NUMPY_DTYPES:
+    if (
+        is_builtin_number(x)
+        or isinstance(x, Tensor0D)
+        or isinstance(x, (np.ndarray, np.generic))
+        and x.dtype in ACCEPTED_NUMPY_DTYPES
+    ):
         return True
     elif isinstance(x, (List, Tuple)):
         return __can_be_converted_to_tensor_list_tuple(x)

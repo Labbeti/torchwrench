@@ -35,7 +35,7 @@ def dump_torch(
     make_parents: bool = True,
 ) -> bytes:
     if "_disable_byteorder_record" in inspect.getargs(torch.save.__code__).args:
-        kwds = dict(_disable_byteorder_record=_disable_byteorder_record)
+        kwds = {"_disable_byteorder_record": _disable_byteorder_record}
     else:
         kwds = {}
 

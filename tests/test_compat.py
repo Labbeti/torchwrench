@@ -79,13 +79,13 @@ class TestFunctionsCompat(TestCase):
                 try:
                     tw.set_default_generator(seed)
                     result = tgt_fn(*args)
-                except Exception as err:
+                except Exception as err:  # noqa BLE001
                     result = err
 
                 try:
                     tw.set_default_generator(seed)
                     expected = src_fn(*args)
-                except Exception as err:
+                except Exception as err:  # noqa BLE001
                     expected = err
 
                 msg = f"Invalid results for '{fn_name}': {type(result)=} != {type(expected)=} from '{get_fullname(tgt_fn)}' and '{get_fullname(src_fn)}', with {args=}."

@@ -246,10 +246,10 @@ def pack_to_hdf(
                     dtype=hdf_dtype,
                     **kwargs,
                 )
-            except ValueError as err:
+            except ValueError:
                 msg = f"Cannot create hdf dataset {attr_name=} of shape '{hdf_ds_shape}' with dtype '{hdf_dtype}' and {kwargs=}."
                 pylog.error(msg)
-                raise err
+                raise
 
         if verbose >= 2:
             num_scalars = sum(len(hdf_ds.shape) == 1 for hdf_ds in hdf_dsets.values())
@@ -342,14 +342,14 @@ def pack_to_hdf(
 
                     try:
                         hdf_dset[slices] = value
-                    except (TypeError, ValueError, OSError) as err:
+                    except (TypeError, ValueError, OSError):
                         msg = f"Cannot set data {value} of shape {shape} into {hdf_dset.shape=} ({attr_name=}, {i=}, {slices=}, {value.dtype=} {hdf_dset.dtype=})"
                         pylog.error(msg)
-                        raise err
+                        raise
 
                     # Store original shape if needed
                     shape_name = f"{attr_name}{shape_suffix}"
-                    if shape_name in hdf_dsets.keys():
+                    if shape_name in hdf_dsets:
                         hdf_shapes_dset = hdf_dsets[shape_name]
                         hdf_shapes_dset[i] = shape
 

@@ -7,7 +7,7 @@ import torch
 from pythonwrench.typing.classes import BuiltinNumber, BuiltinScalar
 from typing_extensions import TypeAlias
 
-from torchwrench.extras.numpy.definitions import (  # noqa: F401
+from torchwrench.extras.numpy.definitions import (
     NumpyNumberLike,
     NumpyScalarLike,
     np,

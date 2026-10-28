@@ -59,12 +59,12 @@ class MultiIndicesToMultihot(Module):
 
     def extra_repr(self) -> str:
         return dump_dict(
-            dict(
-                num_classes=self.num_classes,
-                padding_idx=self.padding_idx,
-                device=self.device,
-                dtype=self.dtype,
-            ),
+            {
+                "num_classes": self.num_classes,
+                "padding_idx": self.padding_idx,
+                "device": self.device,
+                "dtype": self.dtype,
+            },
             ignore_lst=(None,),
         )
 
@@ -97,9 +97,9 @@ class MultiIndicesToMultinames(Generic[T_Name], nn.Module):
 
     def extra_repr(self) -> str:
         return dump_dict(
-            dict(
-                padding_idx=self.padding_idx,
-            ),
+            {
+                "padding_idx": self.padding_idx,
+            },
             ignore_lst=(None,),
         )
 
@@ -122,9 +122,9 @@ class MultihotToMultiIndices(Module):
 
     def extra_repr(self) -> str:
         return dump_dict(
-            dict(
-                padding_idx=self.padding_idx,
-            ),
+            {
+                "padding_idx": self.padding_idx,
+            },
             ignore_lst=(None,),
         )
 
@@ -200,10 +200,10 @@ class MultinamesToMultihot(Generic[T_Name], nn.Module):
 
     def extra_repr(self) -> str:
         return dump_dict(
-            dict(
-                device=self.device,
-                dtype=self.dtype,
-            ),
+            {
+                "device": self.device,
+                "dtype": self.dtype,
+            },
             ignore_lst=(None,),
         )
 
@@ -264,10 +264,10 @@ class ProbsToMultihot(Module):
 
     def extra_repr(self) -> str:
         return dump_dict(
-            dict(
-                device=self.device,
-                dtype=self.dtype,
-            ),
+            {
+                "device": self.device,
+                "dtype": self.dtype,
+            },
             ignore_lst=(None,),
         )
 

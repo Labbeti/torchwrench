@@ -106,7 +106,7 @@ class TestResampleNearest(TestCase):
 class TestFlatten(TestCase):
     def test_example_1(self) -> None:
         if not numpy_is_available():
-            return None
+            return
 
         x = [
             [
@@ -127,7 +127,7 @@ class TestFlatten(TestCase):
 
     def test_example_2_between_dims(self) -> None:
         if not numpy_is_available():
-            return None
+            return
 
         shape = (10, 3, 4, 5)
 

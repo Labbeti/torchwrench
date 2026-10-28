@@ -13,8 +13,8 @@ from ._mixins import (
     _DEFAULT_DEVICE_DETECT_MODE,
     ConfigModule,
     DeviceDetectMode,
-    EModule,  # noqa: F401
-    ESequential,  # noqa: F401
+    EModule,
+    ESequential,
     InType,
     OutType,
     OutType3,

@@ -41,7 +41,7 @@ def load_safetensors(
 ) -> Union[Dict[str, Tensor], Tuple[Dict[str, Tensor], Dict[str, str]]]:
     tensors = {}
     with safe_open(fpath, framework="pt", device=device) as f:
-        for k in f.keys():
+        for k in f.keys():  # noqa: SIM118
             tensors[k] = f.get_tensor(k)
 
         if return_metadata:

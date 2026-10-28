@@ -71,10 +71,10 @@ def download_file(
             progress=verbose > 0,
         )
 
-    except HTTPError as err:
+    except HTTPError:
         msg = f"Cannot download from {url=}. (with {fpath=}, {hash_prefix=}, {make_parents=})"
         pylog.error(msg)
-        raise err
+        raise
 
     return fpath
 

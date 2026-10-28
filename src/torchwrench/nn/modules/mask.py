@@ -26,9 +26,9 @@ class MaskedMean(Module):
 
     def extra_repr(self) -> str:
         return dump_dict(
-            dict(
-                dim=self.dim,
-            ),
+            {
+                "dim": self.dim,
+            },
             ignore_lst=(None,),
         )
 
@@ -48,8 +48,8 @@ class MaskedSum(Module):
 
     def extra_repr(self) -> str:
         return dump_dict(
-            dict(
-                dim=self.dim,
-            ),
+            {
+                "dim": self.dim,
+            },
             ignore_lst=(None,),
         )

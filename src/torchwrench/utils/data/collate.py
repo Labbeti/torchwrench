@@ -73,7 +73,7 @@ class AdvancedCollateDict:
         )
         batch_keys = [
             k
-            for k in batch_dict.keys()
+            for k in batch_dict
             if match_patterns(
                 k,
                 self.include_keys,

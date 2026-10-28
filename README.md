@@ -198,6 +198,7 @@ packed_root = "path/to/packed_dataset.hdf"
 dataset = SPEECHCOMMANDS(speech_commands_root, download=True, subset="validation")
 # dataset[0] is a tuple, contains waveform and other metadata
 
+
 class MyTransform(nn.Module):
     def __init__(self) -> None:
         super().__init__()
@@ -207,6 +208,7 @@ class MyTransform(nn.Module):
         waveform = item[0]
         spectrogram = self.spectrogram_extractor(waveform)
         return (spectrogram,) + item[1:]
+
 
 pack_to_hdf(dataset, packed_root, MyTransform())
 ```

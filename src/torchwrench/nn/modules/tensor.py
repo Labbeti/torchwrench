@@ -209,12 +209,12 @@ class Max(Module):
 
     def extra_repr(self) -> str:
         return dump_dict(
-            dict(
-                dim=self.dim,
-                return_values=self.return_values,
-                return_indices=self.return_indices,
-                keepdim=self.keepdim,
-            ),
+            {
+                "dim": self.dim,
+                "return_values": self.return_values,
+                "return_indices": self.return_indices,
+                "keepdim": self.keepdim,
+            },
         )
 
 
@@ -248,11 +248,11 @@ class Mean(Module):
 
     def extra_repr(self) -> str:
         return dump_dict(
-            dict(
-                dim=self.dim,
-                keepdim=self.keepdim,
-                dtype=self.dtype,
-            ),
+            {
+                "dim": self.dim,
+                "keepdim": self.keepdim,
+                "dtype": self.dtype,
+            },
             ignore_lst=(None,),
         )
 
@@ -304,12 +304,12 @@ class Min(Module):
 
     def extra_repr(self) -> str:
         return dump_dict(
-            dict(
-                dim=self.dim,
-                return_values=self.return_values,
-                return_indices=self.return_indices,
-                keepdim=self.keepdim,
-            ),
+            {
+                "dim": self.dim,
+                "return_values": self.return_values,
+                "return_indices": self.return_indices,
+                "keepdim": self.keepdim,
+            },
         )
 
 
@@ -334,11 +334,11 @@ class Normalize(Module):
 
     def extra_repr(self) -> str:
         return dump_dict(
-            dict(
-                p=self.p,
-                dim=self.dim,
-                eps=self.eps,
-            )
+            {
+                "p": self.p,
+                "dim": self.dim,
+                "eps": self.eps,
+            }
         )
 
 
@@ -356,9 +356,9 @@ class Permute(Module):
 
     def extra_repr(self) -> str:
         return dump_dict(
-            dict(
-                dims=self.dims,
-            ),
+            {
+                "dims": self.dims,
+            },
             fmt="{value}",
         )
 
@@ -425,11 +425,11 @@ class RepeatInterleave(Module):
 
     def extra_repr(self) -> str:
         return dump_dict(
-            dict(
-                repeats=self.repeats,
-                dim=self.dim,
-                output_size=self.output_size,
-            ),
+            {
+                "repeats": self.repeats,
+                "dim": self.dim,
+                "output_size": self.output_size,
+            },
             ignore_lst=(None,),
         )
 
@@ -448,9 +448,9 @@ class Reshape(Module):
 
     def extra_repr(self) -> str:
         return dump_dict(
-            dict(
-                shape=self.shape,
-            ),
+            {
+                "shape": self.shape,
+            },
         )
 
 
@@ -540,10 +540,10 @@ class Transpose(Module):
 
     def extra_repr(self) -> str:
         return dump_dict(
-            dict(
-                dim0=self.dim0,
-                dim1=self.dim1,
-            ),
+            {
+                "dim0": self.dim0,
+                "dim1": self.dim1,
+            },
             fmt="{value}",
         )
 

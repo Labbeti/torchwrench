@@ -61,7 +61,7 @@ class TestTabularDataset(TestCase):
 
     def test_ndarray(self) -> None:
         if not numpy_is_available():
-            return None
+            return
 
         data: np.ndarray = np.random.rand(10, 3, 2)
         ds = TabularDataset(data)
@@ -83,7 +83,7 @@ class TestTabularDataset(TestCase):
 
     def test_dynamic_item_dataset(self) -> None:
         if not speechbrain_is_available():
-            return None
+            return
 
         data = {f"{i}": {"string": i} for i in range(100)}
         ds = DynamicItemDataset(data)

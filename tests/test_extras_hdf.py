@@ -83,7 +83,7 @@ class TestHDF(TestCase):
             path,
             exists="overwrite",
             shape_suffix=shape_suffix,
-            ds_kwds=dict(cast="to_torch_or_builtin"),
+            ds_kwds={"cast": "to_torch_or_builtin"},
         )
 
         assert len(hdf_dataset.added_columns) == 0
@@ -113,7 +113,7 @@ class TestHDF(TestCase):
             ds_list,
             path,
             exists="overwrite",
-            ds_kwds=dict(cast="none"),
+            ds_kwds={"cast": "none"},
         )
 
         # Random indices test
@@ -160,7 +160,7 @@ class TestHDF(TestCase):
             ds_list,
             fpath,
             exists="overwrite",
-            ds_kwds=dict(cast="to_torch_src"),
+            ds_kwds={"cast": "to_torch_src"},
         )
 
         assert len(hdf_ds.added_columns) == 0
@@ -190,7 +190,7 @@ class TestHDF(TestCase):
         ds_list = dict_list_to_list_dict(ds_dict, "same")
 
         path = tmpdir.joinpath("test_slice.hdf")
-        pack_to_hdf(ds_list, path, exists="overwrite", ds_kwds=dict(open_hdf=False))
+        pack_to_hdf(ds_list, path, exists="overwrite", ds_kwds={"open_hdf": False})
 
         hdf_dataset = HDFDataset(path, cast="as_builtin")
 
@@ -234,7 +234,7 @@ class TestHDF(TestCase):
             ds_list,
             path,
             exists="overwrite",
-            ds_kwds=dict(cast="as_builtin"),
+            ds_kwds={"cast": "as_builtin"},
         )
 
         assert hdf_dataset._src_is_unicode == {
@@ -253,9 +253,8 @@ class TestHDF(TestCase):
         assert eq, f"{idx=}; {col=}"
 
         assert len(hdf_dataset) == len(ds_list)
-        for k in ds_dict.keys():
+        for k, ds_col in ds_dict.items():
             hdf_col = hdf_dataset[:, k]
-            ds_col = ds_dict[k]
             eq = hdf_col == ds_col
             if isinstance(eq, np.ndarray):
                 eq = eq.all()
@@ -339,8 +338,7 @@ class TestHDF(TestCase):
 
             assert ds_bytes_data.keys() == ds_vlen_data.keys()
             assert all(
-                np.all(ds_bytes_data[k] == ds_vlen_data[k])
-                for k in ds_bytes_data.keys()
+                np.all(ds_bytes_data[k] == ds_vlen_data[k]) for k in ds_bytes_data
             )
 
         if not (np.median(duration_ds_bytes_lst) < np.median(duration_ds_vlen_lst)):
@@ -385,7 +383,7 @@ class TestHDF(TestCase):
         hdf_compressed = pack_to_hdf(
             data,
             hdf_fpath_compressed,
-            col_kwds=dict(compression="lzf"),
+            col_kwds={"compression": "lzf"},
             exists="overwrite",
         )
 

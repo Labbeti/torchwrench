@@ -137,7 +137,7 @@ class ProxyDeviceModule(nn.Module):
 class ConfigModule(Generic[T_MutableMappingStr], nn.Module):
     _CONFIG_TYPES: ClassVar[Tuple[type, ...]] = (int, str, bool, float, NoneType)
     _CONFIG_EXCLUDE: ClassVar[Tuple[str, ...]] = ("^_.*",) + tuple(
-        f".*{k}$" for k in nn.Module().__dict__.keys()
+        f".*{k}$" for k in nn.Module().__dict__
     )
     _DEFAULT_EXTRA_REPR: ClassVar[bool] = False
 

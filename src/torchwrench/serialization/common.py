@@ -16,7 +16,7 @@ from typing import (
 
 import pythonwrench as pw
 import torch
-from pythonwrench.cast import as_builtin  # noqa: F401
+from pythonwrench.cast import as_builtin
 from torch import Tensor
 
 from torchwrench.core.packaging import (
@@ -125,7 +125,7 @@ def _fpath_to_saving_backend(
         raise ValueError(msg)
 
     if verbose >= 2:
-        msg = f"Loading file '{str(fpath)}' using {saving_backend=}."
+        msg = f"Loading file '{fpath!s}' using {saving_backend=}."
         pylog.debug(msg)
     return saving_backend
 
