@@ -3,10 +3,13 @@
 
 All notable changes to this project will be documented in this file.
 
-
 ## [0.9.3] UNRELEASED
 ### Added
-- pandas functions in extras.
+- `empty_dataframe`, `drop_duplicated_col_names`, `concat_without_duplicated_col_names` pandas functions in extras.
+- `log_completion_time` function helper in utils.
+
+### Modified
+- Update optimizers imported in optim init file.
 
 
 ## [0.9.2] 2026-08-27
