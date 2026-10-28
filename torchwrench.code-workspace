@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.exclude": {
+			".*_cache": true,
+			".coverage": true,
+			".vscode": true,
+			"**/*egg-info": true,
+			"build": true,
+			"dist": true
+		}
+	}
+}
