@@ -13,11 +13,28 @@ from torchwrench.core.dtype_enum import (
     str_to_torch_dtype,
 )
 
+DevicePredefinedName = Literal["cpu", "cuda", "mps", "xpu", "xla"]
 DeviceLike: TypeAlias = Union[
-    torch.device, None, Literal["default", "cuda_if_available"], str, int
+    torch.device,
+    None,
+    Literal["default", "cuda_if_available"],
+    DevicePredefinedName,
+    str,
+    int,
 ]
-DTypeLike: TypeAlias = Union[torch.dtype, None, Literal["default"], str, DTypeEnum]
-GeneratorLike: TypeAlias = Union[torch.Generator, None, Literal["default"], int]
+DTypeLike: TypeAlias = Union[
+    torch.dtype,
+    None,
+    Literal["default"],
+    str,
+    DTypeEnum,
+]
+GeneratorLike: TypeAlias = Union[
+    torch.Generator,
+    None,
+    Literal["default"],
+    int,
+]
 
 # Expose torch types
 Generator = torch.Generator

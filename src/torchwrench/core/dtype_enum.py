@@ -167,8 +167,8 @@ def str_to_torch_dtype(dtype: str) -> torch.dtype:
     if name not in _NAME_TO_DTYPE:
         msg = f"Invalid argument {dtype=}. (expected one of {tuple(_NAME_TO_DTYPE.keys())})"
         raise KeyError(msg)
-    dtype = _NAME_TO_DTYPE[name]
-    return dtype
+    dtype_cls = _NAME_TO_DTYPE[name]
+    return dtype_cls
 
 
 def torch_dtype_to_enum_dtype(dtype: torch.dtype) -> DTypeEnum:
