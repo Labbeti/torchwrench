@@ -3,7 +3,6 @@
 
 from typing import TYPE_CHECKING
 
-from torch.optim._adafactor import Adafactor as Adafactor
 from torch.optim.adadelta import Adadelta as Adadelta
 from torch.optim.adagrad import Adagrad as Adagrad
 from torch.optim.adam import Adam as Adam
