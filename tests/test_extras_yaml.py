@@ -21,7 +21,7 @@ from torchwrench.extras.yaml import (
 class TestYaml(TestCase):
     def test_yaml_load_examples(self) -> None:
         if not yaml_is_available():
-            return None
+            return
 
         dumped = "a: !!python/tuple\n- 1\n- 2"
 

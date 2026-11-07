@@ -46,11 +46,11 @@ __all__ = [
     "arange",
     "empty",
     "full",
-    "rand",
-    "randn",
-    "randint",
-    "randperm",
     "ones",
+    "rand",
+    "randint",
+    "randn",
+    "randperm",
     "zeros",
 ]
 

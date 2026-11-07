@@ -100,7 +100,7 @@ class SubsetCycleSampler(Sampler[int]):
 
     def _shuffle_indices(self) -> None:
         if not self._shuffle:
-            return None
+            return
         self._indices = shuffled(self._indices, generator=self._generator)
 
 
@@ -155,11 +155,10 @@ class BalancedSampler(Sampler):
         self._shuffle_indices()
 
     def __iter__(self) -> Iterator[int]:
-        global_idx = 0
         n_classes = len(self._cls_to_sample_indices)
         cls_indices = torch.randperm(n_classes, generator=self._generator)
 
-        for i, cls_idx in enumerate(itertools.cycle(range(n_classes))):
+        for global_idx, cls_idx in enumerate(itertools.cycle(range(n_classes))):
             cls_idx = int(cls_indices[cls_idx].item())
             if global_idx >= self._n_max_iterations:
                 break
@@ -176,9 +175,8 @@ class BalancedSampler(Sampler):
             yield sample_idx
 
             self._local_idx_per_class[cls_idx] = (pointer_idx + 1) % len(pointers)
-            global_idx += 1
 
-            if self._shuffle and i == n_classes - 1:
+            if self._shuffle and global_idx == n_classes - 1:
                 cls_indices = shuffled(cls_indices, generator=self._generator)
 
     def __len__(self) -> int:
@@ -186,7 +184,7 @@ class BalancedSampler(Sampler):
 
     def _shuffle_indices(self) -> None:
         if not self._shuffle:
-            return None
+            return
 
         for i, pointers in enumerate(self._pointers_per_class):
             pointers_pt = as_tensor(pointers)

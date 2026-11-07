@@ -14,7 +14,9 @@ if not tensorboard_is_available():
     msg = "Cannot import tensorboard objects because optional dependency 'tensorboard' is not installed. Please install it using 'pip install torchwrench[extras]'"
     raise ImportError(msg)
 
-from tensorboard.backend.event_processing.event_file_loader import EventFileLoader
+from tensorboard.backend.event_processing.event_file_loader import (
+    EventFileLoader,  # type: ignore
+)
 
 pylog = logging.getLogger(__name__)
 

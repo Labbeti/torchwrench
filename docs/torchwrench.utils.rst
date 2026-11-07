@@ -21,6 +21,7 @@ Submodules
    :maxdepth: 4
 
    torchwrench.utils.disk_cache
+   torchwrench.utils.monitoring
    torchwrench.utils.pkg_hooks
    torchwrench.utils.return_types
    torchwrench.utils.rng

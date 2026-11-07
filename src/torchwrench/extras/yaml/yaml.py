@@ -131,11 +131,11 @@ def loads_yaml(
 
     try:
         data = yaml.load(content, Loader=Loader)  # type: ignore
-    except (ScannerError, ParserError) as err:
+    except (ScannerError, ParserError):
         if on_error == "ignore":
             return None
         else:
-            raise err
+            raise
     return data
 
 

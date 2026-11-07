@@ -42,11 +42,11 @@ class CropDim(Module):
 
     def extra_repr(self) -> str:
         return dump_dict(
-            dict(
-                target_length=self.target_length,
-                dim=self.dim,
-                align=self.align,
-            )
+            {
+                "target_length": self.target_length,
+                "dim": self.dim,
+                "align": self.align,
+            }
         )
 
 
@@ -80,9 +80,9 @@ class CropDims(Module):
 
     def extra_repr(self) -> str:
         return dump_dict(
-            dict(
-                target_lengths=self.target_lengths,
-                dims=self.dims,
-                aligns=self.aligns,
-            )
+            {
+                "target_lengths": self.target_lengths,
+                "dims": self.dims,
+                "aligns": self.aligns,
+            }
         )

@@ -45,9 +45,9 @@ def tensor_to_ndarray(
 ) -> np.ndarray:
     """Convert PyTorch tensor to numpy array."""
     if Version(str(torch.__version__)) >= Version("1.13.0"):
-        kwargs = dict(force=force)
+        kwargs = {"force": force}
     elif not force:
-        kwargs = dict()
+        kwargs = {}
     else:
         msg = f"Invalid argument {force=} for {get_current_fn_name()}. (expected True because torch version is below 1.13)"
         raise ValueError(msg)

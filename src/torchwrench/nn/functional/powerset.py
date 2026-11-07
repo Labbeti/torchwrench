@@ -163,7 +163,7 @@ def build_powerset_mapping(
     mapping = torch.zeros(num_powerset_classes, num_classes, dtype=dtype)
     powerset_k = 0
 
-    for set_size in range(0, max_set_size + 1):
+    for set_size in range(max_set_size + 1):
         for current_set in combinations(range(num_classes), set_size):
             mapping[powerset_k, current_set] = 1
             powerset_k += 1
@@ -173,5 +173,5 @@ def build_powerset_mapping(
 
 @lru_cache(maxsize=None)
 def get_num_powerset_classes(num_classes: int, max_set_size: int) -> int:
-    binom_coefficients = (math.comb(num_classes, i) for i in range(0, max_set_size + 1))
+    binom_coefficients = (math.comb(num_classes, i) for i in range(max_set_size + 1))
     return int(sum(binom_coefficients))

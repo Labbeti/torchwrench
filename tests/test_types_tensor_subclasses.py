@@ -167,7 +167,7 @@ class TestTensorTyping(TestCase):
 
     def test_instantiation_with_args(self) -> None:
         args = (1, 2, 3)
-        kwargs = dict()
+        kwargs = {}
         x = LongTensor(*args, **kwargs)
         assert x.ndim == len(args) and x.dtype == torch.long
 

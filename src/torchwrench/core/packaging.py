@@ -13,7 +13,7 @@ from pythonwrench.warnings import warn_once
 def _is_available_package_catch_all_errors(package: str) -> bool:
     try:
         return is_available_package(package)
-    except Exception:
+    except Exception:  # noqa: BLE001
         return False
 
 

@@ -42,9 +42,9 @@ from ._core import (
 )
 
 __all__ = [
-    "TabularDataset",
-    "T_RowIndex",
     "T_ColIndex",
+    "T_RowIndex",
+    "TabularDataset",
 ]
 
 

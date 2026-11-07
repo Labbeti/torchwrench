@@ -17,11 +17,11 @@ T_Indices = TypeVar("T_Indices", bound=Tensor, covariant=True)
 __all__ = [
     "max",
     "min",
-    "sort",
-    "topk",
-    "shape",
     "ndim",
+    "shape",
+    "sort",
     "top_p",
+    "topk",
 ]
 
 
@@ -36,7 +36,7 @@ class _namedtuple_values_indices(Generic[T_Values, T_Indices], tuple):
 
 
 if Version(str(__version__)) >= Version("2.0.0"):
-    from torch.return_types import max, min, sort, topk  # type: ignore # noqa: F401
+    from torch.return_types import max, min, sort, topk  # type: ignore
 
 else:
 

@@ -96,7 +96,7 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
         if not hdf_fpath.is_file():
             names = os.listdir(osp.dirname(hdf_fpath))
             names = [name for name in names if name.endswith(".hdf")]
-            names = list(sorted(names))
+            names = sorted(names)
             names_str = "\n - ".join(names)
             msg = f"Cannot find HDF file in path {hdf_fpath=}."
             if len(names) > 0:
@@ -385,7 +385,7 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
 
         shape_column = f"{column}{self._shape_suffix}"
         must_remove_padding = (
-            shape_column in self._hdf_file.keys() and column not in self._keep_padding
+            shape_column in self._hdf_file and column not in self._keep_padding
         )
         hdf_ds: HDFRawDataset = self._hdf_file[column]
         hdf_dtype: np.dtype = hdf_ds.dtype
@@ -437,7 +437,7 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
     def open(self, ignore_if_opened: bool = False) -> None:
         if self.is_open():
             if ignore_if_opened:
-                return None
+                return
             else:
                 raise RuntimeError("Cannot open the HDF file twice.")
 
@@ -451,7 +451,7 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
         }
 
     # Magic methods
-    def __eq__(self, __o: object) -> bool:
+    def __eq__(self, /, __o: object) -> bool:
         return isinstance(__o, HDFDataset) and pickle.dumps(self) == pickle.dumps(__o)
 
     def __enter__(self) -> Self:
@@ -603,7 +603,7 @@ class HDFDataset(Generic[T, U], DatasetSlicer[U]):
             pylog.error(msg)
 
         if not hasattr(self, "__orig_class__"):
-            return None
+            return
 
         t_type = self.__orig_class__.__args__[0]  # type: ignore
         if t_type is not Any and (

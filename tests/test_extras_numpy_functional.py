@@ -25,7 +25,7 @@ from torchwrench.extras.numpy import (
 class TestNumpy(TestCase):
     def test_example_1(self) -> None:
         if not numpy_is_available():
-            return None
+            return
 
         x_tensor = torch.rand(3, 4, 5)
         x_array = tensor_to_ndarray(x_tensor)
@@ -35,7 +35,7 @@ class TestNumpy(TestCase):
 
     def test_complex(self) -> None:
         if not numpy_is_available():
-            return None
+            return
 
         complex_dtypes = [np.complex64, np.complex128]
         x_complex = [

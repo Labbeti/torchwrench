@@ -58,12 +58,12 @@ class IndexToOnehot(Module):
 
     def extra_repr(self) -> str:
         return dump_dict(
-            dict(
-                num_classes=self.num_classes,
-                padding_idx=self.padding_idx,
-                device=self.device,
-                dtype=self.dtype,
-            ),
+            {
+                "num_classes": self.num_classes,
+                "padding_idx": self.padding_idx,
+                "device": self.device,
+                "dtype": self.dtype,
+            },
             ignore_lst=(None,),
         )
 
@@ -184,10 +184,10 @@ class NameToOnehot(Generic[T_Name], nn.Module):
 
     def extra_repr(self) -> str:
         return dump_dict(
-            dict(
-                device=self.device,
-                dtype=self.dtype,
-            ),
+            {
+                "device": self.device,
+                "dtype": self.dtype,
+            },
             ignore_lst=(None,),
         )
 
@@ -243,11 +243,11 @@ class ProbsToOnehot(Module):
 
     def extra_repr(self) -> str:
         return dump_dict(
-            dict(
-                dim=self.dim,
-                device=self.device,
-                dtype=self.dtype,
-            ),
+            {
+                "dim": self.dim,
+                "device": self.device,
+                "dtype": self.dtype,
+            },
             ignore_lst=(None,),
         )
 

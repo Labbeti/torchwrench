@@ -68,7 +68,7 @@ class _WrapperBase(Generic[T], Dataset[T]):
         return dataset  # type: ignore
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({repr(self.dataset)})"
+        return f"{self.__class__.__name__}({self.dataset!r})"
 
 
 class Wrapper(Generic[T], _WrapperBase[T]):

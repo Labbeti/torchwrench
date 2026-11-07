@@ -119,27 +119,26 @@ class TestSaving(TestCase):
         assert pw.is_full(map(len, data_objs.values()))
 
         tests: List[Tuple[str, Any, bool, dict, dict]] = [
-            ("json", data_objs, True, dict(), dict()),
-            ("pickle", data_objs, False, dict(), dict()),
+            ("json", data_objs, True, {}, {}),
+            ("pickle", data_objs, False, {}, {}),
         ]
 
         if numpy_is_available():
             from torchwrench.extras.numpy import to_ndarray
 
             tests += [
-                ("numpy", to_ndarray(v), False, dict(), dict())
-                for k, v in data_objs.items()
+                ("numpy", to_ndarray(v), False, {}, {}) for k, v in data_objs.items()
             ]
 
         if safetensors_is_available():
             tests += [
-                ("safetensors", data_tensors, False, dict(), dict()),
+                ("safetensors", data_tensors, False, {}, {}),
             ]
 
         if yaml_is_available():
             tests += [
-                ("yaml", data_tensors, True, dict(), dict()),
-                ("yaml", data_objs, True, dict(), dict()),
+                ("yaml", data_tensors, True, {}, {}),
+                ("yaml", data_objs, True, {}, {}),
             ]
 
         for i, (backend, data, to_builtins, load_kwds, dump_kwds) in enumerate(tests):

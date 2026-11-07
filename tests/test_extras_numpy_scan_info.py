@@ -11,7 +11,7 @@ from torchwrench.extras.numpy import merge_numpy_dtypes, np
 class TestDType(TestCase):
     def test_merge_numpy_dtypes(self) -> None:
         if not numpy_is_available():
-            return None
+            return
 
         empty = None
         args_lst = [

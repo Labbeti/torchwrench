@@ -16,7 +16,6 @@ from typing import (
     overload,
 )
 
-from torchwrench.extras.numpy import np
 import pythonwrench as pw
 import torch
 from pythonwrench.typing import SupportsGetitemIterLen
@@ -24,7 +23,7 @@ from torch import Tensor
 from torch.utils.data.dataset import Dataset
 from typing_extensions import TypeVar
 
-from torchwrench.extras.numpy import is_numpy_bool_array, is_numpy_integral_array
+from torchwrench.extras.numpy import is_numpy_bool_array, is_numpy_integral_array, np
 from torchwrench.extras.pandas import pd
 from torchwrench.extras.speechbrain import DynamicItemDataset
 from torchwrench.nn.functional.multilabel import multihot_to_multi_indices
@@ -505,7 +504,7 @@ def _recursive_get_values(
             result[col] = ds[idx, col]
             continue
 
-        if col not in fns.keys():
+        if col not in fns:
             msg = f"Invalid argument {col=}. (expected one of {tuple(fns.keys())})"
             raise KeyError(msg)
 
@@ -703,9 +702,12 @@ def _get_from_indices(
     x: Union[Tensor, np.ndarray, pw.SupportsGetitemLen],
     indices: Union[Tensor, np.ndarray, Iterable],
 ) -> Union[Tensor, np.ndarray, list]:
-    if isinstance(x, Tensor) and isinstance(indices, Tensor):
-        return x[indices]
-    elif isinstance(x, np.ndarray) and isinstance(indices, np.ndarray):
+    if (
+        isinstance(x, Tensor)
+        and isinstance(indices, Tensor)
+        or isinstance(x, np.ndarray)
+        and isinstance(indices, np.ndarray)
+    ):
         return x[indices]
     elif isinstance(x, pw.SupportsGetitemLen):
         return [x[idx] for idx in indices]  # type: ignore
@@ -718,9 +720,12 @@ def _get_from_mask(
     x: Union[Tensor, np.ndarray, pw.SupportsGetitemLen],
     mask: Union[Tensor, np.ndarray, Iterable],
 ) -> Union[Tensor, np.ndarray, list]:
-    if isinstance(x, Tensor) and isinstance(mask, Tensor):
-        return x[mask]
-    elif isinstance(x, np.ndarray) and isinstance(mask, np.ndarray):
+    if (
+        isinstance(x, Tensor)
+        and isinstance(mask, Tensor)
+        or isinstance(x, np.ndarray)
+        and isinstance(mask, np.ndarray)
+    ):
         return x[mask]
     elif isinstance(x, pw.SupportsGetitemLen):
         indices = multihot_to_multi_indices(mask)

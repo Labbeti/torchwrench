@@ -57,7 +57,7 @@ class TestChecksum(TestCase):
 
     def test_large_arrays_numpy(self) -> None:
         if not numpy_is_available():
-            return None
+            return
         x0 = np.random.rand(10000, 100)
         x1 = np.random.rand(10000, 100)
         assert tw.checksum_any(x0) != tw.checksum_any(x1)
@@ -71,7 +71,7 @@ class TestChecksum(TestCase):
     def test_nan(self) -> None:
         # NaN tw.checksum_any are equal but nan itself can be different
         if not numpy_is_available():
-            return None
+            return
         x0 = math.nan
         x1 = np.nan
         assert id(x0) != id(x1)

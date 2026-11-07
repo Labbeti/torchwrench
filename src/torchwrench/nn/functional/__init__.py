@@ -213,7 +213,7 @@ if TYPE_CHECKING:
         segments_to_activity,
         segments_to_segments_list,
     )
-    from .transform import (  # noqa: F811
+    from .transform import (
         as_tensor,
         flatten,
         identity,

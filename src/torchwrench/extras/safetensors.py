@@ -7,8 +7,8 @@ from typing import Any, Dict, Literal, Optional, Tuple, Union, overload
 from pythonwrench.inspect import get_fullname
 from pythonwrench.serialization._core import _setup_output_fpath
 from pythonwrench.typing.checks import isinstance_generic
-from safetensors import safe_open
-from safetensors.torch import save
+from safetensors import safe_open  # type: ignore
+from safetensors.torch import save  # type: ignore
 from torch import Tensor
 
 from torchwrench.core.packaging import safetensors_is_available  # noqa: F401
@@ -41,7 +41,7 @@ def load_safetensors(
 ) -> Union[Dict[str, Tensor], Tuple[Dict[str, Tensor], Dict[str, str]]]:
     tensors = {}
     with safe_open(fpath, framework="pt", device=device) as f:
-        for k in f.keys():
+        for k in f.keys():  # noqa: SIM118
             tensors[k] = f.get_tensor(k)
 
         if return_metadata:

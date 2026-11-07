@@ -126,7 +126,7 @@ class TestGuards(TestCase):
         assert not is_builtin_scalar(i2, strict=True)
 
         if not numpy_is_available():
-            return None
+            return
 
         s1 = "abc"
         arr = np.array([s1, s1])

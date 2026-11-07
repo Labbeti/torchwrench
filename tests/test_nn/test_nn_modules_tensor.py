@@ -77,13 +77,13 @@ class TestModuleCompat(TestCase):
             try:
                 module = module_cls()
                 result = module(x)
-            except Exception as err:
+            except Exception as err:  # noqa: BLE001
                 result = err
 
             fn = getattr(base_module, fn_name)
             try:
                 expected = fn(x)
-            except Exception as err:
+            except Exception as err:  # noqa: BLE001
                 expected = err
 
             if isinstance(result, Exception) and isinstance(expected, Exception):

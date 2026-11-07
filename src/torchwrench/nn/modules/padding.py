@@ -59,13 +59,13 @@ class PadDim(Module):
 
     def extra_repr(self) -> str:
         return dump_dict(
-            dict(
-                target_length=self.target_length,
-                dim=self.dim,
-                align=self.align,
-                pad_value=self.pad_value,
-                mode=self.mode,
-            )
+            {
+                "target_length": self.target_length,
+                "dim": self.dim,
+                "align": self.align,
+                "pad_value": self.pad_value,
+                "mode": self.mode,
+            }
         )
 
 
@@ -108,13 +108,13 @@ class PadDims(Module):
 
     def extra_repr(self) -> str:
         return dump_dict(
-            dict(
-                target_lengths=self.target_lengths,
-                dims=self.dims,
-                aligns=self.aligns,
-                pad_value=self.pad_value,
-                mode=self.mode,
-            )
+            {
+                "target_lengths": self.target_lengths,
+                "dims": self.dims,
+                "aligns": self.aligns,
+                "pad_value": self.pad_value,
+                "mode": self.mode,
+            }
         )
 
 
@@ -139,7 +139,7 @@ class PadAndStackRec(Module):
 
     def forward(
         self,
-        sequence: Union[Tensor, int, float, tuple, list],
+        sequence: Union[Tensor, float, tuple, list],
     ) -> Tensor:
         return pad_and_stack_rec(
             sequence,
@@ -151,10 +151,10 @@ class PadAndStackRec(Module):
 
     def extra_repr(self) -> str:
         return dump_dict(
-            dict(
-                pad_value=self.pad_value,
-                align=self.align,
-                device=self.device,
-                dtype=self.dtype,
-            )
+            {
+                "pad_value": self.pad_value,
+                "align": self.align,
+                "device": self.device,
+                "dtype": self.dtype,
+            }
         )

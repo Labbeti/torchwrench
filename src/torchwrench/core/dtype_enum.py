@@ -3,7 +3,7 @@
 
 import builtins
 from enum import auto
-from typing import Any, Dict, Final
+from typing import Dict, Final
 
 import torch
 from pythonwrench.enum import StrEnum
@@ -144,7 +144,7 @@ class DTypeEnum(StrEnum):
     def to_complex(self) -> "DTypeEnum":
         return DTypeEnum.from_dtype(self.dtype.to_complex())  # type: ignore
 
-    def __eq__(self, other: Any) -> _bool:
+    def __eq__(self, other: object) -> _bool:
         if isinstance(other, DTypeEnum):
             return self.dtype == other.dtype
         elif isinstance(other, torch.dtype):
@@ -167,8 +167,8 @@ def str_to_torch_dtype(dtype: str) -> torch.dtype:
     if name not in _NAME_TO_DTYPE:
         msg = f"Invalid argument {dtype=}. (expected one of {tuple(_NAME_TO_DTYPE.keys())})"
         raise KeyError(msg)
-    dtype = _NAME_TO_DTYPE[name]
-    return dtype
+    dtype_cls = _NAME_TO_DTYPE[name]
+    return dtype_cls
 
 
 def torch_dtype_to_enum_dtype(dtype: torch.dtype) -> DTypeEnum:

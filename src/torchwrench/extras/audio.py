@@ -18,7 +18,7 @@ if not torchaudio_is_available():
     msg = f"Cannot use python module {__file__} since torchaudio package is not installed."
     raise ImportError(msg)
 
-import torchaudio
+import torchaudio  # type: ignore
 
 try:
     from torchaudio import _AudioMetaData  # type: ignore

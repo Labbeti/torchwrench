@@ -5,7 +5,7 @@ authors = [
 ]
 description = "Collection of functions and modules to help development in PyTorch."
 readme = "README.md"
-requires-python = ">=3.8,<3.15"
+requires-python = ">=3.8,<3.16"
 keywords = ["pytorch", "deep-learning"]
 license = {file = "LICENSE"}
 # license-files = ["LICENSE"]  # unsupported by python 3.8, but will be required in 2026
@@ -20,6 +20,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
     "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Operating System :: OS Independent",
@@ -64,11 +65,6 @@ testpaths = ["tests"]
 [tool.coverage.run]
 source = ["src"]
 
-[tool.ruff.lint.extend-per-file-ignores]
-# F401: module imported but unused
-# F403: ‘from module import *’ used; unable to detect undefined names
-"__init__.py" = ["F401", "F403"]
-
 [tool.uv.sources]
 torchwrench = { workspace = true }
 
@@ -95,7 +91,7 @@ dev = [
     "torchwrench[tests]",
 ]
 tests = [
-    "ruff~=0.14.9",
+    "ruff==0.16.10",
     "coverage[toml]>=7.6.1",
     "pytest>=8.3.5",
     "torchvision>=0.11.1",
@@ -166,3 +162,20 @@ packages = ["src/torchwrench"]
 
 [tool.hatch.version]
 path = "src/torchwrench/__init__.py"
+
+[tool.ruff]
+# In addition to the standard set of exclusions, omit all tests, plus a specific file.
+extend-exclude = ["notebooks/**.ipynb"]
+
+[tool.ruff.lint.per-file-ignores]
+# F401   : unused imports
+# E402   : module import not at top of file
+# UP009  : remove unnecessary utf-8 coding
+# EXE001 : specify sheshang but file is not executable
+# PYI061 : replace Literal[None, ...] by Literal[...] | None
+# FA100  : Add `from __future__ import annotations` to simplify `typing.Dict`
+# PLC0105: `TypeVar` name "T_BuiltinScalar" does not reflect its covariance; consider renaming it to "T_BuiltinScalar_co"
+# PYI059 : `Generic[]` should always be the last base class
+"__init__.py" = ["F401"]
+"notebooks/**.ipynb" = ["E402"]
+"*.py" = ["UP009", "EXE001", "PYI061", "FA100", "PLC0105", "PYI059"]
