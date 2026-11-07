@@ -43,6 +43,9 @@ class TestRegistryHub(TestCase):
         tmpdir.mkdir(parents=True, exist_ok=True)
         cls.tmpdir = tmpdir
 
+    @unittest.skip(
+        "Disabled for now because it required internet connection that slows down tests."
+    )
     def test_cnext_register(self) -> None:
         register = RegistryHub(
             infos={
