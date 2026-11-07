@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 from dataclasses import dataclass
-from typing import Any, Generic, Iterable, Tuple, Union
+from typing import Any, Generic, Iterable, Tuple, Union, overload
 
 import pythonwrench as pw
 import torch
-from pythonwrench import BuiltinScalar, get_current_fn_name
+from pythonwrench import BuiltinScalar, EllipsisType, get_current_fn_name
 from torch import Tensor
 from typing_extensions import TypeVar
 
@@ -21,8 +21,19 @@ class InvalidTorchDType(metaclass=pw.Singleton):
         return f"{self.__class__.__name__}()"
 
 
-T_Invalid = TypeVar("T_Invalid", covariant=True, default=InvalidTorchDType)
-T_EmptyNp = TypeVar("T_EmptyNp", covariant=True, default=np.dtype)
+T_Invalid = TypeVar(
+    "T_Invalid",
+    torch.dtype,
+    str,
+    None,
+    EllipsisType,
+    InvalidTorchDType,
+    covariant=True,
+    default=InvalidTorchDType,
+)
+T_EmptyNp = TypeVar(
+    "T_EmptyNp", np.dtype, str, None, EllipsisType, covariant=True, default=np.dtype
+)
 T_EmptyTorch = TypeVar("T_EmptyTorch", covariant=True, default=InvalidTorchDType)
 
 
@@ -49,6 +60,26 @@ class ShapeDTypeInfo(Generic[T_Invalid, T_EmptyTorch, T_EmptyNp]):
             return "V"
 
 
+@overload
+def scan_shape_dtypes(
+    x: Any,
+    *,
+    accept_heterogeneous_shape: bool = False,
+    empty_torch: T_EmptyTorch = None,
+    empty_np: T_EmptyNp,
+) -> ShapeDTypeInfo[InvalidTorchDType, T_EmptyTorch, T_EmptyNp]: ...
+
+
+@overload
+def scan_shape_dtypes(
+    x: Any,
+    *,
+    accept_heterogeneous_shape: bool = False,
+    empty_torch: T_EmptyTorch = None,
+    empty_np: EllipsisType = ...,
+) -> ShapeDTypeInfo[InvalidTorchDType, T_EmptyTorch, np.dtype]: ...
+
+
 def scan_shape_dtypes(
     x: Any,
     *,
@@ -58,7 +89,7 @@ def scan_shape_dtypes(
 ) -> ShapeDTypeInfo[InvalidTorchDType, T_EmptyTorch, T_EmptyNp]:
     """Returns the shape and the hdf_dtype for an input."""
     if empty_np is ...:
-        empty_np = np.dtype("V")
+        empty_np = np.dtype("V")  # type: ignore
 
     valid_shape, shape = tw.get_shape(x, return_indicator=True)
     if not accept_heterogeneous_shape and not valid_shape:
@@ -77,15 +108,33 @@ def scan_shape_dtypes(
     return info
 
 
+@overload
 def scan_torch_dtype(
     x: Any,
     *,
-    invalid: T_Invalid = ...,
+    invalid: T_Invalid,
+    empty: T_EmptyTorch = None,
+) -> Union[torch.dtype, T_Invalid, T_EmptyTorch]: ...
+
+
+@overload
+def scan_torch_dtype(
+    x: Any,
+    *,
+    invalid: EllipsisType = ...,
+    empty: T_EmptyTorch = None,
+) -> Union[torch.dtype, InvalidTorchDType, T_EmptyTorch]: ...
+
+
+def scan_torch_dtype(
+    x: Any,
+    *,
+    invalid: Union[T_Invalid, EllipsisType] = ...,
     empty: T_EmptyTorch = None,
 ) -> Union[torch.dtype, T_Invalid, T_EmptyTorch]:
     """Returns torch dtype of an arbitrary object. Works recursively on tuples and lists. An instance of InvalidTorchDType can be returned if a str is passed."""
-    if empty is ...:
-        empty = InvalidTorchDType()
+    if invalid is ...:
+        invalid = InvalidTorchDType()
 
     if isinstance(x, (int, float, bool, complex)):
         torch_dtype = torch.as_tensor(x).dtype
@@ -120,7 +169,7 @@ def scan_numpy_dtype(
     empty: T_EmptyNp = ...,
 ) -> Union[np.dtype, T_EmptyNp]:
     if empty is ...:
-        empty = np.dtype("V")
+        empty = np.dtype("V")  # type: ignore
 
     if isinstance(x, (int, float, bool, complex)):
         numpy_dtype = np.array(x).dtype
