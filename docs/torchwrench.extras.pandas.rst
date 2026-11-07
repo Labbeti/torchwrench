@@ -13,3 +13,4 @@ Submodules
    :maxdepth: 4
 
    torchwrench.extras.pandas.definitions
+   torchwrench.extras.pandas.pandas
