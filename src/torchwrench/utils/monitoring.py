@@ -5,31 +5,38 @@ import logging
 import time
 from datetime import timedelta
 from typing import Optional
+from numbers import Number
+
+import pythonwrench as pw
 
 logger = logging.getLogger(__name__)
 
 
 def log_completion_time(
     step: int,
-    max_steps: int,
+    max_steps: Optional[int],
     epoch: int,
     max_epochs: Optional[int],
     fit_start_time: Optional[float],
 ) -> None:
-    step_completion_percent = step / max(max_steps, 1) * 100.0
-
-    if max_epochs is None:
-        epoch_completion_percent = 0.0
+    """Log completion time based on current step/epoch and estimated end time."""
+    if isinstance(max_steps, Number) and max_steps > 0:
+        step_completion_percent = step / max(max_steps, 1) * 100.0
     else:
+        step_completion_percent = 0.0
+
+    if isinstance(max_epochs, Number) and max_epochs > 0:
         epoch_completion_percent = epoch / max(max_epochs, 1) * 100.0
+    else:
+        epoch_completion_percent = 0.0
 
     completion_percent = max(step_completion_percent, epoch_completion_percent)
-    msg = f"Fit completion: {completion_percent:.1f}% (epoch: {epoch}/{max_epochs} ({epoch_completion_percent:.1f}%), step: {step}/{max_steps} ({step_completion_percent:.1f}%))"
+    msg = f"Completion: {completion_percent:.1f}% (epoch: {epoch}/{max_epochs} ({epoch_completion_percent:.1f}%), step: {step}/{max_steps} ({step_completion_percent:.1f}%))"
     logger.info(msg)
 
     if fit_start_time is None:
         msg = f"Cannot estimate end date because {fit_start_time=}."
-        logger.warning(msg)
+        pw.warn_once(msg)
     elif completion_percent == 0.0:
         pass
     else:
@@ -47,5 +54,5 @@ def log_completion_time(
             seconds=estimated_duration_remaining_s
         )
 
-        msg = f"Estimated fit end: {estimated_fit_end_date} (elapsed: {duration_elapsed_delta}, remaining: {estimated_duration_remaining_delta})"
+        msg = f"Estimated end: {estimated_fit_end_date} (elapsed: {duration_elapsed_delta}, remaining: {estimated_duration_remaining_delta})"
         logger.info(msg)
