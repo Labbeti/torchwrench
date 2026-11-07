@@ -30,4 +30,5 @@ def set_seed(
     if cudnn:
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
+
     return seed

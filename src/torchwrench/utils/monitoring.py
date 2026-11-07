@@ -3,10 +3,10 @@
 
 import logging
 import time
-from datetime import timedelta
 from dataclasses import dataclass
-from typing import Optional, Mapping, Tuple
+from datetime import timedelta
 from numbers import Real
+from typing import Mapping, Optional, Tuple
 
 import pythonwrench as pw
 from pythonwrench.datetime import ISO8601_HOUR_FORMAT_DOUBLE_DOT
