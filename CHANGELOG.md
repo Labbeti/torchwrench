@@ -3,7 +3,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.9.3] UNRELEASED
+## [0.9.3] 2026-11-08
 ### Added
 - `empty_dataframe`, `drop_duplicated_col_names`, `concat_without_duplicated_col_names` pandas functions in extras.
 - `log_completion_time` function helper in utils.
