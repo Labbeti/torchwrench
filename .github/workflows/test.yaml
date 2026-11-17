@@ -290,7 +290,7 @@ jobs:
 
     - name: Test with coverage + pytest
       run: |
-        uv run coverage run --debug=trace -m pytest -v '--ignore-glob=tests/**test_extras*.py'
+        uv run coverage run --debug=trace -m pytest -v '--ignore-glob=tests/test_extras/*.py'
 
     - name: Show coverage results
       run: |
